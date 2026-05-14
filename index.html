@@ -12,3 +12,639 @@
   body{background:#050c06;font-family:'Courier New',Courier,monospace;color:#dceede;}
 </style>
 </head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef}=React;
+const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
+
+const CITIES={
+  'Augusta':[33.47,-81.97],'Augusta, GA':[33.47,-81.97],
+  'Thomson':[33.47,-82.50],'Thomson, GA':[33.47,-82.50],
+  'Aiken':[33.56,-81.72],'Aiken, SC':[33.56,-81.72],
+  'North Augusta':[33.51,-81.96],'North Augusta, SC':[33.51,-81.96],
+  'Martinez':[33.52,-82.07],'Martinez, GA':[33.52,-82.07],
+  'Evans':[33.53,-82.13],'Evans, GA':[33.53,-82.13],
+  'Grovetown':[33.45,-82.20],'Grovetown, GA':[33.45,-82.20],
+  'Waynesboro':[33.09,-82.02],'Waynesboro, GA':[33.09,-82.02],
+  'Harlem':[33.42,-82.31],'Harlem, GA':[33.42,-82.31],
+  'Columbia':[34.00,-81.03],'Columbia, SC':[34.00,-81.03],
+  'Atlanta':[33.75,-84.39],'Atlanta, GA':[33.75,-84.39],
+  'Savannah':[32.08,-81.10],'Savannah, GA':[32.08,-81.10],
+  'Macon':[32.84,-83.63],'Macon, GA':[32.84,-83.63],
+  'Athens':[33.96,-83.38],'Athens, GA':[33.96,-83.38],
+  'Statesboro':[32.45,-81.78],'Statesboro, GA':[32.45,-81.78],
+  'Gainesville':[34.30,-83.82],'Gainesville, GA':[34.30,-83.82],
+  'Charlotte':[35.23,-80.84],'Charlotte, NC':[35.23,-80.84],
+  'Raleigh':[35.78,-78.64],'Raleigh, NC':[35.78,-78.64],
+  'Durham':[35.99,-78.90],'Durham, NC':[35.99,-78.90],
+  'Greensboro':[36.07,-79.79],'Greensboro, NC':[36.07,-79.79],
+  'Lexington':[35.82,-80.25],'Lexington, NC':[35.82,-80.25],
+  'Winston-Salem':[36.10,-80.24],'Winston-Salem, NC':[36.10,-80.24],
+  'Concord':[35.41,-80.58],'Concord, NC':[35.41,-80.58],
+  'Asheville':[35.58,-82.55],'Asheville, NC':[35.58,-82.55],
+  'Fayetteville':[35.05,-78.88],'Fayetteville, NC':[35.05,-78.88],
+  'Greenville':[34.85,-82.40],'Greenville, SC':[34.85,-82.40],
+  'Spartanburg':[34.95,-81.93],'Spartanburg, SC':[34.95,-81.93],
+  'Charleston':[32.78,-79.93],'Charleston, SC':[32.78,-79.93],
+  'Rock Hill':[34.93,-81.03],'Rock Hill, SC':[34.93,-81.03],
+  'Orangeburg':[33.49,-80.86],'Orangeburg, SC':[33.49,-80.86],
+  'Florence':[34.20,-79.76],'Florence, SC':[34.20,-79.76],
+  'Sumter':[33.92,-80.34],'Sumter, SC':[33.92,-80.34],
+  'Chattanooga':[35.05,-85.31],'Chattanooga, TN':[35.05,-85.31],
+  'Nashville':[36.16,-86.78],'Nashville, TN':[36.16,-86.78],
+  'Knoxville':[35.96,-83.92],'Knoxville, TN':[35.96,-83.92],
+  'Jacksonville':[30.33,-81.66],'Jacksonville, FL':[30.33,-81.66],
+  'Richmond':[37.54,-77.44],'Richmond, VA':[37.54,-77.44],
+  'Birmingham':[33.52,-86.80],'Birmingham, AL':[33.52,-86.80],
+  'Montgomery':[32.37,-86.30],'Montgomery, AL':[32.37,-86.30],
+  'Myrtle Beach':[33.69,-78.89],'Myrtle Beach, SC':[33.69,-78.89],
+  'Hilton Head':[32.22,-80.75],'Hilton Head, SC':[32.22,-80.75],
+  'Wilmington':[34.23,-77.95],'Wilmington, NC':[34.23,-77.95],
+  'High Point':[35.96,-80.00],'High Point, NC':[35.96,-80.00]
+};
+const BG_CITIES=[['Atlanta',33.75,-84.39],['Charlotte',35.23,-80.84],['Columbia',34.00,-81.03],['Charleston',32.78,-79.93],['Raleigh',35.78,-78.64],['Savannah',32.08,-81.10],['Greenville',34.85,-82.40],['Knoxville',35.96,-83.92],['Nashville',36.16,-86.78],['Birmingham',33.52,-86.80],['Richmond',37.54,-77.44],['Jacksonville',30.33,-81.66]];
+const toXY=(lat,lng)=>[((lng+88)/11)*340,((38.5-lat)/9.5)*210];
+const pCoords=s=>{if(!s)return null;const c=s.split(',')[0].trim();return CITIES[s.trim()]||CITIES[c]||null;};
+
+const LEADS=[
+  {id:1,name:"Jim Whitehead's Best One Tire",phone:"706-738-5126"},
+  {id:2,name:"Wingfoot Commercial Tire",phone:"706-738-4517"},
+  {id:3,name:"G&A Tires",phone:"706-750-0707 / 706-798-3377"},
+  {id:4,name:"Deluxe Car Care Wholesale Used Tires",phone:"706-526-0446"},
+  {id:5,name:"Smith Tire Co.",phone:"706-724-8277"},
+  {id:6,name:"Broad Street Tires",phone:"706-922-3022 / 706-364-5109"},
+  {id:7,name:"RNR Tire Express",phone:"706-860-6811"},
+  {id:8,name:"Goodyear Auto Service — Martinez",phone:"706-860-6200"},
+  {id:9,name:"Goodyear Auto Service — Belair Rd",phone:"706-228-5452"},
+  {id:10,name:"Aiken Discount Tire",phone:"803-642-6349"},
+  {id:11,name:"McKinney Tire Service",phone:"803-648-4040"},
+  {id:12,name:"Tyler's Tire & Auto Center",phone:"803-648-7201 / 803-642-0704"},
+  {id:13,name:"Gate 2 Tire & Auto Center",phone:"706-651-0500"},
+  {id:14,name:"Morris Tire & Auto",phone:"803-642-8251"},
+  {id:15,name:"Belair Building Supply",phone:"706-863-3447"},
+  {id:16,name:"Mulherin Lumber",phone:"706-863-6070 / 706-736-2039"},
+  {id:17,name:"Bradley Floorings of Augusta",phone:"762-246-6718"},
+  {id:18,name:"Augusta Carpet Mart",phone:"706-793-6629"},
+  {id:19,name:"Kelley Appliance Center",phone:"706-863-7098"},
+  {id:20,name:"Howard's Appliance",phone:"706-738-7751"},
+  {id:21,name:"Dave's Appliance Warehouse",phone:"706-305-1832"},
+  {id:22,name:"Weinberger's Furniture Warehouse",phone:"706-922-8163"},
+  {id:23,name:"Furniture Warehouse",phone:"706-651-1127"},
+  {id:24,name:"Precision Pallet",phone:"706-793-3200"},
+  {id:25,name:"CHEF'STORE Augusta",phone:"762-383-6900"},
+  {id:26,name:"Homefolks Wholesale / HFW Distributor",phone:"706-868-0055 / 800-762-7588"},
+  {id:27,name:"Sunbelt Rentals Augusta",phone:"706-772-4859"},
+  {id:28,name:"United Rentals — Mike Padgett Hwy",phone:"706-650-9898"},
+  {id:29,name:"United Rentals — Tubman Home Rd",phone:"706-796-6402"},
+  {id:30,name:"Herc Rentals Augusta",phone:"706-796-0823"},
+  {id:31,name:"Celebrations Party Rental",phone:"706-725-4386"},
+  {id:32,name:"A1 Bestway Logistics / Warehousing",phone:"706-793-1312"}
+];
+
+const SEED={id:1,date:'2026-05-08',pickup:'Thomson, GA',dropoff:'Lexington, NC',miles:252,dh:32,rpm:'4.00',pay:900,fuel:125,comments:'All-in RPM: $3.17 · Net after fuel: $775 · Net/all mi: $2.73'};
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+const STATUSES=['Not called','Called - No answer','Called - Interested','Called - Not interested','Follow up','Active customer'];
+const MAINT_TYPES=['Oil Change','Tire Rotation','DEF Fill','Brake Service','Air Filter','Fuel Filter','Tire Replacement','Inspection','Transmission Service','Other'];
+
+const sBadge=s=>s==='Active customer'||s==='Called - Interested'?{background:'#0b2e1a',color:'#4ade80',border:'1px solid #1a5530'}:s==='Follow up'?{background:'#271d00',color:'#fbbf24',border:'1px solid #4d3800'}:s==='Called - Not interested'?{background:'#2a0808',color:'#f87171',border:'1px solid #4d1515'}:s==='Called - No answer'?{background:'#181d18',color:'#6b8070',border:'1px solid #2a2f2a'}:{background:'transparent',color:DIM,border:'1px solid #1a2e1e'};
+const rC=r=>r>=3.5?'#4ade80':r>=2.5?'#fbbf24':'#f87171';
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const cbColor=d=>{if(!d)return null;const t=todayStr();if(d<t)return '#f87171';if(d===t)return '#fbbf24';return G;};
+
+// localStorage persistence (works in a local HTML file)
+const sg=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}};
+const ss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
+
+function makeDB(url,key){
+  const H=(x={})=>({'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json',...x});
+  const base=url+'/rest/v1';
+  return{
+    get:async p=>{const r=await fetch(base+'/'+p,{headers:H()});if(!r.ok)throw new Error(r.status);return r.json();},
+    post:async(p,b,u=false)=>{const ex=u?{'Prefer':'resolution=merge-duplicates,return=representation'}:{'Prefer':'return=representation'};const r=await fetch(base+'/'+p,{method:'POST',headers:H(ex),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null;},
+    patch:async(p,b)=>{const r=await fetch(base+'/'+p,{method:'PATCH',headers:H(),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);},
+    del:async p=>{const r=await fetch(base+'/'+p,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(r.status);}
+  };
+}
+
+function SetupScreen({onConnect,onSkip}){
+  const [url,setUrl]=useState('');const [key,setKey]=useState('');const [testing,setTesting]=useState(false);const [err,setErr]=useState('');
+  const connect=async()=>{
+    if(!url.trim()||!key.trim()){setErr('Both fields required.');return;}
+    const u=url.trim().replace(/\/$/,'');setTesting(true);setErr('');
+    try{
+      const r=await fetch(u+'/rest/v1/gg_weekly?id=eq.1',{headers:{'apikey':key.trim(),'Authorization':'Bearer '+key.trim()}});
+      if(!r.ok)throw new Error('HTTP '+r.status+' — check URL/key and run supabase_setup.sql first');
+      ss('gg-su',u);ss('gg-sk',key.trim());
+      onConnect(u,key.trim());
+    }catch(e){setErr(e.message);}
+    setTesting(false);
+  };
+  return(
+    <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:460,width:'100%'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
+          <span style={{fontSize:24}}>🐊</span>
+          <div>
+            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Connect <span style={{color:G}}>Green Gator</span> to Cloud</div>
+            <div style={{color:DIM,fontSize:11,marginTop:2}}>Supabase powers Telegram bot sync</div>
+          </div>
+        </div>
+        <div style={{marginBottom:12}}>
+          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Supabase Project URL</span>
+          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://xxxxxxxxxxxx.supabase.co"/>
+        </div>
+        <div style={{marginBottom:16}}>
+          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Anon / Public Key</span>
+          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={key} onChange={e=>setKey(e.target.value)} placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."/>
+        </div>
+        {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6,border:'1px solid rgba(248,113,113,.2)'}}>⚠ {err}</div>}
+        <div style={{display:'flex',gap:8}}>
+          <button onClick={connect} disabled={testing} style={{flex:1,background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:testing?.6:1}}>{testing?'Testing...':'Connect Dashboard →'}</button>
+          <button onClick={onSkip} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Skip</button>
+        </div>
+        <div style={{marginTop:14,padding:'10px 12px',background:'rgba(57,255,107,.04)',border:'1px solid rgba(57,255,107,.1)',borderRadius:7,fontSize:10,color:DIM,lineHeight:1.7}}>
+          <span style={{color:G,fontWeight:700}}>Setup:</span> supabase.com → New Project → SQL Editor → run supabase_setup.sql → Settings → API → copy URL + anon key.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  useEffect(()=>{
+    const s=document.createElement('style');
+    s.textContent=`
+      @keyframes gp{0%,100%{opacity:1;box-shadow:0 0 6px #39ff6b}50%{opacity:.1}}
+      @keyframes gg{0%,100%{text-shadow:0 0 20px rgba(57,255,107,.35)}50%{text-shadow:0 0 45px rgba(57,255,107,.7)}}
+      @keyframes ga{0%,100%{text-shadow:0 0 15px rgba(251,191,36,.3)}50%{text-shadow:0 0 40px rgba(251,191,36,.65)}}
+      @keyframes gr2{0%,100%{text-shadow:0 0 15px rgba(248,113,113,.3)}50%{text-shadow:0 0 35px rgba(248,113,113,.6)}}
+      @keyframes cbpulse{0%,100%{opacity:1}50%{opacity:.3}}
+      @keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+      .gg{animation:gg 3s ease-in-out infinite}.ga{animation:ga 3s ease-in-out infinite}.gr{animation:gr2 3s ease-in-out infinite}
+      .ld{width:7px;height:7px;border-radius:50%;background:#39ff6b;display:inline-block;animation:gp 1.6s infinite;flex-shrink:0}
+      .nav{background:rgba(5,12,6,.97);border-bottom:1px solid #1a3520;padding:0 16px;display:flex;align-items:center;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+      .nav-logo{display:flex;align-items:center;gap:8px;padding:12px 14px 12px 0;border-right:1px solid #1a3520;margin-right:6px;flex-shrink:0}
+      .nav-tab{padding:14px 12px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;color:#3d5c45;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;user-select:none}
+      .nav-tab:hover{color:#39ff6b}.nav-tab.active{color:#39ff6b;border-bottom-color:#39ff6b}
+      .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+      .section{padding:18px 16px;animation:fadeup .35s ease both}
+      .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #1a3520;flex-wrap:wrap;gap:8px}
+      .sec-title{font-size:17px;font-weight:700;color:#dceede;display:flex;align-items:center;gap:10px}
+      .sec-title::before{content:'';width:4px;height:20px;background:linear-gradient(to bottom,#39ff6b,#00cc44);border-radius:2px;flex-shrink:0}
+      .card{background:linear-gradient(150deg,#0c1c0e,#081108);border:1px solid #1c3822;border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:border-color .2s}
+      .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(57,255,107,.15),transparent)}
+      .card:hover{border-color:rgba(57,255,107,.2)}
+      .kpi{background:linear-gradient(150deg,#0c1c0e,#081108);border:1px solid #1c3822;border-radius:12px;padding:16px 14px;position:relative;overflow:hidden;transition:all .2s}
+      .kpi:hover{border-color:rgba(57,255,107,.25)}
+      .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(57,255,107,.2),transparent)}
+      .inp{background:rgba(4,9,5,.9);border:1px solid #1c3822;border-radius:7px;color:#dceede;padding:8px 11px;font-size:12px;width:100%;outline:none;font-family:inherit;-webkit-appearance:none;transition:border-color .2s}
+      .inp:focus{border-color:rgba(57,255,107,.4)}
+      select.inp option{background:#0c1c0e}
+      .lbl{color:#4a6d52;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;display:block}
+      .btn{background:#39ff6b;color:#030803;border:none;border-radius:7px;padding:9px 16px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;box-shadow:0 0 20px rgba(57,255,107,.2);transition:all .15s;white-space:nowrap}
+      .btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+      .btn:active{transform:none;filter:brightness(.92)}
+      .btn-g{background:transparent;color:#39ff6b;border:1px solid #1c3822;border-radius:7px;padding:8px 14px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px;transition:all .15s;white-space:nowrap}
+      .btn-g:hover{border-color:rgba(57,255,107,.4);background:rgba(57,255,107,.05)}
+      .btn-amber{background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.25);border-radius:6px;padding:7px 13px;cursor:pointer;font-size:11px;font-family:inherit;font-weight:700;transition:all .15s}
+      .btn-amber:hover{background:rgba(251,191,36,.15)}
+      .btn-danger{background:rgba(248,113,113,.07);color:#f87171;border:1px solid rgba(248,113,113,.2);border-radius:5px;padding:3px 10px;cursor:pointer;font-size:10px;font-family:inherit;transition:background .15s}
+      .btn-danger:hover{background:rgba(248,113,113,.15)}
+      .tbl{width:100%;border-collapse:collapse;font-size:11px}
+      .tbl th{color:#39ff6b;font-size:9px;padding:8px 10px;text-align:left;font-weight:700;letter-spacing:.1em;white-space:nowrap;border-bottom:1px solid #1c3822;background:rgba(57,255,107,.03)}
+      .tbl td{padding:8px 10px;border-bottom:1px solid #142818;transition:background .1s;color:#dceede}
+      .tbl tr:hover td{background:rgba(57,255,107,.03)}
+      .tbl tr.sel td{background:#0d2210}.tbl tr.sel td:first-child{border-left:2px solid rgba(57,255,107,.5)}
+      .sb{display:inline-block;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+      .stat{background:rgba(4,9,5,.7);border:1px solid #1c3822;border-radius:8px;padding:10px 12px}
+      .pg{height:5px;border-radius:3px;background:#142818;overflow:hidden}
+      .pgf{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+      .dv{height:1px;background:linear-gradient(90deg,transparent,#1c3822 20%,#1c3822 80%,transparent);margin:12px 0}
+      .g12{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px}
+      .g11{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+      .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+      .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+      .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
+      .cb-today{animation:cbpulse 1.2s ease-in-out infinite}
+      .cdv{border-radius:5px;padding:3px;min-height:40px;cursor:pointer;transition:background .12s}
+      .cdv:hover{background:#0d2212!important}
+      @media(max-width:600px){
+        .g4{grid-template-columns:repeat(2,1fr)}
+        .g12{grid-template-columns:1fr}
+        .g11{grid-template-columns:1fr}
+        .nav-tab{padding:10px 8px;font-size:9px}
+      }
+    `;
+    document.head.appendChild(s);
+    return()=>document.head.removeChild(s);
+  },[]);
+
+  const [appState,setAppState]=useState('init');
+  const [db,setDb]=useState(null);
+  const [sec,setSec]=useState('overview');
+  const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:'5.15',mpg:'9',tg:'5000'});
+  const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:'Not called',notes:'',callbackDate:''})));
+  const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
+  const [search,setSearch]=useState('');
+  const [statusFilter,setStatusFilter]=useState('All');
+  const [log,setLog]=useState([SEED]);
+  const [logF,setLogF]=useState({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});
+  const [addLog,setAddLog]=useState(false);
+  const [route,setRoute]=useState(SEED);
+  const [bal,setBal]=useState('26921');const [maint2,setMaint2]=useState('4000');
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26921');const [tMaint,setTMaint]=useState('4000');
+  const nowD=new Date();
+  const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
+  const [toast,setToast]=useState('');
+  const [maintLog,setMaintLog]=useState([]);
+  const [maintF,setMaintF]=useState({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});
+  const [addMaint,setAddMaint]=useState(false);
+  const [weekHistory,setWeekHistory]=useState([]);
+  const [showReset,setShowReset]=useState(false);
+  const refs={overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
+
+  const loadLocal=()=>{
+    const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
+    if(w)setW(w);if(l)setLeads(l);
+    if(lg){setLog(lg);if(lg[0])setRoute(lg[0]);}
+    if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}}
+    if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);
+  };
+  const loadSupa=async(d)=>{
+    try{
+      const [wR,lR,lgR,cfR,mlR,whR]=await Promise.all([
+        d.get('gg_weekly?id=eq.1&select=*'),
+        d.get('gg_leads?select=*&order=id'),
+        d.get('gg_log?select=*&order=created_at.desc'),
+        d.get('gg_config?select=key,value'),
+        d.get('gg_maintenance?select=*&order=created_at.desc').catch(()=>[]),
+        d.get('gg_weekly_history?select=*&order=week_end.desc&limit=8').catch(()=>[]),
+      ]);
+      if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||5.15),mpg:String(r.mpg||9),tg:String(r.tg||5000)});}
+      if(lR?.length)setLeads(lR.map(l=>({...l,callbackDate:l.callback_date||''})));
+      if(lgR?.length){setLog(lgR);setRoute(lgR[0]);}
+      const cfg=Object.fromEntries((cfR||[]).map(r=>[r.key,r.value]));
+      if(cfg.truck_balance){setBal(cfg.truck_balance);setTBal(cfg.truck_balance);}
+      if(cfg.maintenance_reserve){setMaint2(cfg.maintenance_reserve);setTMaint(cfg.maintenance_reserve);}
+      if(mlR?.length)setMaintLog(mlR);
+      if(whR?.length)setWeekHistory(whR);
+    }catch(e){console.log('Supa err',e);loadLocal();}
+  };
+
+  useEffect(()=>{
+    const su=sg('gg-su'),sk=sg('gg-sk');
+    if(su&&sk){const d=makeDB(su,sk);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}
+    else{loadLocal();setAppState('ready');}
+  },[]);
+
+  const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
+  const navTo=id=>{setSec(id);setTimeout(()=>refs[id]?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
+
+  const saveW=async(k,v)=>{
+    const u={...W,[k]:v};setW(u);
+    if(db)try{await db.post('gg_weekly',{id:1,ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||5.15,mpg:parseFloat(u.mpg)||9,tg:parseFloat(u.tg)||5000},true);}catch{}
+    else ss('gg-w',u);
+  };
+  const saveLead=async()=>{
+    const i=parseInt(lf.num)-1;if(i<0||i>=leads.length)return;
+    const u=leads.map((l,x)=>x===i?{...l,status:lf.status,notes:lf.notes,callbackDate:lf.callbackDate}:l);
+    setLeads(u);
+    if(db)try{await db.patch('gg_leads?id=eq.'+leads[i].id,{status:lf.status,notes:lf.notes,callback_date:lf.callbackDate||null});}catch{}
+    else ss('gg-l',u);
+    flash('Lead #'+lf.num+' saved');
+  };
+  const doAddLog=async()=>{
+    const e={id:Date.now(),date:logF.date,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:logF.rpm,pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
+    const u=[e,...log];setLog(u);setRoute(e);setAddLog(false);
+    if(db)try{await db.post('gg_log',{date:e.date,pickup:e.pickup,dropoff:e.dropoff,miles:e.miles,dh:e.dh,rpm:e.rpm,pay:e.pay,fuel:e.fuel,comments:e.comments});}catch{}
+    else ss('gg-lg',u);
+    setLogF({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});flash('Load logged');
+  };
+  const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
+  const saveCfg=async()=>{
+    setBal(tBal);setMaint2(tMaint);
+    if(db)try{await db.patch('gg_config?key=eq.truck_balance',{value:tBal});await db.patch('gg_config?key=eq.maintenance_reserve',{value:tMaint});}catch{}
+    else ss('gg-c',{b:tBal,m:tMaint});
+    setEditCfg(false);flash('Config saved');
+  };
+  const doAddMaint=async()=>{
+    const e={id:Date.now(),...maintF,cost:parseFloat(maintF.cost)||0,mileage:parseFloat(maintF.mileage)||0};
+    const u=[e,...maintLog];setMaintLog(u);
+    if(db)try{await db.post('gg_maintenance',{date:e.date,type:e.type,mileage:e.mileage,cost:e.cost,notes:e.notes});}catch{}
+    else ss('gg-ml',u);
+    setAddMaint(false);setMaintF({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});flash('Maintenance saved');
+  };
+  const delMaint=async id=>{const u=maintLog.filter(e=>e.id!==id);setMaintLog(u);if(!db)ss('gg-ml',u);};
+  const doWeekReset=async()=>{
+    const snap={id:Date.now(),weekEnd:todayStr(),ar:W.ar,dg:W.dg,dl:W.dl,mi:W.mi,gross:(parseFloat(W.ar)||0)+(parseFloat(W.dg)||0)+(parseFloat(W.dl)||0),net:net,loads:log.filter(e=>new Date(e.date)>new Date(Date.now()-7*864e5)).length};
+    const h2=[snap,...weekHistory].slice(0,12);setWeekHistory(h2);
+    const cleared={...W,ar:'',dg:'',dl:'',fs:'',mi:''};setW(cleared);
+    if(db)try{await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||5.15,mpg:parseFloat(W.mpg)||9,tg:parseFloat(W.tg)||5000},true);}catch{}
+    ss('gg-w',cleared);ss('gg-wh',h2);setShowReset(false);flash('Week archived & tracker reset');
+  };
+  const disconnectSupa=async()=>{
+    try{localStorage.removeItem('gg-su');localStorage.removeItem('gg-sk');}catch{}
+    setDb(null);flash('Disconnected from Supabase');
+  };
+  const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
+
+  const ar=parseFloat(W.ar)||0,dg=parseFloat(W.dg)||0,dl=parseFloat(W.dl)||0;
+  const gross=ar+dg+dl,tgt=parseFloat(W.tg)||5000,gap=Math.max(0,tgt-gross);
+  const mi=parseFloat(W.mi)||0,mpg=parseFloat(W.mpg)||9,fp=parseFloat(W.fp)||5.15;
+  const estF=mi>0?(mi/mpg)*fp:0,entF=parseFloat(W.fs)||0;
+  const useF=entF>0?entF:estF,net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
+  const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
+  const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
+  const avgRpm=(()=>{const tm=log.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=log.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?tn/tm:0;})();
+  const moMonth=nowD.getMonth(),moYear=nowD.getFullYear();
+  const moKey=`${moYear}-${String(moMonth+1).padStart(2,'0')}`;
+  const moName=MONTHS[moMonth]+' '+moYear;
+  const moLogs=log.filter(e=>e.date?.startsWith(moKey));
+  const moGross=moLogs.reduce((s,e)=>s+(e.pay||0),0);
+  const moFuel=moLogs.reduce((s,e)=>s+(e.fuel||0),0);
+  const moNet=moGross-moFuel;const moProfit=moNet-2331;
+  const moMiles=moLogs.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);
+  const overdue=leads.filter(l=>l.callbackDate&&l.callbackDate<todayStr());
+  const dueToday=leads.filter(l=>l.callbackDate===todayStr());
+  const filtered=leads.filter(l=>{const ms=statusFilter==='All'||l.status===statusFilter;const mq=!search||l.name.toLowerCase().includes(search.toLowerCase())||l.phone.includes(search);return ms&&mq;});
+  const {y:cy,m:cm}=cal;
+  const fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate();
+  const dLogs=d=>{const s=`${cy}-${String(cm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return log.filter(e=>e.date===s);};
+
+  if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
+  if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
+
+  const SH=({t,right})=><div className="sec-hd"><div className="sec-title">{t}</div>{right&&<div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>{right}</div>}</div>;
+  const Stat=({l,v,c,sub})=><div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:4}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:15,lineHeight:1}}>{v}</div>{sub&&<div style={{color:DIM,fontSize:10,marginTop:3}}>{sub}</div>}</div>;
+
+  return(
+    <div style={{fontFamily:"'Courier New',Courier,monospace",color:'#dceede',background:'#050c06',backgroundImage:'linear-gradient(rgba(26,53,32,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.12) 1px,transparent 1px)',backgroundSize:'36px 36px',minHeight:'100vh'}}>
+
+      {/* NAV */}
+      <div className="nav">
+        <div className="nav-logo">
+          <span style={{fontSize:18}}>🐊</span>
+          <div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div>
+        </div>
+        {['overview','pipeline','logbook','maintenance'].map(id=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{id.charAt(0).toUpperCase()+id.slice(1)}</div>)}
+        <div className="nav-right">
+          {(overdue.length>0||dueToday.length>0)&&<span style={{color:overdue.length>0?'#f87171':'#fbbf24',fontSize:10,padding:'3px 9px',border:`1px solid ${overdue.length>0?'rgba(248,113,113,.25)':'rgba(251,191,36,.25)'}`,borderRadius:5,background:overdue.length>0?'rgba(248,113,113,.06)':'rgba(251,191,36,.06)',cursor:'pointer'}} onClick={()=>navTo('pipeline')}>{overdue.length>0?`⚠ ${overdue.length} overdue`:`${dueToday.length} due today`}</span>}
+          {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
+          {db?<>
+            <button onClick={refreshSupa} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>↻ Sync</button>
+            <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 9px',border:'1px solid rgba(57,255,107,.2)',borderRadius:6,background:'rgba(57,255,107,.05)',cursor:'pointer'}} onClick={disconnectSupa}><span className="ld"/><span style={{color:G,fontSize:9,fontWeight:700,letterSpacing:'.1em'}}>CLOUD</span></div>
+          </>:<button onClick={()=>setAppState('setup')} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>☁ Connect</button>}
+        </div>
+      </div>
+
+      {/* OVERVIEW */}
+      {sec==='overview'&&<div className="section" ref={refs.overview}>
+        <SH t="Overview" right={showReset?<div style={{display:'flex',gap:6,alignItems:'center',padding:'6px 12px',background:'rgba(251,191,36,.07)',border:'1px solid rgba(251,191,36,.2)',borderRadius:8}}>
+          <span style={{color:'#fbbf24',fontSize:11}}>Archive week & clear tracker?</span>
+          <button className="btn" style={{fontSize:10,padding:'5px 12px'}} onClick={doWeekReset}>Yes, Reset</button>
+          <button className="btn-g" style={{fontSize:10,padding:'5px 12px'}} onClick={()=>setShowReset(false)}>Cancel</button>
+        </div>:<button className="btn-amber" onClick={()=>setShowReset(true)}>⟳ Reset Week</button>}/>
+
+        <div className="g4" style={{marginBottom:12}}>
+          <div className="kpi">
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Weekly Gross</div>
+            <div className={gross>0?'gg':''} style={{fontSize:28,fontWeight:700,color:gross>0?G:'#dceede',lineHeight:1,marginBottom:8}}>${gross.toLocaleString()}</div>
+            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:pct+'%',background:`linear-gradient(90deg,${pc}88,${pc})`}}/></div>
+            <div style={{display:'flex',justifyContent:'space-between'}}><span style={{fontSize:9,color:DIM}}>{pct.toFixed(0)}% of ${tgt.toLocaleString()}</span><span style={{fontSize:9,color:pc}}>{pct>=100?'✓ DONE':'$'+gap.toLocaleString()+' to go'}</span></div>
+          </div>
+          <div className="kpi">
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Net After Fuel</div>
+            <div className={net>=0?'gg':'gr'} style={{fontSize:28,fontWeight:700,color:net>=0?G:'#f87171',lineHeight:1,marginBottom:6}}>${net.toFixed(0)}</div>
+            <div style={{color:DIM,fontSize:10}}>Fuel: ${useF.toFixed(0)}{entF>0?' entered':mi>0?' est.':' —'}</div>
+            {mi>0&&<div style={{color:rC(net/mi),fontWeight:700,fontSize:11,marginTop:3}}>Net RPM: ${(net/mi).toFixed(2)}/mi</div>}
+          </div>
+          <div className="kpi">
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Break-Even</div>
+            <div className={bePct>=100?'gg':'ga'} style={{fontSize:28,fontWeight:700,color:bePct>=100?G:'#fbbf24',lineHeight:1,marginBottom:8}}>{bePct.toFixed(0)}%</div>
+            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:bePct+'%',background:`linear-gradient(90deg,${bePct>=100?G:'#fbbf24'}88,${bePct>=100?G:'#fbbf24'})`}}/></div>
+            <div style={{fontSize:9,color:bePct>=100?G:'#f87171'}}>{bePct>=100?'Overhead covered ✓':'$'+(fixedWk-Math.max(0,net)).toFixed(0)+' short of $'+fixedWk.toFixed(0)}</div>
+          </div>
+          <div className="kpi">
+            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent,rgba(248,113,113,.3),transparent)'}}/>
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Truck Payoff</div>
+            <div className="gr" style={{fontSize:28,fontWeight:700,color:'#f87171',lineHeight:1,marginBottom:8}}>${parseFloat(bal).toLocaleString()}</div>
+            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:((40000-parseFloat(bal))/40000)*100+'%',background:'linear-gradient(90deg,#f87171aa,#f87171)'}}/></div>
+            <div style={{fontSize:9,color:DIM}}>2020 MV607 · {(((40000-parseFloat(bal))/40000)*100).toFixed(0)}% paid</div>
+          </div>
+        </div>
+
+        <div className="g12" style={{marginBottom:12}}>
+          <div className="card">
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Truck & Config</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:12}}>{['2020 MV607','26ft box + liftgate','2 pallet jacks','15 straps'].map(t=><span key={t} style={{background:'rgba(57,255,107,.06)',color:G,padding:'4px 10px',borderRadius:20,fontSize:10,border:'1px solid rgba(57,255,107,.18)'}}>{t}</span>)}</div>
+            <div className="dv"/>
+            {editCfg?<>
+              <span className="lbl">Truck Balance</span><input className="inp" style={{marginBottom:8}} value={tBal} onChange={e=>setTBal(e.target.value)}/>
+              <span className="lbl">Maint. Reserve</span><input className="inp" style={{marginBottom:10}} value={tMaint} onChange={e=>setTMaint(e.target.value)}/>
+              <div style={{display:'flex',gap:7}}><button className="btn" style={{fontSize:11,padding:'7px 14px'}} onClick={saveCfg}>Save</button><button className="btn-g" style={{fontSize:11,padding:'7px 14px'}} onClick={()=>setEditCfg(false)}>Cancel</button></div>
+            </>:<>
+              <div className="g11" style={{marginBottom:12}}>
+                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Maint. Reserve</div><div style={{color:G,fontWeight:700,fontSize:16}}>${parseFloat(maint2).toLocaleString()}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Protected.</div></div>
+                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Fixed Monthly</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>$2,331</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Ins+truck+addr+DAT+QB</div></div>
+              </div>
+              <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>{setTBal(bal);setTMaint(maint2);setEditCfg(true);}}>Edit Config</button>
+            </>}
+          </div>
+          <div className="card">
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Weekly Money Tracker</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+              {[{l:'Amazon Relay',k:'ar'},{l:'DAT Gross',k:'dg'},{l:'Direct Local',k:'dl'},{l:'Fuel Spend',k:'fs'},{l:'Miles Driven',k:'mi'},{l:'Fuel $/Gal',k:'fp'},{l:'MPG',k:'mpg'},{l:'Target Gross',k:'tg'}].map(({l,k})=><div key={k}><span className="lbl">{l}</span><input className="inp" value={W[k]} onChange={e=>saveW(k,e.target.value)} inputMode="decimal"/></div>)}
+            </div>
+          </div>
+        </div>
+
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>{moName} — Monthly Earnings</div>
+            {moLogs.length>0&&<span style={{background:'rgba(57,255,107,.08)',color:G,border:'1px solid rgba(57,255,107,.2)',borderRadius:5,padding:'3px 9px',fontSize:10,fontWeight:700}}>{moLogs.length} loads</span>}
+          </div>
+          {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet.</div>:<>
+            <div className="g-auto" style={{marginBottom:12}}>
+              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'Net Revenue',v:'$'+moNet.toLocaleString(),c:G},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'True Profit',v:'$'+moProfit.toLocaleString(),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'After all costs':'Below costs'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+            </div>
+            <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
+          </>}
+        </div>
+
+        {weekHistory.length>0&&<div className="card">
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Past Weeks</div>
+          <div style={{overflowX:'auto'}}>
+            <table className="tbl">
+              <thead><tr>{['WEEK END','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>{weekHistory.map(w=><tr key={w.id}><td style={{color:DIM,fontSize:10}}>{w.weekEnd}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>)}</tbody>
+            </table>
+          </div>
+        </div>}
+      </div>}
+
+      {/* PIPELINE */}
+      {sec==='pipeline'&&<div className="section" ref={refs.pipeline}>
+        <SH t="Lead Pipeline" right={<>
+          <span style={{color:DIM,fontSize:11}}>{leads.filter(l=>l.status==='Active customer').length} active · {leads.filter(l=>l.status==='Called - Interested').length} interested</span>
+          <span style={{color:DIM,fontSize:11}}>{leads.filter(l=>l.status!=='Not called'&&l.status!=='Called - Not interested').length}/{leads.length} engaged</span>
+        </>}/>
+        <div style={{marginBottom:12,display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+          <input className="inp" style={{width:200}} placeholder="Search leads..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          <select className="inp" style={{width:180}} value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option>All</option>{STATUSES.map(s=><option key={s}>{s}</option>)}</select>
+          <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
+            <div className="pg" style={{width:120}}><div className="pgf" style={{width:(leads.filter(l=>l.status!=='Not called').length/leads.length)*100+'%',background:`linear-gradient(90deg,${G}88,${G})`}}/></div>
+            <span style={{color:DIM,fontSize:10}}>{leads.filter(l=>l.status!=='Not called').length}/{leads.length} called</span>
+          </div>
+        </div>
+        <div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
+          <div style={{overflowX:'auto'}}>
+            <table className="tbl">
+              <thead><tr>{['#','BUSINESS','PHONE','STATUS','CALLBACK','NOTES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>{filtered.map(l=>{const cb=cbColor(l.callbackDate);return <tr key={l.id} style={{cursor:'pointer'}} onClick={()=>{const ld=leads.find(x=>x.id===l.id);setLf({num:String(l.id),status:ld.status,notes:ld.notes,callbackDate:ld.callbackDate||''});}}>
+                <td style={{color:DIM,fontSize:10,width:28}}>{l.id}</td>
+                <td style={{color:'#c8e0cc',fontWeight:700,whiteSpace:'nowrap',maxWidth:180,overflow:'hidden',textOverflow:'ellipsis'}}>{l.name}</td>
+                <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{l.phone}</td>
+                <td><span className="sb" style={sBadge(l.status)}>{l.status}</span></td>
+                <td>{l.callbackDate?<span style={{color:cb,fontSize:10,fontWeight:700}} className={l.callbackDate===todayStr()?'cb-today':''}>{l.callbackDate===todayStr()?'TODAY':l.callbackDate<todayStr()?'⚠ '+l.callbackDate:l.callbackDate}</span>:<span style={{color:DIM,fontSize:10}}>—</span>}</td>
+                <td style={{color:DIM,fontSize:10,maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{l.notes||'—'}</td>
+              </tr>;})}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="card">
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Update Lead #{lf.num}{leads.find(l=>l.id===parseInt(lf.num))?' — '+leads.find(l=>l.id===parseInt(lf.num))?.name:''}</div>
+          <div style={{display:'grid',gridTemplateColumns:'80px 160px 1fr auto',gap:10,alignItems:'flex-end',marginBottom:10}}>
+            <div><span className="lbl">Lead #</span><input className="inp" value={lf.num} onChange={e=>{const l=leads.find(x=>x.id===parseInt(e.target.value));setLf({num:e.target.value,status:l?.status||'Not called',notes:l?.notes||'',callbackDate:l?.callbackDate||''});}} inputMode="numeric"/></div>
+            <div><span className="lbl">Status</span><select className="inp" value={lf.status} onChange={e=>setLf({...lf,status:e.target.value})}>{STATUSES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
+            <div><span className="lbl">Notes</span><input className="inp" value={lf.notes} onChange={e=>setLf({...lf,notes:e.target.value})} placeholder="Decision maker, best time to call..."/></div>
+            <button className="btn" onClick={saveLead}>Save</button>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'180px 1fr',gap:10,alignItems:'center'}}>
+            <div><span className="lbl">Callback Date</span><input className="inp" type="date" value={lf.callbackDate} onChange={e=>setLf({...lf,callbackDate:e.target.value})} style={{colorScheme:'dark'}}/></div>
+            {lf.callbackDate&&<div style={{color:cbColor(lf.callbackDate),fontSize:11,fontWeight:700}}>{lf.callbackDate<todayStr()?'⚠ OVERDUE':lf.callbackDate===todayStr()?'📞 Call today':'Set for '+lf.callbackDate}</div>}
+          </div>
+        </div>
+      </div>}
+
+      {/* LOGBOOK */}
+      {sec==='logbook'&&<div className="section" ref={refs.logbook}>
+        <SH t="Load Logbook" right={<>
+          {[{l:'Loads',v:log.length},{l:'Total Gross',v:'$'+log.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:avgRpm>0?'$'+avgRpm.toFixed(2):'—'}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
+        </>}/>
+        <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>setAddLog(!addLog)}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
+        {addLog&&<div className="card" style={{marginBottom:12}}>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>New Load Entry</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
+            {[{l:'Date',k:'date',t:'date'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'}].map(({l,k,t})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} onChange={e=>setLogF({...logF,[k]:e.target.value})} inputMode={t==='number'?'decimal':undefined}/></div>)}
+          </div>
+          <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
+          <button className="btn" onClick={doAddLog}>Add to Logbook</button>
+        </div>}
+        {log.length>0&&<div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
+          <div style={{overflowX:'auto'}}>
+            <table className="tbl">
+              <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','FUEL','NET','NET RPM',''].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>{log.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
+                return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
+                  <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{e.date}</td>
+                  <td style={{whiteSpace:'nowrap'}}>{e.pickup}</td><td style={{whiteSpace:'nowrap'}}>{e.dropoff}</td>
+                  <td>{e.miles}mi</td><td style={{color:DIM}}>{e.dh}mi</td>
+                  <td style={{color:rC(ai),fontWeight:700}}>${ai.toFixed(2)}</td>
+                  <td style={{color:G,fontWeight:700}}>${e.pay}</td><td style={{color:'#f87171'}}>${e.fuel}</td>
+                  <td style={{color:np>=0?G:'#f87171',fontWeight:700}}>${np}</td>
+                  <td><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
+                  <td><button className="btn-danger" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>Del</button></td>
+                </tr>;
+              })}</tbody>
+            </table>
+          </div>
+        </div>}
+        <div className="g11">
+          <div className="card">
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
+              <button className="btn-g" style={{padding:'5px 11px'}} onClick={()=>setCal(cm===0?{y:cy-1,m:11}:{y:cy,m:cm-1})}>←</button>
+              <span style={{color:G,fontWeight:700,fontSize:13}}>{MONTHS[cm]} {cy}</span>
+              <button className="btn-g" style={{padding:'5px 11px'}} onClick={()=>setCal(cm===11?{y:cy+1,m:0}:{y:cy,m:cm+1})}>→</button>
+            </div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>{DAYS.map(d=><div key={d} style={{color:DIM,fontSize:9,textAlign:'center',paddingBottom:5,fontWeight:700}}>{d}</div>)}</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2}}>
+              {Array(fd).fill(null).map((_,i)=><div key={'e'+i}/>)}
+              {Array(dim).fill(null).map((_,i)=>{const d=i+1,dl=dLogs(d),isT=d===nowD.getDate()&&cm===nowD.getMonth()&&cy===nowD.getFullYear();
+                return <div key={d} className="cdv" style={{border:isT?'1px solid rgba(57,255,107,.6)':`1px solid ${dl.length?BD:'transparent'}`,background:dl.length?'rgba(57,255,107,.04)':'transparent',boxShadow:isT?'0 0 12px rgba(57,255,107,.2)':'none'}}>
+                  <div style={{color:isT?G:DIM,fontSize:9,marginBottom:1,fontWeight:isT?700:400}}>{d}</div>
+                  {dl.slice(0,1).map(e=><div key={e.id} style={{color:'#4ade80',fontSize:7,lineHeight:1.3}}>{e.pickup?.split(',')[0]}→{e.dropoff?.split(',')[0]}<br/><span style={{color:G,fontWeight:700}}>${e.pay}</span></div>)}
+                </div>;
+              })}
+            </div>
+          </div>
+          <div className="card">
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:10}}>Route Map — Southeast US</div>
+            {route?(()=>{
+              const pc2=pCoords(route.pickup);const dc=pCoords(route.dropoff);
+              const [px,py]=pc2?toXY(...pc2):[80,140];
+              const [dx,dy]=dc?toXY(...dc):[240,55];
+              const hasReal=pc2&&dc;
+              return <>
+                <div style={{borderRadius:8,overflow:'hidden',marginBottom:10,background:'#030806',border:'1px solid #1c3822'}}>
+                  <svg width="100%" viewBox="0 0 340 210" style={{display:'block'}}>
+                    {[42,84,126,168].map(y=><line key={'y'+y} x1={0} y1={y} x2={340} y2={y} stroke="#1a3520" strokeWidth=".5"/>)}
+                    {[68,136,204,272].map(x=><line key={'x'+x} x1={x} y1={0} x2={x} y2={210} stroke="#1a3520" strokeWidth=".5"/>)}
+                    {BG_CITIES.map(([name,lat,lng])=>{const [bx,by]=toXY(lat,lng);return <g key={name}><circle cx={bx} cy={by} r={2} fill="#1c3822"/><text x={bx} y={by-4} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">{name}</text></g>;})}
+                    <line x1={px} y1={py} x2={dx} y2={dy} stroke="rgba(251,191,36,.08)" strokeWidth={12} strokeLinecap="round"/>
+                    <line x1={px} y1={py} x2={dx} y2={dy} stroke="#fbbf24" strokeWidth={2} strokeDasharray="7,4" opacity=".9"/>
+                    <circle cx={px} cy={py} r={11} fill="rgba(57,255,107,.08)"/>
+                    <circle cx={px} cy={py} r={7} fill={G}/><circle cx={px} cy={py} r={3} fill="#030806"/>
+                    <circle cx={dx} cy={dy} r={11} fill="rgba(251,191,36,.08)"/>
+                    <circle cx={dx} cy={dy} r={7} fill="#fbbf24"/><circle cx={dx} cy={dy} r={3} fill="#030806"/>
+                    <text x={px} y={py+(py>dy?18:-10)} textAnchor="middle" fill={G} fontSize="8" fontFamily="monospace" fontWeight="700">↑ {route.pickup}</text>
+                    <text x={dx} y={dy+(py>dy?-10:18)} textAnchor="middle" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">{route.dropoff} ↓</text>
+                    {!hasReal&&<text x={170} y={205} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">Use "City, ST" format for real coords</text>}
+                  </svg>
+                </div>
+                <div className="g3">
+                  {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
+                </div>
+              </>;
+            })():<div style={{color:DIM,textAlign:'center',padding:40,fontSize:11}}>Click a logbook row to view its route.</div>}
+          </div>
+        </div>
+      </div>}
+
+      {/* MAINTENANCE */}
+      {sec==='maintenance'&&<div className="section" ref={refs.maintenance}>
+        <SH t="Maintenance Log" right={<>
+          {maintLog.length>0&&<span style={{color:DIM,fontSize:11}}>Total spent: <span style={{color:'#f87171',fontWeight:700}}>${maintLog.reduce((s,e)=>s+(e.cost||0),0).toLocaleString()}</span></span>}
+          <button className={addMaint?'btn-g':'btn'} style={{fontSize:11,padding:'7px 14px',background:addMaint?'rgba(57,255,107,.06)':undefined,boxShadow:addMaint?'none':undefined}} onClick={()=>setAddMaint(!addMaint)}>{addMaint?'✕ Cancel':'+ Log Service'}</button>
+        </>}/>
+        {addMaint&&<div className="card" style={{marginBottom:12}}>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>New Maintenance Entry</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
+            <div><span className="lbl">Date</span><input className="inp" type="date" value={maintF.date} onChange={e=>setMaintF({...maintF,date:e.target.value})} style={{colorScheme:'dark'}}/></div>
+            <div><span className="lbl">Service Type</span><select className="inp" value={maintF.type} onChange={e=>setMaintF({...maintF,type:e.target.value})}>{MAINT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
+            <div><span className="lbl">Odometer (mi)</span><input className="inp" value={maintF.mileage} onChange={e=>setMaintF({...maintF,mileage:e.target.value})} inputMode="numeric" placeholder="180,000"/></div>
+            <div><span className="lbl">Cost ($)</span><input className="inp" value={maintF.cost} onChange={e=>setMaintF({...maintF,cost:e.target.value})} inputMode="decimal" placeholder="0.00"/></div>
+          </div>
+          <div style={{marginBottom:12}}><span className="lbl">Notes / Next Service Due</span><input className="inp" value={maintF.notes} onChange={e=>setMaintF({...maintF,notes:e.target.value})} placeholder="Next oil change at 185,000 mi · parts used..."/></div>
+          <button className="btn" onClick={doAddMaint}>Save Entry</button>
+        </div>}
+        {maintLog.length>0?<div className="card" style={{padding:0,overflow:'hidden'}}>
+          <table className="tbl">
+            <thead><tr>{['DATE','SERVICE TYPE','ODOMETER','COST','NOTES',''].map(h=><th key={h}>{h}</th>)}</tr></thead>
+            <tbody>{maintLog.map(e=><tr key={e.id}><td style={{color:DIM,fontSize:10}}>{e.date}</td><td style={{color:'#c8e0cc',fontWeight:700}}>{e.type}</td><td>{(e.mileage||0).toLocaleString()}mi</td><td style={{color:'#f87171',fontWeight:700}}>${e.cost||0}</td><td style={{color:DIM,maxWidth:180,fontSize:10}}>{e.notes}</td><td><button className="btn-danger" onClick={()=>delMaint(e.id)}>Del</button></td></tr>)}
+            </tbody>
+          </table>
+        </div>:<div style={{color:DIM,fontSize:12,padding:'20px 0',textAlign:'center'}}>No maintenance entries yet.</div>}
+        <div style={{height:24}}/>
+      </div>}
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
