@@ -102,7 +102,13 @@ const LEADS=[
   {id:32,name:"A1 Bestway Logistics / Warehousing",phone:"706-793-1312"}
 ];
 
-const SEED={id:1,date:'2026-05-08',pickup:'Thomson, GA',dropoff:'Lexington, NC',miles:252,dh:32,rpm:'4.00',pay:900,fuel:125,comments:'All-in RPM: $3.17 · Net after fuel: $775 · Net/all mi: $2.73'};
+const SEEDS=[
+  {id:1747612800001,date:'2026-05-11',pickup:'Thomson, GA',dropoff:'Lexington, NC',miles:252,dh:32,rpm:'2.82',pay:800,fuel:100,comments:'Week of May 11-17'},
+  {id:1747699200002,date:'2026-05-12',pickup:'High Point, NC',dropoff:'Beaufort, SC',miles:296,dh:20,rpm:'1.90',pay:600,fuel:238,comments:'Week of May 11-17'},
+  {id:1747785600003,date:'2026-05-13',pickup:'Hardeeville, SC',dropoff:'Atlanta, GA',miles:277,dh:30,rpm:'2.28',pay:700,fuel:175,comments:'Week of May 11-17'},
+  {id:1747785600004,date:'2026-05-13',pickup:'Atlanta, GA',dropoff:'Columbia, SC',miles:233,dh:3,rpm:'1.91',pay:450,fuel:0,comments:'Fuel pending - fill-up in SC'}
+];
+const SEED=SEEDS[0];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
 const STATUSES=['Not called','Called - No answer','Called - Interested','Called - Not interested','Follow up','Active customer'];
@@ -244,12 +250,12 @@ function App(){
   const [appState,setAppState]=useState('init');
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('overview');
-  const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:'5.15',mpg:'9',tg:'5000'});
+  const [W,setW]=useState({ar:'',dg:'2550',dl:'',fs:'513',mi:'1143',fp:'5.15',mpg:'9',tg:'5000'});
   const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:'Not called',notes:'',callbackDate:''})));
   const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
   const [search,setSearch]=useState('');
   const [statusFilter,setStatusFilter]=useState('All');
-  const [log,setLog]=useState([SEED]);
+  const [log,setLog]=useState(SEEDS);
   const [logF,setLogF]=useState({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});
   const [addLog,setAddLog]=useState(false);
   const [route,setRoute]=useState(SEED);
