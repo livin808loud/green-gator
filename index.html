@@ -109,6 +109,8 @@ const SEEDS=[
   {id:1747785600004,date:'2026-05-13',pickup:'Atlanta, GA',dropoff:'Columbia, SC',miles:233,dh:3,rpm:'1.91',pay:450,fuel:0,comments:'Fuel pending - fill-up in SC'}
 ];
 const SEED=SEEDS[0];
+const BAKED_SUPA_URL='https://bzbaifskyvjhvooteowx.supabase.co';
+const BAKED_SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YmFpZnNreXZqaHZvb3Rlb3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDk5NjIsImV4cCI6MjA5Mzk4NTk2Mn0.irq-1Qh8UzdDap66zZv8AKZLDrM-YuTlKtj6mSaQ_dM';
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
 const STATUSES=['Not called','Called - No answer','Called - Interested','Called - Not interested','Follow up','Active customer'];
@@ -250,7 +252,7 @@ function App(){
   const [appState,setAppState]=useState('init');
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('overview');
-  const [W,setW]=useState({ar:'',dg:'2550',dl:'',fs:'513',mi:'1143',fp:'5.15',mpg:'9',tg:'5000'});
+  const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:'5.15',mpg:'9',tg:'5000'});
   const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:'Not called',notes:'',callbackDate:''})));
   const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
   const [search,setSearch]=useState('');
@@ -259,8 +261,8 @@ function App(){
   const [logF,setLogF]=useState({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});
   const [addLog,setAddLog]=useState(false);
   const [route,setRoute]=useState(SEED);
-  const [bal,setBal]=useState('26921');const [maint2,setMaint2]=useState('4000');
-  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26921');const [tMaint,setTMaint]=useState('4000');
+  const [bal,setBal]=useState('26921');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('40000');
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26921');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('40000');
   const nowD=new Date();
   const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
   const [toast,setToast]=useState('');
@@ -275,7 +277,7 @@ function App(){
     const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
     if(w)setW(w);if(l)setLeads(l);
     if(lg){setLog(lg);if(lg[0])setRoute(lg[0]);}
-    if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}}
+    if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}}
     if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);
   };
   const loadSupa=async(d)=>{
@@ -294,15 +296,21 @@ function App(){
       const cfg=Object.fromEntries((cfR||[]).map(r=>[r.key,r.value]));
       if(cfg.truck_balance){setBal(cfg.truck_balance);setTBal(cfg.truck_balance);}
       if(cfg.maintenance_reserve){setMaint2(cfg.maintenance_reserve);setTMaint(cfg.maintenance_reserve);}
+      if(cfg.truck_buy_price){setBuyPrice(cfg.truck_buy_price);setTBuyPrice(cfg.truck_buy_price);}
       if(mlR?.length)setMaintLog(mlR);
       if(whR?.length)setWeekHistory(whR);
     }catch(e){console.log('Supa err',e);loadLocal();}
   };
 
   useEffect(()=>{
-    const su=sg('gg-su'),sk=sg('gg-sk');
-    if(su&&sk){const d=makeDB(su,sk);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}
-    else{loadLocal();setAppState('ready');}
+    // Auto-connect Supabase using baked-in credentials
+    const su=BAKED_SUPA_URL, sk=BAKED_SUPA_KEY;
+    try{ss('gg-su',su);ss('gg-sk',sk);}catch{}
+    const d=makeDB(su,sk);setDb(d);
+    loadSupa(d).then(()=>setAppState('ready')).catch(()=>{loadLocal();setAppState('ready');});
+    // Poll every 30 seconds to keep all devices in sync
+    const pollTimer=setInterval(()=>{loadSupa(d).catch(()=>{});},30000);
+    return ()=>clearInterval(pollTimer);
   },[]);
 
   const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
@@ -330,9 +338,13 @@ function App(){
   };
   const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
   const saveCfg=async()=>{
-    setBal(tBal);setMaint2(tMaint);
-    if(db)try{await db.patch('gg_config?key=eq.truck_balance',{value:tBal});await db.patch('gg_config?key=eq.maintenance_reserve',{value:tMaint});}catch{}
-    else ss('gg-c',{b:tBal,m:tMaint});
+    setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);
+    if(db)try{
+      await db.post('gg_config',{key:'truck_balance',value:tBal},true);
+      await db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true);
+      await db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true);
+    }catch{}
+    else ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice});
     setEditCfg(false);flash('Config saved');
   };
   const doAddMaint=async()=>{
@@ -356,11 +368,26 @@ function App(){
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
+  // Auto-derive Weekly Gross/Fuel/Miles from logs for CURRENT WEEK (Sunday → Saturday)
+  const wkStart=new Date();wkStart.setDate(wkStart.getDate()-wkStart.getDay());wkStart.setHours(0,0,0,0);
+  const wkStartStr=wkStart.toISOString().slice(0,10);
+  const wkEnd=new Date(wkStart);wkEnd.setDate(wkEnd.getDate()+7);
+  const wkEndStr=wkEnd.toISOString().slice(0,10);
+  const weekLogs=log.filter(e=>e.date>=wkStartStr&&e.date<wkEndStr);
+  const autoGross=weekLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
+  const autoFuel=weekLogs.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
+  const autoMiles=weekLogs.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
+  // Manual entries (W.ar/dg/dl/fs/mi) act as ADJUSTMENTS, added to auto values
   const ar=parseFloat(W.ar)||0,dg=parseFloat(W.dg)||0,dl=parseFloat(W.dl)||0;
-  const gross=ar+dg+dl,tgt=parseFloat(W.tg)||5000,gap=Math.max(0,tgt-gross);
-  const mi=parseFloat(W.mi)||0,mpg=parseFloat(W.mpg)||9,fp=parseFloat(W.fp)||5.15;
-  const estF=mi>0?(mi/mpg)*fp:0,entF=parseFloat(W.fs)||0;
-  const useF=entF>0?entF:estF,net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
+  const manualGross=ar+dg+dl;
+  const gross=autoGross+manualGross;
+  const tgt=parseFloat(W.tg)||5000,gap=Math.max(0,tgt-gross);
+  const mpg=parseFloat(W.mpg)||9,fp=parseFloat(W.fp)||5.15;
+  const manualMi=parseFloat(W.mi)||0;
+  const mi=autoMiles+manualMi;
+  const manualF=parseFloat(W.fs)||0;
+  const useF=autoFuel+manualF;
+  const net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
   const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
   const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
   const avgRpm=(()=>{const tm=log.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=log.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?tn/tm:0;})();
@@ -400,8 +427,8 @@ function App(){
           {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
           {db?<>
             <button onClick={refreshSupa} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>↻ Sync</button>
-            <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 9px',border:'1px solid rgba(57,255,107,.2)',borderRadius:6,background:'rgba(57,255,107,.05)',cursor:'pointer'}} onClick={disconnectSupa}><span className="ld"/><span style={{color:G,fontSize:9,fontWeight:700,letterSpacing:'.1em'}}>CLOUD</span></div>
-          </>:<button onClick={()=>setAppState('setup')} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>☁ Connect</button>}
+            <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 9px',border:'1px solid rgba(57,255,107,.2)',borderRadius:6,background:'rgba(57,255,107,.05)'}}><span className="ld"/><span style={{color:G,fontSize:9,fontWeight:700,letterSpacing:'.1em'}}>CLOUD</span></div>
+          </>:<span style={{color:'#fbbf24',fontSize:9,padding:'4px 9px',border:'1px solid rgba(251,191,36,.25)',borderRadius:6,background:'rgba(251,191,36,.06)'}}>connecting...</span>}
         </div>
       </div>
 
@@ -436,8 +463,8 @@ function App(){
             <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent,rgba(248,113,113,.3),transparent)'}}/>
             <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Truck Payoff</div>
             <div className="gr" style={{fontSize:28,fontWeight:700,color:'#f87171',lineHeight:1,marginBottom:8}}>${parseFloat(bal).toLocaleString()}</div>
-            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:((40000-parseFloat(bal))/40000)*100+'%',background:'linear-gradient(90deg,#f87171aa,#f87171)'}}/></div>
-            <div style={{fontSize:9,color:DIM}}>2020 MV607 · {(((40000-parseFloat(bal))/40000)*100).toFixed(0)}% paid</div>
+            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:Math.min(100,Math.max(0,((parseFloat(buyPrice)-parseFloat(bal))/parseFloat(buyPrice))*100))+'%',background:'linear-gradient(90deg,#f87171aa,#f87171)'}}/></div>
+            <div style={{fontSize:9,color:DIM}}>2020 MV607 · {Math.min(100,Math.max(0,((parseFloat(buyPrice)-parseFloat(bal))/parseFloat(buyPrice))*100)).toFixed(0)}% paid (of ${parseFloat(buyPrice).toLocaleString()})</div>
           </div>
         </div>
 
@@ -447,8 +474,9 @@ function App(){
             <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:12}}>{['2020 MV607','26ft box + liftgate','2 pallet jacks','15 straps'].map(t=><span key={t} style={{background:'rgba(57,255,107,.06)',color:G,padding:'4px 10px',borderRadius:20,fontSize:10,border:'1px solid rgba(57,255,107,.18)'}}>{t}</span>)}</div>
             <div className="dv"/>
             {editCfg?<>
-              <span className="lbl">Truck Balance</span><input className="inp" style={{marginBottom:8}} value={tBal} onChange={e=>setTBal(e.target.value)}/>
-              <span className="lbl">Maint. Reserve</span><input className="inp" style={{marginBottom:10}} value={tMaint} onChange={e=>setTMaint(e.target.value)}/>
+              <span className="lbl">Truck Balance (current $ owed)</span><input className="inp" style={{marginBottom:8}} value={tBal} onChange={e=>setTBal(e.target.value)} inputMode="decimal"/>
+              <span className="lbl">Original Purchase Price</span><input className="inp" style={{marginBottom:8}} value={tBuyPrice} onChange={e=>setTBuyPrice(e.target.value)} inputMode="decimal"/>
+              <span className="lbl">Maint. Reserve</span><input className="inp" style={{marginBottom:10}} value={tMaint} onChange={e=>setTMaint(e.target.value)} inputMode="decimal"/>
               <div style={{display:'flex',gap:7}}><button className="btn" style={{fontSize:11,padding:'7px 14px'}} onClick={saveCfg}>Save</button><button className="btn-g" style={{fontSize:11,padding:'7px 14px'}} onClick={()=>setEditCfg(false)}>Cancel</button></div>
             </>:<>
               <div className="g11" style={{marginBottom:12}}>
@@ -459,7 +487,7 @@ function App(){
             </>}
           </div>
           <div className="card">
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Weekly Money Tracker</div>
+            <div style={{marginBottom:14}}><div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>Weekly Adjustments</div><div style={{color:'#3d5c45',fontSize:10,marginTop:3}}>Logbook auto-fills Gross/Fuel/Miles. Use these only to ADD extra income/expenses not in the logbook.</div></div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
               {[{l:'Amazon Relay',k:'ar'},{l:'DAT Gross',k:'dg'},{l:'Direct Local',k:'dl'},{l:'Fuel Spend',k:'fs'},{l:'Miles Driven',k:'mi'},{l:'Fuel $/Gal',k:'fp'},{l:'MPG',k:'mpg'},{l:'Target Gross',k:'tg'}].map(({l,k})=><div key={k}><span className="lbl">{l}</span><input className="inp" value={W[k]} onChange={e=>saveW(k,e.target.value)} inputMode="decimal"/></div>)}
             </div>
