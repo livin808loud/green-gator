@@ -362,11 +362,10 @@ function App(){
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
-  // Derive this week's numbers from logbook (Sun-Sat)
-  const _wd=new Date(),_ws=new Date(_wd);_ws.setDate(_wd.getDate()-_wd.getDay());_ws.setHours(0,0,0,0);
-  const _wsStr=_ws.toISOString().slice(0,10);
-  const _we=new Date(_ws);_we.setDate(_ws.getDate()+7);const _weStr=_we.toISOString().slice(0,10);
-  const _wl=log.filter(function(e){return e.date>=_wsStr&&e.date<_weStr;});
+  // Derive weekly numbers from logbook (last 7 days rolling)
+  const _now=new Date(),_ago=new Date(_now);_ago.setDate(_now.getDate()-7);_ago.setHours(0,0,0,0);
+  const _agoStr=_ago.toISOString().slice(0,10);
+  const _wl=log.filter(function(e){return e.date>=_agoStr;});
   const _ag=_wl.reduce(function(s,e){return s+(parseFloat(e.pay)||0);},0);
   const _af=_wl.reduce(function(s,e){return s+(parseFloat(e.fuel)||0);},0);
   const _am=_wl.reduce(function(s,e){return s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);},0);
