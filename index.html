@@ -106,8 +106,7 @@ const SEEDS=[
   {id:1747612800001,date:'2026-05-11',pickup:'Thomson, GA',dropoff:'Lexington, NC',miles:252,dh:32,rpm:'2.82',pay:800,fuel:100,comments:'Week of May 11-17'},
   {id:1747699200002,date:'2026-05-12',pickup:'High Point, NC',dropoff:'Beaufort, SC',miles:296,dh:20,rpm:'1.90',pay:600,fuel:238,comments:'Week of May 11-17'},
   {id:1747785600003,date:'2026-05-13',pickup:'Hardeeville, SC',dropoff:'Atlanta, GA',miles:277,dh:30,rpm:'2.28',pay:700,fuel:175,comments:'Week of May 11-17'},
-  {id:1747785600004,date:'2026-05-13',pickup:'Atlanta, GA',dropoff:'Columbia, SC',miles:233,dh:3,rpm:'1.91',pay:450,fuel:207,comments:'Fuel updated 2026-05-14. Net after fuel: $243'},
-  {id:1747968000005,date:'2026-05-15',pickup:'Thomson, GA',dropoff:'Winston-Salem, NC',miles:268,dh:32,rpm:'2.00',pay:600,fuel:275,comments:'Friday load. Total miles: 300. Loaded RPM: $2.24. Net after fuel: $325'}
+  {id:1747785600004,date:'2026-05-13',pickup:'Atlanta, GA',dropoff:'Columbia, SC',miles:233,dh:3,rpm:'1.91',pay:450,fuel:0,comments:'Fuel pending'}
 ];
 const SEED=SEEDS[0];
 const SU_URL='https://bzbaifskyvjhvooteowx.supabase.co';
@@ -304,10 +303,11 @@ function App(){
   };
 
   useEffect(()=>{
+    loadLocal();
     const su=SU_URL,sk=SU_KEY;
     ss('gg-su',su);ss('gg-sk',sk);
     const d=makeDB(su,sk);setDb(d);
-    loadSupa(d).then(()=>setAppState('ready')).catch(()=>{loadLocal();setAppState('ready');});
+    loadSupa(d).then(()=>setAppState('ready')).catch(()=>setAppState('ready'));
     const t=setInterval(()=>{loadSupa(d).catch(()=>{});},30000);
     return ()=>clearInterval(t);
   },[]);
@@ -338,8 +338,8 @@ function App(){
   const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
   const saveCfg=async()=>{
     setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);
+    ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice});
     if(db)try{await db.patch('gg_config?key=eq.truck_balance',{value:tBal});await db.patch('gg_config?key=eq.maintenance_reserve',{value:tMaint});}catch{}
-    else ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice});
     setEditCfg(false);flash('Config saved');
   };
   const doAddMaint=async()=>{
