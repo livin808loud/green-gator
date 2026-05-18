@@ -270,7 +270,7 @@ function App(){
   const [maintF,setMaintF]=useState({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});
   const [addMaint,setAddMaint]=useState(false);
   const [weekHistory,setWeekHistory]=useState([]);
-  const [showReset,setShowReset]=useState(false);
+  const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||'2026-05-11');
   const refs={overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
 
   const loadLocal=()=>{
@@ -278,7 +278,7 @@ function App(){
     if(w)setW(w);if(l)setLeads(l);
     if(lg){setLog(lg);if(lg[0])setRoute(lg[0]);}
     if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}}
-    if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);
+    if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
   };
   const loadSupa=async(d)=>{
     try{
@@ -351,9 +351,10 @@ function App(){
   };
   const delMaint=async id=>{const u=maintLog.filter(e=>e.id!==id);setMaintLog(u);if(!db)ss('gg-ml',u);};
   const doWeekReset=async()=>{
-    const snap={id:Date.now(),weekEnd:todayStr(),ar:W.ar,dg:W.dg,dl:W.dl,mi:W.mi,gross:(parseFloat(W.ar)||0)+(parseFloat(W.dg)||0)+(parseFloat(W.dl)||0),net:net,loads:log.filter(e=>new Date(e.date)>new Date(Date.now()-7*864e5)).length};
+    const snap={id:Date.now(),weekEnd:todayStr(),ar:W.ar,dg:W.dg,dl:W.dl,mi:String(mi),gross:gross,net:net,loads:_wl.length};
     const h2=[snap,...weekHistory].slice(0,12);setWeekHistory(h2);
     const cleared={...W,ar:'',dg:'',dl:'',fs:'',mi:''};setW(cleared);
+    const today=todayStr();setWeekResetDate(today);ss('gg-wrd',today);
     if(db)try{await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||5.15,mpg:parseFloat(W.mpg)||9,tg:parseFloat(W.tg)||5000},true);}catch{}
     ss('gg-w',cleared);ss('gg-wh',h2);setShowReset(false);flash('Week archived & tracker reset');
   };
@@ -363,10 +364,8 @@ function App(){
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
-  // Derive weekly numbers from logbook (last 7 days rolling)
-  const _now=new Date(),_ago=new Date(_now);_ago.setDate(_now.getDate()-7);_ago.setHours(0,0,0,0);
-  const _agoStr=_ago.toISOString().slice(0,10);
-  const _wl=log.filter(function(e){return e.date>=_agoStr;});
+  // Derive weekly numbers from logbook since last reset
+  const _wl=log.filter(function(e){return e.date>=weekResetDate;});
   const _ag=_wl.reduce(function(s,e){return s+(parseFloat(e.pay)||0);},0);
   const _af=_wl.reduce(function(s,e){return s+(parseFloat(e.fuel)||0);},0);
   const _am=_wl.reduce(function(s,e){return s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);},0);
