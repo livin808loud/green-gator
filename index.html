@@ -106,26 +106,26 @@ const SEEDS=[
   {
     "id": 1779076800001,
     "date": "2026-05-18",
-    "pickup": "TBD",
-    "dropoff": "TBD",
+    "pickup": "Savannah, GA",
+    "dropoff": "Statesboro, GA",
     "miles": 53,
     "dh": 7,
     "rpm": "5.00",
     "pay": 300,
     "fuel": 44.54,
-    "comments": "Load 2 entered from WebChat on 2026-05-18. Pickup/dropoff not provided yet. Total miles incl. deadhead: 60. Loaded RPM: $5.66. All-in RPM: $5.00. Day fuel allocated by miles from $146.24 total: $44.54. Net after allocated fuel: $255.46. Net per all miles: $4.26."
+    "comments": "Load 2 entered from WebChat on 2026-05-18; user later clarified lane was Savannah, GA to Statesboro, GA. Total miles incl. deadhead: 60. Loaded RPM: $5.66. All-in RPM: $5.00. Day fuel allocated by miles from $146.24 total: $44.54. Net after allocated fuel: $255.46. Net per all miles: $4.26."
   },
   {
     "id": 1779076800002,
     "date": "2026-05-18",
-    "pickup": "TBD",
-    "dropoff": "TBD",
+    "pickup": "Port Wentworth, GA",
+    "dropoff": "Savannah, GA",
     "miles": 22,
     "dh": 115,
     "rpm": "2.19",
     "pay": 300,
     "fuel": 101.7,
-    "comments": "Load 1 entered from WebChat on 2026-05-18. Pickup/dropoff not provided yet. Total miles incl. deadhead: 137. Loaded RPM: $13.64. All-in RPM: $2.19. Day fuel allocated by miles from $146.24 total: $101.70. Net after allocated fuel: $198.30. Net per all miles: $1.45."
+    "comments": "Load 1 entered from WebChat on 2026-05-18; user later clarified lane was Port Wentworth, GA to Savannah, GA. Total miles incl. deadhead: 137. Loaded RPM: $13.64. All-in RPM: $2.19. Day fuel allocated by miles from $146.24 total: $101.70. Net after allocated fuel: $198.30. Net per all miles: $1.45."
   },
   {
     "id": 1778817600003,
@@ -379,8 +379,11 @@ function App(){
 
   const mergeSeeds=rows=>{
     const a=Array.isArray(rows)?rows:[];
-    const missing=SEEDS.filter(s=>!a.some(e=>e.id===s.id||(e.date===s.date&&Number(e.miles)===Number(s.miles)&&Number(e.dh)===Number(s.dh)&&Number(e.pay)===Number(s.pay))));
-    return [...missing,...a];
+    const key=e=>`${e.date}|${Number(e.miles)}|${Number(e.dh)}|${Number(e.pay)}`;
+    const seeded=new Map(SEEDS.map(s=>[key(s),s]));
+    const corrected=a.map(e=>seeded.has(key(e))?{...e,...seeded.get(key(e)),id:e.id||seeded.get(key(e)).id}:e);
+    const missing=SEEDS.filter(s=>!corrected.some(e=>key(e)===key(s)));
+    return [...missing,...corrected];
   };
   const loadLocal=()=>{
     const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
