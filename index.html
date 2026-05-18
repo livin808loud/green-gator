@@ -352,10 +352,12 @@ function App(){
   };
   const delMaint=async id=>{const u=maintLog.filter(e=>e.id!==id);setMaintLog(u);if(!db)ss('gg-ml',u);};
   const doWeekReset=async()=>{
-    const snap={id:Date.now(),weekEnd:todayStr(),ar:W.ar,dg:W.dg,dl:W.dl,mi:String(mi),gross:gross,net:net,loads:_wl.length};
-    const h2=[snap,...weekHistory].slice(0,12);setWeekHistory(h2);
+    const today=todayStr();
+    const snap={id:Date.now(),weekStart:weekResetDate,weekEnd:today,mi:String(mi),gross:gross,net:net,loads:_wl.length};
+    const h2=[snap,...weekHistory.filter(function(w){return w.weekEnd!==today;})].slice(0,12);
+    setWeekHistory(h2);
     const cleared={...W,ar:'',dg:'',dl:'',fs:'',mi:''};setW(cleared);
-    const today=todayStr();setWeekResetDate(today);
+    setWeekResetDate(today);
     ss('gg-wrd',today);ss('gg-w',cleared);ss('gg-wh',h2);
     if(db)try{
       await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||5.15,mpg:parseFloat(W.mpg)||9,tg:parseFloat(W.tg)||5000},true);
@@ -504,8 +506,12 @@ function App(){
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Past Weeks</div>
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
-              <thead><tr>{['WEEK END','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{weekHistory.map(w=><tr key={w.id}><td style={{color:DIM,fontSize:10}}>{w.weekEnd}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>)}</tbody>
+              <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>{weekHistory.map(w=>{
+                const fmt=d=>{if(!d)return'?';const[y,m,day]=d.split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1];return mn+' '+parseInt(day);};
+                const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):fmt(w.weekEnd);
+                return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
+              })}</tbody>
             </table>
           </div>
         </div>}
