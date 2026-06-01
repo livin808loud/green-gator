@@ -415,6 +415,15 @@ function App(){
   const {y:cy,m:cm}=cal;
   const fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate();
   const dLogs=d=>{const s=`${cy}-${String(cm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return log.filter(e=>e.date===s);};
+  const weekStartOf=d=>{const x=new Date(d+'T00:00:00');const day=x.getDay();const diff=(day+6)%7;x.setDate(x.getDate()-diff);return x.toISOString().slice(0,10);};
+  const addDays=(d,n)=>{const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
+  const logWeeks=Object.values(log.reduce((m,e)=>{
+    if(!e.date)return m;const ws=weekStartOf(e.date),we=addDays(ws,6);
+    if(!m[ws])m[ws]={id:ws,weekStart:ws,weekEnd:we,gross:0,net:0,loads:0,mi:0,fuel:0};
+    m[ws].gross+=(parseFloat(e.pay)||0);m[ws].fuel+=(parseFloat(e.fuel)||0);m[ws].net+=((parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0));m[ws].loads+=1;m[ws].mi+=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);
+    return m;
+  },{})).sort((a,b)=>b.weekStart.localeCompare(a.weekStart));
+  const overviewWeeks=logWeeks.length?logWeeks:weekHistory;
 
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
   if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
@@ -505,11 +514,11 @@ function App(){
         </div>
 
         <div className="card" style={{marginBottom:12}}>
-          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Past Weeks</div>
-          {weekHistory.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No archived weeks yet.</div>:<div style={{overflowX:'auto'}}>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Weekly History from Logbook</div>
+          {overviewWeeks.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No weeks logged yet.</div>:<div style={{overflowX:'auto'}}>
             <table className="tbl">
               <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{weekHistory.map(w=>{
+              <tbody>{overviewWeeks.map(w=>{
                 const fmt=d=>{if(!d)return'?';const[y,m,day]=String(d).split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]||'';return (mn?mn+' ':'')+parseInt(day||0);};
                 const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
                 return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
