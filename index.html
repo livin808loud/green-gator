@@ -303,7 +303,7 @@ function App(){
       if(cfg.truck_buy_price){setBuyPrice(cfg.truck_buy_price);setTBuyPrice(cfg.truck_buy_price);}
       if(cfg.week_reset_date){setWeekResetDate(cfg.week_reset_date);ss('gg-wrd',cfg.week_reset_date);}
       if(mlR?.length)setMaintLog(mlR);
-      if(whR?.length)setWeekHistory(whR);
+      if(whR?.length)setWeekHistory(whR.map(w=>({...w,weekEnd:w.weekEnd||w.week_end,weekStart:w.weekStart||w.week_start})));
     }catch(e){console.log('Supa err',e);loadLocal();}
   };
 
@@ -505,6 +505,20 @@ function App(){
         </div>
 
         <div className="card" style={{marginBottom:12}}>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Past Weeks</div>
+          {weekHistory.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No archived weeks yet.</div>:<div style={{overflowX:'auto'}}>
+            <table className="tbl">
+              <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>{weekHistory.map(w=>{
+                const fmt=d=>{if(!d)return'?';const[y,m,day]=String(d).split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]||'';return (mn?mn+' ':'')+parseInt(day||0);};
+                const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
+                return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
+              })}</tbody>
+            </table>
+          </div>}
+        </div>
+
+        <div className="card" style={{marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
             <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>{moName} — Monthly Earnings</div>
             {moLogs.length>0&&<span style={{background:'rgba(57,255,107,.08)',color:G,border:'1px solid rgba(57,255,107,.2)',borderRadius:5,padding:'3px 9px',fontSize:10,fontWeight:700}}>{moLogs.length} loads</span>}
@@ -516,20 +530,6 @@ function App(){
             <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
           </>}
         </div>
-
-        {weekHistory.length>0&&<div className="card">
-          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Past Weeks</div>
-          <div style={{overflowX:'auto'}}>
-            <table className="tbl">
-              <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{weekHistory.map(w=>{
-                const fmt=d=>{if(!d)return'?';const[y,m,day]=d.split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1];return mn+' '+parseInt(day);};
-                const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
-                return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
-              })}</tbody>
-            </table>
-          </div>
-        </div>}
       </div>}
 
       {/* PIPELINE */}
