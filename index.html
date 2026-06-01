@@ -524,7 +524,7 @@ function App(){
               <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
               <tbody>{weekHistory.map(w=>{
                 const fmt=d=>{if(!d)return'?';const[y,m,day]=d.split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1];return mn+' '+parseInt(day);};
-                const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):fmt(w.weekEnd);
+                const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
                 return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
               })}</tbody>
             </table>
