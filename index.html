@@ -20,6 +20,8 @@ const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
 
 const CITIES={
   'Augusta':[33.47,-81.97],'Augusta, GA':[33.47,-81.97],
+  'Eatonton':[33.33,-83.39],'Eatonton, GA':[33.33,-83.39],
+  'Stevensville':[38.98,-76.31],'Stevensville, MD':[38.98,-76.31],
   'Thomson':[33.47,-82.50],'Thomson, GA':[33.47,-82.50],
   'Aiken':[33.56,-81.72],'Aiken, SC':[33.56,-81.72],
   'North Augusta':[33.51,-81.96],'North Augusta, SC':[33.51,-81.96],
@@ -258,8 +260,10 @@ function App(){
   const [search,setSearch]=useState('');
   const [statusFilter,setStatusFilter]=useState('All');
   const [log,setLog]=useState(SEEDS);
-  const [logF,setLogF]=useState({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});
+  const blankLog={date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''};
+  const [logF,setLogF]=useState(blankLog);
   const [addLog,setAddLog]=useState(false);
+  const [editingLogId,setEditingLogId]=useState(null);
   const [route,setRoute]=useState(SEED);
   const [bal,setBal]=useState('26341');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
   const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26341');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');
@@ -329,14 +333,24 @@ function App(){
     else ss('gg-l',u);
     flash('Lead #'+lf.num+' saved');
   };
+  const startAddLog=()=>{setEditingLogId(null);setLogF(blankLog);setAddLog(true);};
+  const startEditLog=e=>{setEditingLogId(e.id);setLogF({date:e.date||todayStr(),pickup:e.pickup||'',dropoff:e.dropoff||'',miles:String(e.miles??''),dh:String(e.dh??''),rpm:String(e.rpm??''),pay:String(e.pay??''),fuel:String(e.fuel??''),comments:e.comments||''});setAddLog(true);setRoute(e);setSec('logbook');setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
   const doAddLog=async()=>{
-    const e={id:Date.now(),date:logF.date,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:logF.rpm,pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
+    const base={date:logF.date,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:String(logF.rpm||''),pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
+    if(editingLogId){
+      const e={...base,id:editingLogId};
+      const u=log.map(x=>x.id===editingLogId?{...x,...e}:x);setLog(u);setRoute(e);
+      if(db)try{await db.patch('gg_log?id=eq.'+editingLogId,base);}catch{}else ss('gg-lg',u);
+      setEditingLogId(null);setAddLog(false);setLogF(blankLog);flash('Load updated');return;
+    }
+    const e={id:Date.now(),...base};
     const u=[e,...log];setLog(u);setRoute(e);setAddLog(false);
     if(db)try{await db.post('gg_log',{date:e.date,pickup:e.pickup,dropoff:e.dropoff,miles:e.miles,dh:e.dh,rpm:e.rpm,pay:e.pay,fuel:e.fuel,comments:e.comments});}catch{}
     else ss('gg-lg',u);
-    setLogF({date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''});flash('Load logged');
+    setLogF(blankLog);flash('Load logged');
   };
-  const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
+  const cancelLogEdit=()=>{setAddLog(false);setEditingLogId(null);setLogF(blankLog);};
+  const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(editingLogId===id)cancelLogEdit();if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
   const saveCfg=async()=>{
     setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);
     ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice});
@@ -362,6 +376,7 @@ function App(){
     if(db)try{
       await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||5.15,mpg:parseFloat(W.mpg)||9,tg:parseFloat(W.tg)||5000},true);
       await db.post('gg_config',{key:'week_reset_date',value:today},true);
+      try{await db.post('gg_weekly_history',{id:snap.id,week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true);}catch{}
     }catch{}
     setShowReset(false);flash('Week archived & tracker reset');
   };
@@ -567,19 +582,19 @@ function App(){
         <SH t="Load Logbook" right={<>
           {[{l:'Loads',v:log.length},{l:'Total Gross',v:'$'+log.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:avgRpm>0?'$'+avgRpm.toFixed(2):'—'}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
         </>}/>
-        <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>setAddLog(!addLog)}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
+        <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
         {addLog&&<div className="card" style={{marginBottom:12}}>
-          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>New Load Entry</div>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>{editingLogId?'Edit Load Entry':'New Load Entry'}</div>
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
             {[{l:'Date',k:'date',t:'date'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'}].map(({l,k,t})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} onChange={e=>setLogF({...logF,[k]:e.target.value})} inputMode={t==='number'?'decimal':undefined}/></div>)}
           </div>
           <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
-          <button className="btn" onClick={doAddLog}>Add to Logbook</button>
+          <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddLog}>{editingLogId?'Save Changes':'Add to Logbook'}</button>{editingLogId&&<button className="btn-g" onClick={cancelLogEdit}>Cancel Edit</button>}</div>
         </div>}
         {log.length>0&&<div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
-              <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','FUEL','NET','NET RPM',''].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','FUEL','NET','NET RPM','ACTIONS'].map(h=><th key={h}>{h}</th>)}</tr></thead>
               <tbody>{log.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
                 return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
                   <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{e.date}</td>
@@ -589,7 +604,7 @@ function App(){
                   <td style={{color:G,fontWeight:700}}>${e.pay}</td><td style={{color:'#f87171'}}>${e.fuel}</td>
                   <td style={{color:np>=0?G:'#f87171',fontWeight:700}}>${np}</td>
                   <td><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
-                  <td><button className="btn-danger" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>Del</button></td>
+                  <td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={ev=>{ev.stopPropagation();startEditLog(e);}}>Edit</button><button className="btn-danger" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>Del</button></td>
                 </tr>;
               })}</tbody>
             </table>
@@ -639,6 +654,10 @@ function App(){
                 </div>
                 <div className="g3">
                   {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
+                </div>
+                <div style={{marginTop:10,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+                  <button className="btn-g" onClick={()=>startEditLog(route)}>Edit Selected Load</button>
+                  <span style={{color:DIM,fontSize:10}}>{route.comments||'No comments saved.'}</span>
                 </div>
               </>;
             })():<div style={{color:DIM,textAlign:'center',padding:40,fontSize:11}}>Click a logbook row to view its route.</div>}
