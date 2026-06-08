@@ -278,6 +278,7 @@ function App(){
   const [addLog,setAddLog]=useState(false);
   const [editingLogId,setEditingLogId]=useState(null);
   const [route,setRoute]=useState(SEED);
+  const [selectedWeek,setSelectedWeek]=useState(null);
   const [bal,setBal]=useState('26341');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
   const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26341');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');
   const nowD=new Date();
@@ -332,6 +333,15 @@ function App(){
 
   const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
   const navTo=id=>{setSec(id);setTimeout(()=>refs[id]?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
+  const openWeek=w=>{
+    if(!w?.weekStart)return;
+    const week={start:w.weekStart,end:w.weekEnd||addDays(w.weekStart,6)};
+    setSelectedWeek(week);
+    const first=log.find(e=>e.date>=week.start&&e.date<=week.end);
+    if(first)setRoute(first);
+    setSec('logbook');
+    setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);
+  };
 
   const saveW=async(k,v)=>{
     const u={...W,[k]:v};setW(u);
@@ -442,6 +452,8 @@ function App(){
     return m;
   },{})).sort((a,b)=>b.weekStart.localeCompare(a.weekStart));
   const overviewWeeks=logWeeks.length?logWeeks:weekHistory;
+  const shownLog=selectedWeek?log.filter(e=>e.date>=selectedWeek.start&&e.date<=selectedWeek.end):log;
+  const weekFilterLabel=selectedWeek?selectedWeek.start+' → '+selectedWeek.end:'';
 
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
   if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
@@ -539,7 +551,7 @@ function App(){
               <tbody>{overviewWeeks.map(w=>{
                 const fmt=d=>{if(!d)return'?';const[y,m,day]=String(d).split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]||'';return (mn?mn+' ':'')+parseInt(day||0);};
                 const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
-                return <tr key={w.id}><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap'}}>{label}</td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
+                return <tr key={w.id} onClick={()=>openWeek(w)} style={{cursor:'pointer'}} title="Open this week in Logbook"><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap',fontWeight:700}}>{label} <span style={{color:G}}>→</span></td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
               })}</tbody>
             </table>
           </div>}
@@ -606,8 +618,9 @@ function App(){
 
       {/* LOGBOOK */}
       {sec==='logbook'&&<div className="section" ref={refs.logbook}>
-        <SH t="Load Logbook" right={<>
-          {[{l:'Loads',v:log.length},{l:'Total Gross',v:'$'+log.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:avgRpm>0?'$'+avgRpm.toFixed(2):'—'}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
+        <SH t={selectedWeek?'Load Logbook — '+weekFilterLabel:'Load Logbook'} right={<>
+          {selectedWeek&&<button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>setSelectedWeek(null)}>Show All Loads</button>}
+          {[{l:'Loads',v:shownLog.length},{l:'Total Gross',v:'$'+shownLog.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:(()=>{const tm=shownLog.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=shownLog.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?'$'+(tn/tm).toFixed(2):'—';})()}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
         </>}/>
         <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
         {addLog&&<div className="card" style={{marginBottom:12}}>
@@ -618,11 +631,11 @@ function App(){
           <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
           <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddLog}>{editingLogId?'Save Changes':'Add to Logbook'}</button>{editingLogId&&<button className="btn-g" onClick={cancelLogEdit}>Cancel Edit</button>}</div>
         </div>}
-        {log.length>0&&<div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
+        {shownLog.length>0&&<div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
               <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','FUEL','NET','NET RPM','ACTIONS'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{log.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
+              <tbody>{shownLog.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
                 return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
                   <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{e.date}</td>
                   <td style={{whiteSpace:'nowrap'}}>{e.pickup}</td><td style={{whiteSpace:'nowrap'}}>{e.dropoff}</td>
@@ -637,6 +650,7 @@ function App(){
             </table>
           </div>
         </div>}
+        {shownLog.length===0&&<div className="card" style={{color:DIM,fontSize:12,textAlign:'center',marginBottom:12}}>No loads found for this week.</div>}
         <div className="g11">
           <div className="card">
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
