@@ -401,7 +401,12 @@ function App(){
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
-  const _wl=log.filter(function(e){return e.date>=weekResetDate;});
+  const weekStartOf=d=>{const x=new Date(d+'T00:00:00');const day=x.getDay();const diff=(day+6)%7;x.setDate(x.getDate()-diff);return x.toISOString().slice(0,10);};
+  const addDays=(d,n)=>{const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
+  const currentWeekStart=weekStartOf(todayStr());
+  const activeWeekStart=weekResetDate>currentWeekStart?weekResetDate:currentWeekStart;
+  const activeWeekEnd=addDays(currentWeekStart,6);
+  const _wl=log.filter(function(e){return e.date>=activeWeekStart&&e.date<=activeWeekEnd;});
   const _ag=_wl.reduce(function(s,e){return s+(parseFloat(e.pay)||0);},0);
   const _af=_wl.reduce(function(s,e){return s+(parseFloat(e.fuel)||0);},0);
   const _am=_wl.reduce(function(s,e){return s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);},0);
@@ -430,8 +435,6 @@ function App(){
   const {y:cy,m:cm}=cal;
   const fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate();
   const dLogs=d=>{const s=`${cy}-${String(cm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return log.filter(e=>e.date===s);};
-  const weekStartOf=d=>{const x=new Date(d+'T00:00:00');const day=x.getDay();const diff=(day+6)%7;x.setDate(x.getDate()-diff);return x.toISOString().slice(0,10);};
-  const addDays=(d,n)=>{const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10);};
   const logWeeks=Object.values(log.reduce((m,e)=>{
     if(!e.date)return m;const ws=weekStartOf(e.date),we=addDays(ws,6);
     if(!m[ws])m[ws]={id:ws,weekStart:ws,weekEnd:we,gross:0,net:0,loads:0,mi:0,fuel:0};
