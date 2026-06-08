@@ -121,6 +121,16 @@ const MAINT_TYPES=['Oil Change','Tire Rotation','DEF Fill','Brake Service','Air 
 const sBadge=s=>s==='Active customer'||s==='Called - Interested'?{background:'#0b2e1a',color:'#4ade80',border:'1px solid #1a5530'}:s==='Follow up'?{background:'#271d00',color:'#fbbf24',border:'1px solid #4d3800'}:s==='Called - Not interested'?{background:'#2a0808',color:'#f87171',border:'1px solid #4d1515'}:s==='Called - No answer'?{background:'#181d18',color:'#6b8070',border:'1px solid #2a2f2a'}:{background:'transparent',color:DIM,border:'1px solid #1a2e1e'};
 const rC=r=>r>=3.5?'#4ade80':r>=2.5?'#fbbf24':'#f87171';
 const todayStr=()=>new Date().toISOString().slice(0,10);
+const normalizeDateInput=v=>{
+  const s=String(v||'').trim();if(!s)return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
+  const m=s.match(/^(\d{1,2})[\/. -](\d{1,2})(?:[\/. -](\d{2}|\d{4}))?$/);
+  if(!m)return '';
+  const y=m[3]?(m[3].length===2?'20'+m[3]:m[3]):String(new Date().getFullYear());
+  const mm=String(parseInt(m[1],10)).padStart(2,'0'),dd=String(parseInt(m[2],10)).padStart(2,'0');
+  const out=`${y}-${mm}-${dd}`,d=new Date(out+'T00:00:00');
+  return !isNaN(d)&&d.toISOString().slice(0,10)===out?out:'';
+};
 const cbColor=d=>{if(!d)return null;const t=todayStr();if(d<t)return '#f87171';if(d===t)return '#fbbf24';return G;};
 
 // localStorage persistence (works in a local HTML file)
@@ -237,6 +247,7 @@ function App(){
       .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
       .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
+      .money-grid,.log-form-grid,.maint-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
       .cb-today{animation:cbpulse 1.2s ease-in-out infinite}
       .cdv{border-radius:5px;padding:3px;min-height:40px;cursor:pointer;transition:background .12s}
       .cdv:hover{background:#0d2212!important}
@@ -245,6 +256,8 @@ function App(){
         .g12{grid-template-columns:1fr}
         .g11{grid-template-columns:1fr}
         .nav-tab{padding:10px 8px;font-size:9px}
+        .money-grid,.log-form-grid,.maint-form-grid{grid-template-columns:1fr!important}
+        .inp{font-size:16px;padding:10px 12px}
       }
     `;
     document.head.appendChild(s);
@@ -336,7 +349,9 @@ function App(){
   const startAddLog=()=>{setEditingLogId(null);setLogF(blankLog);setAddLog(true);};
   const startEditLog=e=>{setEditingLogId(e.id);setLogF({date:e.date||todayStr(),pickup:e.pickup||'',dropoff:e.dropoff||'',miles:String(e.miles??''),dh:String(e.dh??''),rpm:String(e.rpm??''),pay:String(e.pay??''),fuel:String(e.fuel??''),comments:e.comments||''});setAddLog(true);setRoute(e);setSec('logbook');setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
   const doAddLog=async()=>{
-    const base={date:logF.date,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:String(logF.rpm||''),pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
+    const normalizedDate=normalizeDateInput(logF.date);
+    if(!normalizedDate){flash('Use date like 2026-06-03 or 6/3/26');return;}
+    const base={date:normalizedDate,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:String(logF.rpm||''),pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
     if(editingLogId){
       const e={...base,id:editingLogId};
       const u=log.map(x=>x.id===editingLogId?{...x,...e}:x);setLog(u);setRoute(e);
@@ -507,7 +522,7 @@ function App(){
           </div>
           <div className="card">
             <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Weekly Money Tracker</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10}}>
+            <div className="money-grid">
               {[{l:'Amazon Relay',k:'ar'},{l:'DAT Gross',k:'dg'},{l:'Direct Local',k:'dl'},{l:'Fuel Spend',k:'fs'},{l:'Miles Driven',k:'mi'},{l:'Fuel $/Gal',k:'fp'},{l:'MPG',k:'mpg'},{l:'Target Gross',k:'tg'}].map(({l,k})=><div key={k}><span className="lbl">{l}</span><input className="inp" value={W[k]} onChange={e=>saveW(k,e.target.value)} inputMode="decimal"/></div>)}
             </div>
           </div>
@@ -594,8 +609,8 @@ function App(){
         <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
         {addLog&&<div className="card" style={{marginBottom:12}}>
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>{editingLogId?'Edit Load Entry':'New Load Entry'}</div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
-            {[{l:'Date',k:'date',t:'date'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'}].map(({l,k,t})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} onChange={e=>setLogF({...logF,[k]:e.target.value})} inputMode={t==='number'?'decimal':undefined}/></div>)}
+          <div className="log-form-grid" style={{marginBottom:10}}>
+            {[{l:'Date',k:'date',t:'text',p:'2026-06-03 or 6/3/26'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'}].map(({l,k,t,p})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} placeholder={p||''} onChange={e=>setLogF({...logF,[k]:e.target.value})} onBlur={k==='date'?e=>{const nd=normalizeDateInput(e.target.value);if(nd)setLogF(f=>({...f,date:nd}));}:undefined} inputMode={k==='date'?'numeric':t==='number'?'decimal':undefined}/></div>)}
           </div>
           <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
           <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddLog}>{editingLogId?'Save Changes':'Add to Logbook'}</button>{editingLogId&&<button className="btn-g" onClick={cancelLogEdit}>Cancel Edit</button>}</div>
@@ -682,7 +697,7 @@ function App(){
         </>}/>
         {addMaint&&<div className="card" style={{marginBottom:12}}>
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>New Maintenance Entry</div>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:10,marginBottom:10}}>
+          <div className="maint-form-grid" style={{marginBottom:10}}>
             <div><span className="lbl">Date</span><input className="inp" type="date" value={maintF.date} onChange={e=>setMaintF({...maintF,date:e.target.value})} style={{colorScheme:'dark'}}/></div>
             <div><span className="lbl">Service Type</span><select className="inp" value={maintF.type} onChange={e=>setMaintF({...maintF,type:e.target.value})}>{MAINT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
             <div><span className="lbl">Odometer (mi)</span><input className="inp" value={maintF.mileage} onChange={e=>setMaintF({...maintF,mileage:e.target.value})} inputMode="numeric" placeholder="180,000"/></div>
