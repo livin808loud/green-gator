@@ -63,11 +63,23 @@ const CITIES={
   'Myrtle Beach':[33.69,-78.89],'Myrtle Beach, SC':[33.69,-78.89],
   'Hilton Head':[32.22,-80.75],'Hilton Head, SC':[32.22,-80.75],
   'Wilmington':[34.23,-77.95],'Wilmington, NC':[34.23,-77.95],
-  'High Point':[35.96,-80.00],'High Point, NC':[35.96,-80.00]
+  'High Point':[35.96,-80.00],'High Point, NC':[35.96,-80.00],
+  'Appling':[33.55,-82.32],'Appling, GA':[33.55,-82.32],
+  'Estill':[32.75,-81.24],'Estill, SC':[32.75,-81.24],
+  'West Columbia':[33.99,-81.07],'West Columbia, SC':[33.99,-81.07],
+  'Beaufort':[32.43,-80.67],'Beaufort, SC':[32.43,-80.67],
+  'Hardeeville':[32.29,-81.08],'Hardeeville, SC':[32.29,-81.08]
 };
-const BG_CITIES=[['Atlanta',33.75,-84.39],['Charlotte',35.23,-80.84],['Columbia',34.00,-81.03],['Charleston',32.78,-79.93],['Raleigh',35.78,-78.64],['Savannah',32.08,-81.10],['Greenville',34.85,-82.40],['Knoxville',35.96,-83.92],['Nashville',36.16,-86.78],['Birmingham',33.52,-86.80],['Richmond',37.54,-77.44],['Jacksonville',30.33,-81.66]];
+const BG_CITIES=[['Atlanta',33.75,-84.39],['Charlotte',35.23,-80.84],['Columbia',34.00,-81.03],['Charleston',32.78,-79.93],['Raleigh',35.78,-78.64],['Savannah',32.08,-81.10],['Greenville',34.85,-82.40],['Knoxville',35.96,-83.92],['Nashville',36.16,-86.78],['Birmingham',33.52,-86.80],['Richmond',37.54,-77.44],['Jacksonville',30.33,-81.66],['Augusta',33.47,-81.97],['Appling',33.55,-82.32],['Estill',32.75,-81.24],['West Columbia',33.99,-81.07],['Beaufort',32.43,-80.67],['Hardeeville',32.29,-81.08],['Stevensville',38.98,-76.31]];
 const toXY=(lat,lng)=>[((lng+88)/11)*340,((38.5-lat)/9.5)*210];
 const pCoords=s=>{if(!s)return null;const c=s.split(',')[0].trim();return CITIES[s.trim()]||CITIES[c]||null;};
+const routeBounds=(a,b)=>{
+  const lats=[a[0],b[0]],lngs=[a[1],b[1]];
+  let minLat=Math.min(...lats),maxLat=Math.max(...lats),minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const latPad=Math.max(.35,(maxLat-minLat)*.28),lngPad=Math.max(.55,(maxLng-minLng)*.28);
+  minLat-=latPad;maxLat+=latPad;minLng-=lngPad;maxLng+=lngPad;
+  return{minLat,maxLat,minLng,maxLng,toXY:(lat,lng)=>[18+((lng-minLng)/(maxLng-minLng))*304,18+((maxLat-lat)/(maxLat-minLat))*174]};
+};
 
 const LEADS=[
   {id:1,name:"Jim Whitehead's Best One Tire",phone:"706-738-5126"},
@@ -670,28 +682,29 @@ function App(){
             </div>
           </div>
           <div className="card">
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:10}}>Route Map — Southeast US</div>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:10}}>Route Map</div>
             {route?(()=>{
               const pc2=pCoords(route.pickup);const dc=pCoords(route.dropoff);
-              const [px,py]=pc2?toXY(...pc2):[80,140];
-              const [dx,dy]=dc?toXY(...dc):[240,55];
               const hasReal=pc2&&dc;
+              const rb=hasReal?routeBounds(pc2,dc):null;
+              const [px,py]=hasReal?rb.toXY(...pc2):[80,140];
+              const [dx,dy]=hasReal?rb.toXY(...dc):[240,55];
+              const bg=hasReal?BG_CITIES.filter(([,lat,lng])=>lat>=rb.minLat&&lat<=rb.maxLat&&lng>=rb.minLng&&lng<=rb.maxLng):[];
               return <>
                 <div style={{borderRadius:8,overflow:'hidden',marginBottom:10,background:'#030806',border:'1px solid #1c3822'}}>
-                  <svg width="100%" viewBox="0 0 340 210" style={{display:'block'}}>
+                  {hasReal?<svg width="100%" viewBox="0 0 340 210" style={{display:'block'}}>
                     {[42,84,126,168].map(y=><line key={'y'+y} x1={0} y1={y} x2={340} y2={y} stroke="#1a3520" strokeWidth=".5"/>)}
                     {[68,136,204,272].map(x=><line key={'x'+x} x1={x} y1={0} x2={x} y2={210} stroke="#1a3520" strokeWidth=".5"/>)}
-                    {BG_CITIES.map(([name,lat,lng])=>{const [bx,by]=toXY(lat,lng);return <g key={name}><circle cx={bx} cy={by} r={2} fill="#1c3822"/><text x={bx} y={by-4} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">{name}</text></g>;})}
+                    {bg.map(([name,lat,lng])=>{const [bx,by]=rb.toXY(lat,lng);return <g key={name}><circle cx={bx} cy={by} r={2} fill="#1c3822"/><text x={bx} y={by-4} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">{name}</text></g>;})}
                     <line x1={px} y1={py} x2={dx} y2={dy} stroke="rgba(251,191,36,.08)" strokeWidth={12} strokeLinecap="round"/>
                     <line x1={px} y1={py} x2={dx} y2={dy} stroke="#fbbf24" strokeWidth={2} strokeDasharray="7,4" opacity=".9"/>
                     <circle cx={px} cy={py} r={11} fill="rgba(57,255,107,.08)"/>
                     <circle cx={px} cy={py} r={7} fill={G}/><circle cx={px} cy={py} r={3} fill="#030806"/>
                     <circle cx={dx} cy={dy} r={11} fill="rgba(251,191,36,.08)"/>
                     <circle cx={dx} cy={dy} r={7} fill="#fbbf24"/><circle cx={dx} cy={dy} r={3} fill="#030806"/>
-                    <text x={px} y={py+(py>dy?18:-10)} textAnchor="middle" fill={G} fontSize="8" fontFamily="monospace" fontWeight="700">↑ {route.pickup}</text>
-                    <text x={dx} y={dy+(py>dy?-10:18)} textAnchor="middle" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">{route.dropoff} ↓</text>
-                    {!hasReal&&<text x={170} y={205} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">Use "City, ST" format for real coords</text>}
-                  </svg>
+                    <text x={px} y={Math.max(12,Math.min(198,py+(py>dy?18:-10)))} textAnchor="middle" fill={G} fontSize="8" fontFamily="monospace" fontWeight="700">↑ {route.pickup}</text>
+                    <text x={dx} y={Math.max(12,Math.min(198,dy+(py>dy?-10:18)))} textAnchor="middle" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">{route.dropoff} ↓</text>
+                  </svg>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>Map needs recognized city/state names.<br/>I won’t fake coordinates anymore.</div>}
                 </div>
                 <div className="g3">
                   {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
