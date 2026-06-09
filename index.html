@@ -80,6 +80,7 @@ const routeBounds=(a,b)=>{
   minLat-=latPad;maxLat+=latPad;minLng-=lngPad;maxLng+=lngPad;
   return{minLat,maxLat,minLng,maxLng,toXY:(lat,lng)=>[18+((lng-minLng)/(maxLng-minLng))*304,18+((maxLat-lat)/(maxLat-minLat))*174]};
 };
+const googleRouteUrl=r=>'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(r?.pickup||'')+'&destination='+encodeURIComponent(r?.dropoff||'')+'&travelmode=driving';
 
 const LEADS=[
   {id:1,name:"Jim Whitehead's Best One Tire",phone:"706-738-5126"},
@@ -704,13 +705,14 @@ function App(){
                     <circle cx={dx} cy={dy} r={7} fill="#fbbf24"/><circle cx={dx} cy={dy} r={3} fill="#030806"/>
                     <text x={px} y={Math.max(12,Math.min(198,py+(py>dy?18:-10)))} textAnchor="middle" fill={G} fontSize="8" fontFamily="monospace" fontWeight="700">↑ {route.pickup}</text>
                     <text x={dx} y={Math.max(12,Math.min(198,dy+(py>dy?-10:18)))} textAnchor="middle" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">{route.dropoff} ↓</text>
-                  </svg>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>Map needs recognized city/state names.<br/>I won’t fake coordinates anymore.</div>}
+                  </svg>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>I don’t have local coordinates for this city yet.<br/>Use Google Maps for the real route.<br/><a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" style={{display:'inline-block',marginTop:10,color:G,border:'1px solid #1c3822',borderRadius:7,padding:'7px 12px',textDecoration:'none',fontWeight:700}}>Open in Google Maps →</a></div>}
                 </div>
                 <div className="g3">
                   {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
                 </div>
                 <div style={{marginTop:10,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
                   <button className="btn-g" onClick={()=>startEditLog(route)}>Edit Selected Load</button>
+                  <a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" className="btn-g" style={{textDecoration:'none'}}>Google Maps</a>
                   <span style={{color:DIM,fontSize:10}}>{route.comments||'No comments saved.'}</span>
                 </div>
               </>;
