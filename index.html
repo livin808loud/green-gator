@@ -7,6 +7,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:#050c06;font-family:'Courier New',Courier,monospace;color:#dceede;}
@@ -81,6 +83,21 @@ const routeBounds=(a,b)=>{
   return{minLat,maxLat,minLng,maxLng,toXY:(lat,lng)=>[18+((lng-minLng)/(maxLng-minLng))*304,18+((maxLat-lat)/(maxLat-minLat))*174]};
 };
 const googleRouteUrl=r=>'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(r?.pickup||'')+'&destination='+encodeURIComponent(r?.dropoff||'')+'&travelmode=driving';
+const GEO_CACHE_KEY='gg-geocode-v1';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const readGeoCache=()=>sg(GEO_CACHE_KEY)||{};
+const writeGeoCache=c=>ss(GEO_CACHE_KEY,c);
+const osmSearchUrl=q=>'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q='+encodeURIComponent(q);
+const geocodePlace=async place=>{
+  const clean=String(place||'').trim();if(!clean)return null;
+  const known=pCoords(clean);if(known)return{coords:known,source:'saved'};
+  const cache=readGeoCache();if(cache[clean])return{coords:cache[clean],source:'cached'};
+  const q=/,\s*[A-Z]{2}/.test(clean)?clean:clean+', USA';
+  const r=await fetch(osmSearchUrl(q),{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('geocode '+r.status);
+  const a=await r.json();if(!a?.[0])return null;
+  const coords=[parseFloat(a[0].lat),parseFloat(a[0].lon)];
+  cache[clean]=coords;writeGeoCache(cache);return{coords,source:'osm'};
+};
 
 const LEADS=[
   {id:1,name:"Jim Whitehead's Best One Tire",phone:"706-738-5126"},
@@ -261,6 +278,8 @@ function App(){
       .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
       .money-grid,.log-form-grid,.maint-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+      .route-map{height:230px;width:100%;background:#030806}
+      .leaflet-container{background:#030806;font-family:'Courier New',Courier,monospace}
       .cb-today{animation:cbpulse 1.2s ease-in-out infinite}
       .cdv{border-radius:5px;padding:3px;min-height:40px;cursor:pointer;transition:background .12s}
       .cdv:hover{background:#0d2212!important}
@@ -300,9 +319,48 @@ function App(){
   const [maintLog,setMaintLog]=useState([]);
   const [maintF,setMaintF]=useState({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});
   const [addMaint,setAddMaint]=useState(false);
+  const [editingMaintId,setEditingMaintId]=useState(null);
+  const [mapCoords,setMapCoords]=useState(null);
+  const [mapNote,setMapNote]=useState('');
+  const mapElRef=useRef(null);const leafletMapRef=useRef(null);
   const [weekHistory,setWeekHistory]=useState([]);
   const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||'2026-05-11');
   const refs={overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
+
+  useEffect(()=>{
+    let off=false;
+    const run=async()=>{
+      if(!route){setMapCoords(null);setMapNote('');return;}
+      setMapCoords(null);setMapNote('Checking map coordinates...');
+      try{
+        const pKnown=pCoords(route.pickup),dKnown=pCoords(route.dropoff);
+        const pRes=pKnown?{coords:pKnown,source:'saved'}:await geocodePlace(route.pickup);
+        if(!pKnown&&!dKnown)await sleep(1100);
+        const dRes=dKnown?{coords:dKnown,source:'saved'}:await geocodePlace(route.dropoff);
+        if(off)return;
+        if(pRes?.coords&&dRes?.coords){
+          setMapCoords({pickup:pRes.coords,dropoff:dRes.coords});
+          const used=[pRes.source,dRes.source].includes('osm')?' · found with OpenStreetMap':' · saved city coords';
+          setMapNote('Map ready'+used);
+        }else{setMapCoords(null);setMapNote('Could not map one of these places. Use Google Maps.');}
+      }catch(e){if(!off){setMapCoords(null);setMapNote('Map lookup failed. Use Google Maps.');}}
+    };
+    run();return()=>{off=true};
+  },[route?.id,route?.pickup,route?.dropoff]);
+
+  useEffect(()=>{
+    if(leafletMapRef.current){leafletMapRef.current.remove();leafletMapRef.current=null;}
+    if(!mapCoords||!mapElRef.current||!window.L)return;
+    const m=window.L.map(mapElRef.current,{zoomControl:false});leafletMapRef.current=m;
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(m);
+    const p=mapCoords.pickup,d=mapCoords.dropoff;
+    window.L.marker(p,{title:route.pickup}).addTo(m).bindPopup('Pickup: '+route.pickup);
+    window.L.marker(d,{title:route.dropoff}).addTo(m).bindPopup('Dropoff: '+route.dropoff);
+    window.L.polyline([p,d],{color:'#fbbf24',weight:4,dashArray:'8,6'}).addTo(m);
+    m.fitBounds([p,d],{padding:[28,28]});
+    setTimeout(()=>m.invalidateSize(),80);
+    return()=>{if(leafletMapRef.current){leafletMapRef.current.remove();leafletMapRef.current=null;}};
+  },[mapCoords,route?.id]);
 
   const loadLocal=()=>{
     const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
@@ -395,14 +453,22 @@ function App(){
     if(db)try{await db.patch('gg_config?key=eq.truck_balance',{value:tBal});await db.patch('gg_config?key=eq.maintenance_reserve',{value:tMaint});}catch{}
     setEditCfg(false);flash('Config saved');
   };
+  const resetMaintForm=()=>{setAddMaint(false);setEditingMaintId(null);setMaintF({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});};
+  const startEditMaint=e=>{setEditingMaintId(e.id);setMaintF({date:e.date||todayStr(),type:e.type||'Oil Change',mileage:String(e.mileage??''),cost:String(e.cost??''),notes:e.notes||''});setAddMaint(true);setTimeout(()=>refs.maintenance?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
   const doAddMaint=async()=>{
-    const e={id:Date.now(),...maintF,cost:parseFloat(maintF.cost)||0,mileage:parseFloat(maintF.mileage)||0};
-    const u=[e,...maintLog];setMaintLog(u);
-    if(db)try{await db.post('gg_maintenance',{date:e.date,type:e.type,mileage:e.mileage,cost:e.cost,notes:e.notes});}catch{}
-    else ss('gg-ml',u);
-    setAddMaint(false);setMaintF({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});flash('Maintenance saved');
+    const base={date:maintF.date,type:maintF.type,mileage:parseFloat(maintF.mileage)||0,cost:parseFloat(maintF.cost)||0,notes:maintF.notes};
+    if(editingMaintId){
+      const u=maintLog.map(x=>x.id===editingMaintId?{...x,...base}:x);setMaintLog(u);
+      if(db)try{await db.patch('gg_maintenance?id=eq.'+editingMaintId,base);}catch{}else ss('gg-ml',u);
+      resetMaintForm();flash('Maintenance updated');return;
+    }
+    const e={id:Date.now(),...base};let saved=e;
+    if(db)try{const r=await db.post('gg_maintenance',{date:e.date,type:e.type,mileage:e.mileage,cost:e.cost,notes:e.notes});if(r?.[0])saved=r[0];}catch{}
+    const u=[saved,...maintLog];setMaintLog(u);
+    if(!db)ss('gg-ml',u);
+    resetMaintForm();flash('Maintenance saved');
   };
-  const delMaint=async id=>{const u=maintLog.filter(e=>e.id!==id);setMaintLog(u);if(!db)ss('gg-ml',u);};
+  const delMaint=async id=>{const u=maintLog.filter(e=>e.id!==id);setMaintLog(u);if(editingMaintId===id)resetMaintForm();if(db)try{await db.del('gg_maintenance?id=eq.'+id);}catch{}else ss('gg-ml',u);};
   const doWeekReset=async()=>{
     const today=todayStr();
     const snap={id:Date.now(),weekStart:weekResetDate,weekEnd:today,mi:String(mi),gross:gross,net:net,loads:_wl.length};
@@ -683,30 +749,13 @@ function App(){
             </div>
           </div>
           <div className="card">
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:10}}>Route Map</div>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:10}}>Route Map — OpenStreetMap</div>
             {route?(()=>{
-              const pc2=pCoords(route.pickup);const dc=pCoords(route.dropoff);
-              const hasReal=pc2&&dc;
-              const rb=hasReal?routeBounds(pc2,dc):null;
-              const [px,py]=hasReal?rb.toXY(...pc2):[80,140];
-              const [dx,dy]=hasReal?rb.toXY(...dc):[240,55];
-              const bg=hasReal?BG_CITIES.filter(([,lat,lng])=>lat>=rb.minLat&&lat<=rb.maxLat&&lng>=rb.minLng&&lng<=rb.maxLng):[];
               return <>
-                <div style={{borderRadius:8,overflow:'hidden',marginBottom:10,background:'#030806',border:'1px solid #1c3822'}}>
-                  {hasReal?<svg width="100%" viewBox="0 0 340 210" style={{display:'block'}}>
-                    {[42,84,126,168].map(y=><line key={'y'+y} x1={0} y1={y} x2={340} y2={y} stroke="#1a3520" strokeWidth=".5"/>)}
-                    {[68,136,204,272].map(x=><line key={'x'+x} x1={x} y1={0} x2={x} y2={210} stroke="#1a3520" strokeWidth=".5"/>)}
-                    {bg.map(([name,lat,lng])=>{const [bx,by]=rb.toXY(lat,lng);return <g key={name}><circle cx={bx} cy={by} r={2} fill="#1c3822"/><text x={bx} y={by-4} textAnchor="middle" fill="#2a4530" fontSize="6.5" fontFamily="monospace">{name}</text></g>;})}
-                    <line x1={px} y1={py} x2={dx} y2={dy} stroke="rgba(251,191,36,.08)" strokeWidth={12} strokeLinecap="round"/>
-                    <line x1={px} y1={py} x2={dx} y2={dy} stroke="#fbbf24" strokeWidth={2} strokeDasharray="7,4" opacity=".9"/>
-                    <circle cx={px} cy={py} r={11} fill="rgba(57,255,107,.08)"/>
-                    <circle cx={px} cy={py} r={7} fill={G}/><circle cx={px} cy={py} r={3} fill="#030806"/>
-                    <circle cx={dx} cy={dy} r={11} fill="rgba(251,191,36,.08)"/>
-                    <circle cx={dx} cy={dy} r={7} fill="#fbbf24"/><circle cx={dx} cy={dy} r={3} fill="#030806"/>
-                    <text x={px} y={Math.max(12,Math.min(198,py+(py>dy?18:-10)))} textAnchor="middle" fill={G} fontSize="8" fontFamily="monospace" fontWeight="700">↑ {route.pickup}</text>
-                    <text x={dx} y={Math.max(12,Math.min(198,dy+(py>dy?-10:18)))} textAnchor="middle" fill="#fbbf24" fontSize="8" fontFamily="monospace" fontWeight="700">{route.dropoff} ↓</text>
-                  </svg>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>I don’t have local coordinates for this city yet.<br/>Use Google Maps for the real route.<br/><a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" style={{display:'inline-block',marginTop:10,color:G,border:'1px solid #1c3822',borderRadius:7,padding:'7px 12px',textDecoration:'none',fontWeight:700}}>Open in Google Maps →</a></div>}
+                <div style={{borderRadius:8,overflow:'hidden',marginBottom:8,background:'#030806',border:'1px solid #1c3822'}}>
+                  {mapCoords?<div ref={mapElRef} className="route-map"/>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>{mapNote||'Loading map...'}<br/><a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" style={{display:'inline-block',marginTop:10,color:G,border:'1px solid #1c3822',borderRadius:7,padding:'7px 12px',textDecoration:'none',fontWeight:700}}>Open in Google Maps →</a></div>}
                 </div>
+                <div style={{color:DIM,fontSize:9,marginBottom:10}}>© OpenStreetMap contributors · {mapNote}</div>
                 <div className="g3">
                   {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
                 </div>
@@ -725,10 +774,10 @@ function App(){
       {sec==='maintenance'&&<div className="section" ref={refs.maintenance}>
         <SH t="Maintenance Log" right={<>
           {maintLog.length>0&&<span style={{color:DIM,fontSize:11}}>Total spent: <span style={{color:'#f87171',fontWeight:700}}>${maintLog.reduce((s,e)=>s+(e.cost||0),0).toLocaleString()}</span></span>}
-          <button className={addMaint?'btn-g':'btn'} style={{fontSize:11,padding:'7px 14px',background:addMaint?'rgba(57,255,107,.06)':undefined,boxShadow:addMaint?'none':undefined}} onClick={()=>setAddMaint(!addMaint)}>{addMaint?'✕ Cancel':'+ Log Service'}</button>
+          <button className={addMaint?'btn-g':'btn'} style={{fontSize:11,padding:'7px 14px',background:addMaint?'rgba(57,255,107,.06)':undefined,boxShadow:addMaint?'none':undefined}} onClick={()=>addMaint?resetMaintForm():setAddMaint(true)}>{addMaint?'✕ Cancel':'+ Log Service'}</button>
         </>}/>
         {addMaint&&<div className="card" style={{marginBottom:12}}>
-          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>New Maintenance Entry</div>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>{editingMaintId?'Edit Maintenance Entry':'New Maintenance Entry'}</div>
           <div className="maint-form-grid" style={{marginBottom:10}}>
             <div><span className="lbl">Date</span><input className="inp" type="date" value={maintF.date} onChange={e=>setMaintF({...maintF,date:e.target.value})} style={{colorScheme:'dark'}}/></div>
             <div><span className="lbl">Service Type</span><select className="inp" value={maintF.type} onChange={e=>setMaintF({...maintF,type:e.target.value})}>{MAINT_TYPES.map(t=><option key={t} value={t}>{t}</option>)}</select></div>
@@ -736,12 +785,12 @@ function App(){
             <div><span className="lbl">Cost ($)</span><input className="inp" value={maintF.cost} onChange={e=>setMaintF({...maintF,cost:e.target.value})} inputMode="decimal" placeholder="0.00"/></div>
           </div>
           <div style={{marginBottom:12}}><span className="lbl">Notes / Next Service Due</span><input className="inp" value={maintF.notes} onChange={e=>setMaintF({...maintF,notes:e.target.value})} placeholder="Next oil change at 185,000 mi · parts used..."/></div>
-          <button className="btn" onClick={doAddMaint}>Save Entry</button>
+          <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddMaint}>{editingMaintId?'Save Changes':'Save Entry'}</button>{editingMaintId&&<button className="btn-g" onClick={resetMaintForm}>Cancel Edit</button>}</div>
         </div>}
         {maintLog.length>0?<div className="card" style={{padding:0,overflow:'hidden'}}>
           <table className="tbl">
             <thead><tr>{['DATE','SERVICE TYPE','ODOMETER','COST','NOTES',''].map(h=><th key={h}>{h}</th>)}</tr></thead>
-            <tbody>{maintLog.map(e=><tr key={e.id}><td style={{color:DIM,fontSize:10}}>{e.date}</td><td style={{color:'#c8e0cc',fontWeight:700}}>{e.type}</td><td>{(e.mileage||0).toLocaleString()}mi</td><td style={{color:'#f87171',fontWeight:700}}>${e.cost||0}</td><td style={{color:DIM,maxWidth:180,fontSize:10}}>{e.notes}</td><td><button className="btn-danger" onClick={()=>delMaint(e.id)}>Del</button></td></tr>)}
+            <tbody>{maintLog.map(e=><tr key={e.id}><td style={{color:DIM,fontSize:10}}>{e.date}</td><td style={{color:'#c8e0cc',fontWeight:700}}>{e.type}</td><td>{(e.mileage||0).toLocaleString()}mi</td><td style={{color:'#f87171',fontWeight:700}}>${e.cost||0}</td><td style={{color:DIM,maxWidth:180,fontSize:10}}>{e.notes}</td><td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={()=>startEditMaint(e)}>Edit</button><button className="btn-danger" onClick={()=>delMaint(e.id)}>Del</button></td></tr>)}
             </tbody>
           </table>
         </div>:<div style={{color:DIM,fontSize:12,padding:'20px 0',textAlign:'center'}}>No maintenance entries yet.</div>}
