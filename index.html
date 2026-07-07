@@ -4,6 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Green Gator Enterprises — Ops Dashboard</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#050c06"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Green Gator"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
@@ -88,15 +96,23 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const readGeoCache=()=>sg(GEO_CACHE_KEY)||{};
 const writeGeoCache=c=>ss(GEO_CACHE_KEY,c);
 const osmSearchUrl=q=>'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q='+encodeURIComponent(q);
+const photonUrl=q=>'https://photon.komoot.io/api/?limit=1&q='+encodeURIComponent(q);
 const geocodePlace=async place=>{
   const clean=String(place||'').trim();if(!clean)return null;
   const known=pCoords(clean);if(known)return{coords:known,source:'saved'};
   const cache=readGeoCache();if(cache[clean])return{coords:cache[clean],source:'cached'};
-  const q=/,\s*[A-Z]{2}/.test(clean)?clean:clean+', USA';
-  const r=await fetch(osmSearchUrl(q),{headers:{'Accept':'application/json'}});if(!r.ok)throw new Error('geocode '+r.status);
-  const a=await r.json();if(!a?.[0])return null;
-  const coords=[parseFloat(a[0].lat),parseFloat(a[0].lon)];
-  cache[clean]=coords;writeGeoCache(cache);return{coords,source:'osm'};
+  const q=/,\s*[A-Z]{2}\b/.test(clean)?clean:clean+', USA';
+  // Provider 1: OpenStreetMap Nominatim
+  try{
+    const r=await fetch(osmSearchUrl(q),{headers:{'Accept':'application/json'}});
+    if(r.ok){const a=await r.json();if(a?.[0]){const coords=[parseFloat(a[0].lat),parseFloat(a[0].lon)];cache[clean]=coords;writeGeoCache(cache);return{coords,source:'osm'};}}
+  }catch(e){}
+  // Provider 2 (backup): Photon geocoder
+  try{
+    const r2=await fetch(photonUrl(q),{headers:{'Accept':'application/json'}});
+    if(r2.ok){const a2=await r2.json();const f=a2?.features?.[0];if(f?.geometry?.coordinates){const coords=[parseFloat(f.geometry.coordinates[1]),parseFloat(f.geometry.coordinates[0])];cache[clean]=coords;writeGeoCache(cache);return{coords,source:'photon'};}}
+  }catch(e){}
+  return null;
 };
 
 const LEADS=[
@@ -151,6 +167,8 @@ const MAINT_TYPES=['Oil Change','Tire Rotation','DEF Fill','Brake Service','Air 
 const sBadge=s=>s==='Active customer'||s==='Called - Interested'?{background:'#0b2e1a',color:'#4ade80',border:'1px solid #1a5530'}:s==='Follow up'?{background:'#271d00',color:'#fbbf24',border:'1px solid #4d3800'}:s==='Called - Not interested'?{background:'#2a0808',color:'#f87171',border:'1px solid #4d1515'}:s==='Called - No answer'?{background:'#181d18',color:'#6b8070',border:'1px solid #2a2f2a'}:{background:'transparent',color:DIM,border:'1px solid #1a2e1e'};
 const rC=r=>r>=3.5?'#4ade80':r>=2.5?'#fbbf24':'#f87171';
 const todayStr=()=>new Date().toISOString().slice(0,10);
+const fmtDate=d=>{if(!d)return'';const m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[2]}/${m[3]}/${m[1]}`:String(d);};
+const parseStates=s=>{const out=[];const re=/([A-Za-z]{2})\s*[:= ]\s*(\d+(?:\.\d+)?)/g;let m;const str=String(s||'');while((m=re.exec(str)))out.push([m[1].toUpperCase(),parseFloat(m[2])]);return out;};
 const normalizeDateInput=v=>{
   const s=String(v||'').trim();if(!s)return '';
   if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;
@@ -283,6 +301,20 @@ function App(){
       .cb-today{animation:cbpulse 1.2s ease-in-out infinite}
       .cdv{border-radius:5px;padding:3px;min-height:40px;cursor:pointer;transition:background .12s}
       .cdv:hover{background:#0d2212!important}
+      .tbl-tight th{padding:8px 8px}
+      .tbl-tight td{padding:7px 8px}
+      .route-cell{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .route-arrow{color:#39ff6b;margin:0 4px}
+      .icon-btn{background:transparent;border:1px solid #1c3822;border-radius:5px;color:#39ff6b;cursor:pointer;font-size:11px;padding:3px 7px;font-family:inherit;transition:all .15s;line-height:1}
+      .icon-btn:hover{border-color:rgba(57,255,107,.4);background:rgba(57,255,107,.05)}
+      .icon-btn.danger{color:#f87171;border-color:rgba(248,113,113,.2)}
+      .icon-btn.danger:hover{background:rgba(248,113,113,.12)}
+      .show-sm{display:none}
+      @media(max-width:700px){
+        .hide-sm{display:none!important}
+        .show-sm{display:inline}
+        .route-cell{max-width:130px}
+      }
       @media(max-width:600px){
         .g4{grid-template-columns:repeat(2,1fr)}
         .g12{grid-template-columns:1fr}
@@ -290,6 +322,7 @@ function App(){
         .nav-tab{padding:10px 8px;font-size:9px}
         .money-grid,.log-form-grid,.maint-form-grid{grid-template-columns:1fr!important}
         .inp{font-size:16px;padding:10px 12px}
+        .tbl-tight th,.tbl-tight td{padding:7px 6px;font-size:10px}
       }
     `;
     document.head.appendChild(s);
@@ -305,7 +338,7 @@ function App(){
   const [search,setSearch]=useState('');
   const [statusFilter,setStatusFilter]=useState('All');
   const [log,setLog]=useState(SEEDS);
-  const blankLog={date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''};
+  const blankLog={date:fmtDate(todayStr()),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',states:'',comments:''};
   const [logF,setLogF]=useState(blankLog);
   const [addLog,setAddLog]=useState(false);
   const [editingLogId,setEditingLogId]=useState(null);
@@ -322,6 +355,8 @@ function App(){
   const [editingMaintId,setEditingMaintId]=useState(null);
   const [mapCoords,setMapCoords]=useState(null);
   const [mapNote,setMapNote]=useState('');
+  const [mapFallback,setMapFallback]=useState(false);
+  const [selMonth,setSelMonth]=useState('all');
   const mapElRef=useRef(null);const leafletMapRef=useRef(null);
   const [weekHistory,setWeekHistory]=useState([]);
   const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||'2026-05-11');
@@ -330,8 +365,9 @@ function App(){
   useEffect(()=>{
     let off=false;
     const run=async()=>{
-      if(!route){setMapCoords(null);setMapNote('');return;}
-      setMapCoords(null);setMapNote('Checking map coordinates...');
+      if(!route){setMapCoords(null);setMapNote('');setMapFallback(false);return;}
+      setMapCoords(null);setMapFallback(false);setMapNote('Checking map coordinates...');
+      const hasBoth=!!(route.pickup&&route.dropoff);
       try{
         const pKnown=pCoords(route.pickup),dKnown=pCoords(route.dropoff);
         const pRes=pKnown?{coords:pKnown,source:'saved'}:await geocodePlace(route.pickup);
@@ -339,11 +375,11 @@ function App(){
         const dRes=dKnown?{coords:dKnown,source:'saved'}:await geocodePlace(route.dropoff);
         if(off)return;
         if(pRes?.coords&&dRes?.coords){
-          setMapCoords({pickup:pRes.coords,dropoff:dRes.coords});
-          const used=[pRes.source,dRes.source].includes('osm')?' · found with OpenStreetMap':' · saved city coords';
+          setMapCoords({pickup:pRes.coords,dropoff:dRes.coords});setMapFallback(false);
+          const used=[pRes.source,dRes.source].some(s=>s==='osm'||s==='photon')?' · geocoded live':' · saved city coords';
           setMapNote('Map ready'+used);
-        }else{setMapCoords(null);setMapNote('Could not map one of these places. Use Google Maps.');}
-      }catch(e){if(!off){setMapCoords(null);setMapNote('Map lookup failed. Use Google Maps.');}}
+        }else{setMapCoords(null);setMapFallback(hasBoth);setMapNote(hasBoth?'Showing backup route map (Google).':'Add pickup & dropoff to map this load.');}
+      }catch(e){if(!off){setMapCoords(null);setMapFallback(hasBoth);setMapNote(hasBoth?'Showing backup route map (Google).':'Map lookup failed.');}}
     };
     run();return()=>{off=true};
   },[route?.id,route?.pickup,route?.dropoff]);
@@ -407,7 +443,7 @@ function App(){
   const openWeek=w=>{
     if(!w?.weekStart)return;
     const week={start:w.weekStart,end:w.weekEnd||addDays(w.weekStart,6)};
-    setSelectedWeek(week);
+    setSelectedWeek(week);setSelMonth('all');
     const first=log.find(e=>e.date>=week.start&&e.date<=week.end);
     if(first)setRoute(first);
     setSec('logbook');
@@ -428,20 +464,21 @@ function App(){
     flash('Lead #'+lf.num+' saved');
   };
   const startAddLog=()=>{setEditingLogId(null);setLogF(blankLog);setAddLog(true);};
-  const startEditLog=e=>{setEditingLogId(e.id);setLogF({date:e.date||todayStr(),pickup:e.pickup||'',dropoff:e.dropoff||'',miles:String(e.miles??''),dh:String(e.dh??''),rpm:String(e.rpm??''),pay:String(e.pay??''),fuel:String(e.fuel??''),comments:e.comments||''});setAddLog(true);setRoute(e);setSec('logbook');setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
+  const startEditLog=e=>{setEditingLogId(e.id);setLogF({date:fmtDate(e.date)||fmtDate(todayStr()),pickup:e.pickup||'',dropoff:e.dropoff||'',miles:String(e.miles??''),dh:String(e.dh??''),rpm:String(e.rpm??''),pay:String(e.pay??''),fuel:String(e.fuel??''),states:e.states||'',comments:e.comments||''});setAddLog(true);setRoute(e);setSec('logbook');setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
   const doAddLog=async()=>{
     const normalizedDate=normalizeDateInput(logF.date);
-    if(!normalizedDate){flash('Use date like 2026-06-03 or 6/3/26');return;}
-    const base={date:normalizedDate,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:String(logF.rpm||''),pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,comments:logF.comments};
+    if(!normalizedDate){flash('Use date like 07/05/2026 or 7/5/26');return;}
+    const base={date:normalizedDate,pickup:logF.pickup,dropoff:logF.dropoff,miles:parseFloat(logF.miles)||0,dh:parseFloat(logF.dh)||0,rpm:String(logF.rpm||''),pay:parseFloat(logF.pay)||0,fuel:parseFloat(logF.fuel)||0,states:String(logF.states||''),comments:logF.comments};
+    const noStates=b=>{const{states,...rest}=b;return rest;};
     if(editingLogId){
       const e={...base,id:editingLogId};
       const u=log.map(x=>x.id===editingLogId?{...x,...e}:x);setLog(u);setRoute(e);
-      if(db)try{await db.patch('gg_log?id=eq.'+editingLogId,base);}catch{}else ss('gg-lg',u);
+      if(db)try{await db.patch('gg_log?id=eq.'+editingLogId,base);}catch{try{await db.patch('gg_log?id=eq.'+editingLogId,noStates(base));}catch{}}else ss('gg-lg',u);
       setEditingLogId(null);setAddLog(false);setLogF(blankLog);flash('Load updated');return;
     }
     const e={id:Date.now(),...base};
     const u=[e,...log];setLog(u);setRoute(e);setAddLog(false);
-    if(db)try{await db.post('gg_log',{date:e.date,pickup:e.pickup,dropoff:e.dropoff,miles:e.miles,dh:e.dh,rpm:e.rpm,pay:e.pay,fuel:e.fuel,comments:e.comments});}catch{}
+    if(db)try{await db.post('gg_log',base);}catch{try{await db.post('gg_log',noStates(base));}catch{}}
     else ss('gg-lg',u);
     setLogF(blankLog);flash('Load logged');
   };
@@ -510,14 +547,25 @@ function App(){
   const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
   const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
   const avgRpm=(()=>{const tm=log.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=log.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?tn/tm:0;})();
-  const moMonth=nowD.getMonth(),moYear=nowD.getFullYear();
-  const moKey=`${moYear}-${String(moMonth+1).padStart(2,'0')}`;
-  const moName=MONTHS[moMonth]+' '+moYear;
-  const moLogs=log.filter(e=>e.date?.startsWith(moKey));
-  const moGross=moLogs.reduce((s,e)=>s+(e.pay||0),0);
-  const moFuel=moLogs.reduce((s,e)=>s+(e.fuel||0),0);
-  const moNet=moGross-moFuel;const moProfit=moNet-2331;
-  const moMiles=moLogs.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);
+  const curKey=`${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}`;
+  const monthOptions=(()=>{const set=new Set([curKey]);log.forEach(e=>{const k=String(e.date||'').slice(0,7);if(/^\d{4}-\d{2}$/.test(k))set.add(k);});return [...set].sort((a,b)=>b.localeCompare(a));})();
+  const monthLabel=k=>{const[y,m]=String(k).split('-');return (MONTHS[parseInt(m,10)-1]||'?')+' '+y;};
+  const prevMonthKey=k=>{let[y,m]=String(k).split('-').map(Number);m-=1;if(m===0){m=12;y-=1;}return `${y}-${String(m).padStart(2,'0')}`;};
+  const monthStats=k=>{
+    const ls=log.filter(e=>String(e.date||'').startsWith(k));
+    const gross=ls.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
+    const fuel=ls.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
+    const miles=ls.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
+    const net=gross-fuel;
+    return{logs:ls,loads:ls.length,gross,fuel,miles,net,rpm:miles>0?net/miles:0};
+  };
+  const moKey=selMonth==='all'?curKey:selMonth;
+  const moName=monthLabel(moKey);
+  const prevKey=prevMonthKey(moKey);
+  const prevName=monthLabel(prevKey);
+  const M1=monthStats(moKey),M0=monthStats(prevKey);
+  const moLogs=M1.logs,moGross=M1.gross,moFuel=M1.fuel,moNet=M1.net,moMiles=M1.miles;
+  const moProfit=moNet-2331;
   const overdue=leads.filter(l=>l.callbackDate&&l.callbackDate<todayStr());
   const dueToday=leads.filter(l=>l.callbackDate===todayStr());
   const filtered=leads.filter(l=>{const ms=statusFilter==='All'||l.status===statusFilter;const mq=!search||l.name.toLowerCase().includes(search.toLowerCase())||l.phone.includes(search);return ms&&mq;});
@@ -531,8 +579,104 @@ function App(){
     return m;
   },{})).sort((a,b)=>b.weekStart.localeCompare(a.weekStart));
   const overviewWeeks=logWeeks.length?logWeeks:weekHistory;
-  const shownLog=selectedWeek?log.filter(e=>e.date>=selectedWeek.start&&e.date<=selectedWeek.end):log;
-  const weekFilterLabel=selectedWeek?selectedWeek.start+' → '+selectedWeek.end:'';
+  const shownLog=(selectedWeek?log.filter(e=>e.date>=selectedWeek.start&&e.date<=selectedWeek.end):selMonth!=='all'?log.filter(e=>String(e.date||'').startsWith(selMonth)):log).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  const weekFilterLabel=selectedWeek?fmtDate(selectedWeek.start)+' → '+fmtDate(selectedWeek.end):'';
+  const exportCSV=()=>{
+    if(!shownLog.length){flash('Nothing to export');return;}
+    const esc=v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const rows=[['Date','Pickup','Dropoff','Loaded Miles','Deadhead Miles','Total Miles','Rate/Mile','Gross Pay','Fuel','Net','Net RPM','Comments']];
+    shownLog.forEach(e=>{
+      const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);
+      const net=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);
+      rows.push([fmtDate(e.date),e.pickup||'',e.dropoff||'',e.miles||0,e.dh||0,tot,e.rpm||'',e.pay||0,e.fuel||0,net,tot>0?(net/tot).toFixed(2):'',e.comments||'']);
+    });
+    const totG=shownLog.reduce((s,e)=>s+(parseFloat(e.pay)||0),0),totF=shownLog.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0),totM=shownLog.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
+    rows.push([]);rows.push(['TOTALS','','','','',totM,'',totG,totF,totG-totF,totM>0?((totG-totF)/totM).toFixed(2):'','']);
+    const csv=rows.map(r=>(r||[]).map(esc).join(',')).join('\r\n');
+    const tag=selectedWeek?('week-'+selectedWeek.start):selMonth!=='all'?selMonth:'all-loads';
+    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='green-gator-loads-'+tag+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+    flash('CSV exported ✓');
+  };
+  const fuelFlag=e=>{
+    const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);if(tot<=0)return null;
+    const mpgV=parseFloat(W.mpg)||9,fpV=parseFloat(W.fp)||5.15;
+    const est=(tot/mpgV)*fpV,f=parseFloat(e.fuel)||0;
+    if(f===0)return tot>50?{t:'none',est}:null;
+    const dev=Math.abs(f-est);
+    if(est>0&&dev/est>0.4&&dev>25)return{t:f>est?'high':'low',est};
+    return null;
+  };
+  const iftaAgg=(()=>{const agg={},un={loads:0,miles:0};let mismatch=0;
+    shownLog.forEach(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const st=parseStates(e.states);
+      if(!st.length){un.loads++;un.miles+=tot;return;}
+      let sum=0;st.forEach(([s,m])=>{agg[s]=(agg[s]||0)+m;sum+=m;});
+      if(tot>0&&Math.abs(sum-tot)/tot>0.1)mismatch++;});
+    return{agg,un,mismatch};})();
+  const exportIFTA=()=>{
+    if(!shownLog.length){flash('Nothing to export');return;}
+    const esc=v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const rows=[['Date','Pickup','Dropoff','Total Miles','State','State Miles']];
+    shownLog.slice().reverse().forEach(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const st=parseStates(e.states);
+      if(!st.length)rows.push([fmtDate(e.date),e.pickup||'',e.dropoff||'',tot,'UNTAGGED',tot]);
+      else st.forEach(([s,m])=>rows.push([fmtDate(e.date),e.pickup||'',e.dropoff||'',tot,s,m]));});
+    rows.push([]);rows.push(['STATE TOTALS','','','','','']);
+    Object.keys(iftaAgg.agg).sort().forEach(s=>rows.push(['','','','',s,Math.round(iftaAgg.agg[s]*10)/10]));
+    if(iftaAgg.un.miles>0)rows.push(['','','','','UNTAGGED',Math.round(iftaAgg.un.miles*10)/10]);
+    const csv=rows.map(r=>(r||[]).map(esc).join(',')).join('\r\n');
+    const tag=selectedWeek?('week-'+selectedWeek.start):selMonth!=='all'?selMonth:'all-loads';
+    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='green-gator-ifta-'+tag+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+    flash('IFTA CSV exported ✓');
+  };
+  const exportPnL=()=>{
+    const key=moKey,name=moName;
+    const S=monthStats(key);
+    if(!S.loads){flash('No loads in '+name);return;}
+    const mMaint=maintLog.filter(e=>String(e.date||'').startsWith(key));
+    const maintTotal=mMaint.reduce((s,e)=>s+(parseFloat(e.cost)||0),0);
+    const overhead=2331;
+    const profit=S.net-maintTotal-overhead;
+    const money=v=>'$'+(Math.round(v*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const rowsHtml=S.logs.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const net=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);return `<tr><td>${fmtDate(e.date)}</td><td>${(e.pickup||'')+' → '+(e.dropoff||'')}</td><td class="r">${tot}</td><td class="r">${money(e.pay||0)}</td><td class="r">${money(e.fuel||0)}</td><td class="r">${money(net)}</td></tr>`;}).join('');
+    const maintHtml=mMaint.length?mMaint.map(e=>`<tr><td>${fmtDate(e.date)}</td><td>${e.type||''}</td><td>${e.notes||''}</td><td class="r">${money(e.cost||0)}</td></tr>`).join(''):'<tr><td colspan="4" style="color:#888">No maintenance recorded this month.</td></tr>';
+    const html=`<!DOCTYPE html><html><head><title>P&L — ${name} — Green Gator Enterprises</title><style>
+      body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:36px;font-size:12px}
+      h1{font-size:20px;margin:0}h2{font-size:13px;margin:24px 0 8px;border-bottom:2px solid #111;padding-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+      .sub{color:#555;margin:4px 0 0}
+      table{width:100%;border-collapse:collapse;margin-top:6px}
+      th{text-align:left;border-bottom:1.5px solid #111;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+      td{padding:6px 8px;border-bottom:1px solid #ddd}
+      .r{text-align:right;white-space:nowrap}
+      .sum td{font-weight:bold;border-top:2px solid #111;border-bottom:none}
+      .neg{color:#b00020}.pos{color:#0a7a2f}
+      .foot{margin-top:36px;color:#777;font-size:10px}
+      @media print{body{margin:14mm}}
+    </style></head><body>
+      <h1>Green Gator Enterprises LLC</h1>
+      <div class="sub">Profit &amp; Loss Statement — ${name}</div>
+      <div class="sub">Generated ${fmtDate(todayStr())} · ${S.loads} loads · ${S.miles.toLocaleString()} total miles</div>
+      <h2>Summary</h2>
+      <table>
+        <tr><td>Gross Revenue</td><td class="r">${money(S.gross)}</td></tr>
+        <tr><td>Fuel</td><td class="r neg">(${money(S.fuel)})</td></tr>
+        <tr><td>Maintenance &amp; Repairs</td><td class="r neg">(${money(maintTotal)})</td></tr>
+        <tr><td>Fixed Overhead (insurance, truck note, DAT, QB, addr)</td><td class="r neg">(${money(overhead)})</td></tr>
+        <tr class="sum"><td>Net Profit</td><td class="r ${profit>=0?'pos':'neg'}">${money(profit)}</td></tr>
+      </table>
+      <h2>Load Detail</h2>
+      <table><thead><tr><th>Date</th><th>Route</th><th class="r">Miles</th><th class="r">Gross</th><th class="r">Fuel</th><th class="r">Net</th></tr></thead>
+      <tbody>${rowsHtml}<tr class="sum"><td colspan="2">Totals</td><td class="r">${S.miles.toLocaleString()}</td><td class="r">${money(S.gross)}</td><td class="r">${money(S.fuel)}</td><td class="r">${money(S.net)}</td></tr></tbody></table>
+      <h2>Maintenance Detail</h2>
+      <table><thead><tr><th>Date</th><th>Service</th><th>Notes</th><th class="r">Cost</th></tr></thead><tbody>${maintHtml}${mMaint.length?`<tr class="sum"><td colspan="3">Total</td><td class="r">${money(maintTotal)}</td></tr>`:''}</tbody></table>
+      <div class="foot">Prepared from Green Gator Ops Dashboard load logbook. Avg net rate: ${S.miles>0?'$'+S.rpm.toFixed(2)+'/mi':'—'}. Fixed overhead is a standing monthly estimate.</div>
+      <script>window.onload=function(){setTimeout(function(){window.print();},350);};<\/script>
+    </body></html>`;
+    const w=window.open('','_blank');
+    if(!w){flash('Popup blocked — allow popups for P&L report');return;}
+    w.document.write(html);w.document.close();
+    flash('P&L report opened — use Print → Save as PDF');
+  };
 
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
   if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
@@ -697,39 +841,106 @@ function App(){
 
       {/* LOGBOOK */}
       {sec==='logbook'&&<div className="section" ref={refs.logbook}>
-        <SH t={selectedWeek?'Load Logbook — '+weekFilterLabel:'Load Logbook'} right={<>
-          {selectedWeek&&<button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>setSelectedWeek(null)}>Show All Loads</button>}
+        <SH t={selectedWeek?'Load Logbook — Week '+weekFilterLabel:selMonth!=='all'?'Load Logbook — '+monthLabel(selMonth):'Load Logbook'} right={<>
           {[{l:'Loads',v:shownLog.length},{l:'Total Gross',v:'$'+shownLog.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:(()=>{const tm=shownLog.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=shownLog.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?'$'+(tn/tm).toFixed(2):'—';})()}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
         </>}/>
-        <div style={{marginBottom:12}}><button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button></div>
+        <div style={{marginBottom:12,display:'flex',gap:8,alignItems:'flex-end',flexWrap:'wrap'}}>
+          <button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button>
+          <div>
+            <span className="lbl">Month</span>
+            <select className="inp" style={{width:170}} value={selMonth} onChange={e=>{setSelMonth(e.target.value);setSelectedWeek(null);}}>
+              <option value="all">All Months</option>
+              {monthOptions.map(k=><option key={k} value={k}>{monthLabel(k)}</option>)}
+            </select>
+          </div>
+          {selectedWeek&&<button className="btn-g" style={{fontSize:10,padding:'8px 11px'}} onClick={()=>setSelectedWeek(null)}>✕ Clear Week Filter</button>}
+          <div style={{marginLeft:'auto',display:'flex',gap:8}}>
+            <button className="btn-g" onClick={exportPnL} title="Printable Profit & Loss for the selected month — use Print → Save as PDF">🖨 P&L Report</button>
+            <button className="btn-g" onClick={exportCSV} title="Download the loads shown below as a CSV file">⬇ Export CSV</button>
+          </div>
+        </div>
         {addLog&&<div className="card" style={{marginBottom:12}}>
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>{editingLogId?'Edit Load Entry':'New Load Entry'}</div>
           <div className="log-form-grid" style={{marginBottom:10}}>
-            {[{l:'Date',k:'date',t:'text',p:'2026-06-03 or 6/3/26'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'}].map(({l,k,t,p})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} placeholder={p||''} onChange={e=>setLogF({...logF,[k]:e.target.value})} onBlur={k==='date'?e=>{const nd=normalizeDateInput(e.target.value);if(nd)setLogF(f=>({...f,date:nd}));}:undefined} inputMode={k==='date'?'numeric':t==='number'?'decimal':undefined}/></div>)}
+            {[{l:'Date',k:'date',t:'text',p:'07/05/2026 or 7/5/26'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'},{l:'State Miles (IFTA)',k:'states',p:'GA:120, SC:80'}].map(({l,k,t,p})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} placeholder={p||''} onChange={e=>setLogF({...logF,[k]:e.target.value})} onBlur={k==='date'?e=>{const nd=normalizeDateInput(e.target.value);if(nd)setLogF(f=>({...f,date:fmtDate(nd)}));}:undefined} inputMode={k==='date'?'numeric':t==='number'?'decimal':undefined}/></div>)}
           </div>
           <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
           <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddLog}>{editingLogId?'Save Changes':'Add to Logbook'}</button>{editingLogId&&<button className="btn-g" onClick={cancelLogEdit}>Cancel Edit</button>}</div>
         </div>}
         {shownLog.length>0&&<div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
+          <table className="tbl tbl-tight" style={{tableLayout:'auto'}}>
+            <thead><tr>
+              <th>DATE</th><th>ROUTE</th><th>MILES</th><th>GROSS</th><th className="hide-sm">FUEL</th><th>NET</th><th className="hide-sm">NET RPM</th><th style={{textAlign:'right'}}></th>
+            </tr></thead>
+            <tbody>{shownLog.map(e=>{const tot=(e.miles||0)+(e.dh||0);const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
+              return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
+                <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{fmtDate(e.date)}</td>
+                <td className="route-cell" title={(e.pickup||'')+' → '+(e.dropoff||'')}>{e.pickup?.split(',')[0]}<span className="route-arrow">→</span>{e.dropoff?.split(',')[0]}</td>
+                <td style={{whiteSpace:'nowrap'}}>{tot}<span style={{color:DIM,fontSize:9}}>mi</span>{(e.dh||0)>0&&<span className="hide-sm" style={{color:DIM,fontSize:9}}> ({e.dh}dh)</span>}</td>
+                <td style={{color:G,fontWeight:700,whiteSpace:'nowrap'}}>${e.pay}</td>
+                <td className="hide-sm" style={{color:'#f87171',whiteSpace:'nowrap'}}>${e.fuel}{(()=>{const fl=fuelFlag(e);if(!fl)return null;const tot2=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const msg=fl.t==='none'?'No fuel logged on this load. A '+tot2+'mi trip at your '+(W.mpg||9)+' MPG and $'+(W.fp||'5.15')+'/gal usually burns about $'+fl.est.toFixed(0)+'.':'You logged $'+(e.fuel||0)+' fuel, but '+tot2+'mi at '+(W.mpg||9)+' MPG and $'+(W.fp||'5.15')+'/gal usually burns about $'+fl.est.toFixed(0)+'. Looks '+(fl.t==='high'?'high':'low')+' — double-check the entry (or ignore if you topped off the tank).';return <span title={msg} style={{cursor:'help',marginLeft:4,color:'#fbbf24'}}>⚠</span>;})()}</td>
+                <td style={{color:np>=0?G:'#f87171',fontWeight:700,whiteSpace:'nowrap'}}>${np}{(()=>{const fl=fuelFlag(e);return fl?<span className="show-sm" title="Check fuel entry on this load" style={{marginLeft:3,color:'#fbbf24',fontWeight:400}}>⚠</span>:null;})()}</td>
+                <td className="hide-sm" style={{whiteSpace:'nowrap'}}><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
+                <td style={{whiteSpace:'nowrap',textAlign:'right'}}><button className="icon-btn" title="Edit load" style={{marginRight:5}} onClick={ev=>{ev.stopPropagation();startEditLog(e);}}>✎</button><button className="icon-btn danger" title="Delete load" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>✕</button></td>
+              </tr>;
+            })}</tbody>
+          </table>
+        </div>}
+        {shownLog.length===0&&<div className="card" style={{color:DIM,fontSize:12,textAlign:'center',marginBottom:12}}>No loads found for this filter.</div>}
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>Month vs Month — {moName} <span style={{color:DIM}}>vs</span> {prevName}</div>
+            {M0.loads===0&&<span style={{color:DIM,fontSize:10}}>No data logged for {prevName}</span>}
+          </div>
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
-              <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','FUEL','NET','NET RPM','ACTIONS'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{shownLog.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);
-                return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
-                  <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{e.date}</td>
-                  <td style={{whiteSpace:'nowrap'}}>{e.pickup}</td><td style={{whiteSpace:'nowrap'}}>{e.dropoff}</td>
-                  <td>{e.miles}mi</td><td style={{color:DIM}}>{e.dh}mi</td>
-                  <td style={{color:rC(ai),fontWeight:700}}>${ai.toFixed(2)}</td>
-                  <td style={{color:G,fontWeight:700}}>${e.pay}</td><td style={{color:'#f87171'}}>${e.fuel}</td>
-                  <td style={{color:np>=0?G:'#f87171',fontWeight:700}}>${np}</td>
-                  <td><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
-                  <td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={ev=>{ev.stopPropagation();startEditLog(e);}}>Edit</button><button className="btn-danger" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>Del</button></td>
-                </tr>;
-              })}</tbody>
+              <thead><tr>{['METRIC',moName.toUpperCase(),prevName.toUpperCase(),'CHANGE'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <tbody>
+                {(()=>{
+                  const money=v=>'$'+(Math.round(v*100)/100).toLocaleString();
+                  const rows=[
+                    {l:'Gross Revenue',a:M1.gross,b:M0.gross,f:money},
+                    {l:'Number of Loads',a:M1.loads,b:M0.loads,f:v=>String(v)},
+                    {l:'Total Miles',a:M1.miles,b:M0.miles,f:v=>v.toLocaleString()+' mi'},
+                    {l:'Avg Rate / Mile (net)',a:M1.rpm,b:M0.rpm,f:v=>'$'+v.toFixed(2)},
+                    {l:'Fuel Spend (logged)',a:M1.fuel,b:M0.fuel,f:money,inv:true},
+                    {l:'Net After Fuel',a:M1.net,b:M0.net,f:money},
+                  ];
+                  return rows.map(({l,a,b,f,inv})=>{
+                    const diff=a-b;
+                    const pctCh=b!==0?(diff/Math.abs(b))*100:null;
+                    const good=inv?diff<=0:diff>=0;
+                    const dc=diff===0?DIM:good?G:'#f87171';
+                    const arrow=diff===0?'—':diff>0?'▲':'▼';
+                    return <tr key={l}>
+                      <td style={{color:'#c8e0cc',fontWeight:700,whiteSpace:'nowrap'}}>{l}</td>
+                      <td style={{color:G,fontWeight:700,whiteSpace:'nowrap'}}>{f(a)}</td>
+                      <td style={{color:DIM,whiteSpace:'nowrap'}}>{M0.loads===0&&b===0?'—':f(b)}</td>
+                      <td style={{whiteSpace:'nowrap'}}><span style={{color:dc,fontWeight:700}}>{arrow} {f(Math.abs(diff))}</span>{pctCh!==null&&<span style={{color:dc,fontSize:9,marginLeft:6}}>({pctCh>=0?'+':''}{pctCh.toFixed(0)}%)</span>}</td>
+                    </tr>;
+                  });
+                })()}
+              </tbody>
             </table>
           </div>
-        </div>}
-        {shownLog.length===0&&<div className="card" style={{color:DIM,fontSize:12,textAlign:'center',marginBottom:12}}>No loads found for this week.</div>}
+        </div>
+
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}}>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>IFTA State Miles <span style={{color:DIM,fontWeight:400,fontSize:10}}>— {selectedWeek?'week '+weekFilterLabel:selMonth!=='all'?monthLabel(selMonth):'all loads'}</span></div>
+            <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={exportIFTA}>⬇ IFTA CSV</button>
+          </div>
+          {Object.keys(iftaAgg.agg).length===0&&iftaAgg.un.miles===0?<div style={{color:DIM,fontSize:11}}>No miles in this filter. Tag loads with state miles (e.g. <span style={{color:G}}>GA:120, SC:80</span>) in the load form to build quarterly IFTA totals.</div>:<>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:10}}>
+              {Object.keys(iftaAgg.agg).sort().map(s=><span key={s} style={{background:'rgba(57,255,107,.06)',color:G,padding:'5px 12px',borderRadius:20,fontSize:11,border:'1px solid rgba(57,255,107,.18)',fontWeight:700}}>{s} <span style={{color:'#dceede'}}>{Math.round(iftaAgg.agg[s]*10)/10}mi</span></span>)}
+              {iftaAgg.un.miles>0&&<span style={{background:'rgba(251,191,36,.07)',color:'#fbbf24',padding:'5px 12px',borderRadius:20,fontSize:11,border:'1px solid rgba(251,191,36,.25)',fontWeight:700}}>UNTAGGED <span>{Math.round(iftaAgg.un.miles*10)/10}mi · {iftaAgg.un.loads} loads</span></span>}
+            </div>
+            {(iftaAgg.un.loads>0||iftaAgg.mismatch>0)&&<div style={{color:DIM,fontSize:10,lineHeight:1.6}}>
+              {iftaAgg.un.loads>0&&<span>⚠ <span style={{color:'#fbbf24'}}>{iftaAgg.un.loads} load{iftaAgg.un.loads>1?'s':''}</span> missing state tags — edit them and fill "State Miles (IFTA)" like <span style={{color:G}}>GA:120, SC:80</span>. </span>}
+              {iftaAgg.mismatch>0&&<span>⚠ {iftaAgg.mismatch} load{iftaAgg.mismatch>1?'s':''} where state miles don't add up to total miles (±10%).</span>}
+            </div>}
+          </>}
+        </div>
         <div className="g11">
           <div className="card">
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
@@ -753,15 +964,19 @@ function App(){
             {route?(()=>{
               return <>
                 <div style={{borderRadius:8,overflow:'hidden',marginBottom:8,background:'#030806',border:'1px solid #1c3822'}}>
-                  {mapCoords?<div ref={mapElRef} className="route-map"/>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>{mapNote||'Loading map...'}<br/><a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" style={{display:'inline-block',marginTop:10,color:G,border:'1px solid #1c3822',borderRadius:7,padding:'7px 12px',textDecoration:'none',fontWeight:700}}>Open in Google Maps →</a></div>}
+                  {mapCoords?<div ref={mapElRef} className="route-map"/>
+                  :mapFallback?<iframe title="Backup route map" className="route-map" style={{border:0,display:'block',filter:'invert(0.88) hue-rotate(180deg) saturate(0.85)'}} loading="lazy" src={'https://maps.google.com/maps?saddr='+encodeURIComponent(route.pickup||'')+'&daddr='+encodeURIComponent(route.dropoff||'')+'&output=embed'}/>
+                  :<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>{mapNote||'Loading map...'}</div>}
                 </div>
-                <div style={{color:DIM,fontSize:9,marginBottom:10}}>© OpenStreetMap contributors · {mapNote}</div>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8,flexWrap:'wrap',marginBottom:10}}>
+                  <span style={{color:DIM,fontSize:9}}>{mapCoords?'© OpenStreetMap contributors':mapFallback?'Backup map · Google':''} · {mapNote}</span>
+                  <a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" className="btn-g" style={{textDecoration:'none',fontSize:10,padding:'5px 11px'}}>Open in Google Maps →</a>
+                </div>
                 <div className="g3">
                   {[{l:'Total Miles',v:(route.miles||0)+(route.dh||0)+'mi',s:route.miles+' loaded · '+route.dh+' DH'},{l:'Gross Pay',v:'$'+(route.pay||0),s:'⛽ $'+(route.fuel||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0))).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,(route.miles||0)+(route.dh||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
                 </div>
                 <div style={{marginTop:10,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
                   <button className="btn-g" onClick={()=>startEditLog(route)}>Edit Selected Load</button>
-                  <a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" className="btn-g" style={{textDecoration:'none'}}>Google Maps</a>
                   <span style={{color:DIM,fontSize:10}}>{route.comments||'No comments saved.'}</span>
                 </div>
               </>;
@@ -790,7 +1005,7 @@ function App(){
         {maintLog.length>0?<div className="card" style={{padding:0,overflow:'hidden'}}>
           <table className="tbl">
             <thead><tr>{['DATE','SERVICE TYPE','ODOMETER','COST','NOTES',''].map(h=><th key={h}>{h}</th>)}</tr></thead>
-            <tbody>{maintLog.map(e=><tr key={e.id}><td style={{color:DIM,fontSize:10}}>{e.date}</td><td style={{color:'#c8e0cc',fontWeight:700}}>{e.type}</td><td>{(e.mileage||0).toLocaleString()}mi</td><td style={{color:'#f87171',fontWeight:700}}>${e.cost||0}</td><td style={{color:DIM,maxWidth:180,fontSize:10}}>{e.notes}</td><td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={()=>startEditMaint(e)}>Edit</button><button className="btn-danger" onClick={()=>delMaint(e.id)}>Del</button></td></tr>)}
+            <tbody>{maintLog.map(e=><tr key={e.id}><td style={{color:DIM,fontSize:10}}>{fmtDate(e.date)}</td><td style={{color:'#c8e0cc',fontWeight:700}}>{e.type}</td><td>{(e.mileage||0).toLocaleString()}mi</td><td style={{color:'#f87171',fontWeight:700}}>${e.cost||0}</td><td style={{color:DIM,maxWidth:180,fontSize:10}}>{e.notes}</td><td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={()=>startEditMaint(e)}>Edit</button><button className="btn-danger" onClick={()=>delMaint(e.id)}>Del</button></td></tr>)}
             </tbody>
           </table>
         </div>:<div style={{color:DIM,fontSize:12,padding:'20px 0',textAlign:'center'}}>No maintenance entries yet.</div>}
@@ -802,6 +1017,9 @@ function App(){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
 </script>
 </body>
 </html>
