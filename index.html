@@ -245,7 +245,7 @@ function App(){
   useEffect(()=>{
     const s=document.createElement('style');
     s.textContent=`
-      @media(min-width:701px){#root{zoom:1.15}}
+      #root{width:100%;max-width:100%;overflow-x:hidden}
       @keyframes gp{0%,100%{opacity:1;box-shadow:0 0 6px #39ff6b}50%{opacity:.1}}
       @keyframes gg{0%,100%{text-shadow:0 0 20px rgba(57,255,107,.35)}50%{text-shadow:0 0 45px rgba(57,255,107,.7)}}
       @keyframes ga{0%,100%{text-shadow:0 0 15px rgba(251,191,36,.3)}50%{text-shadow:0 0 40px rgba(251,191,36,.65)}}
@@ -295,6 +295,10 @@ function App(){
       .dv{height:1px;background:linear-gradient(90deg,transparent,#1c3822 20%,#1c3822 80%,transparent);margin:12px 0}
       .g12{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px}
       .g11{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+      .logbook-map-grid{grid-template-columns:minmax(0,3fr) minmax(320px,2fr)}
+      .calendar-panel{min-width:0}
+      .calendar-scroll{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+      .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
       .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
       .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
       .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
@@ -302,7 +306,8 @@ function App(){
       .route-map{height:230px;width:100%;background:#030806}
       .leaflet-container{background:#030806;font-family:'Courier New',Courier,monospace}
       .cb-today{animation:cbpulse 1.2s ease-in-out infinite}
-      .cdv{border-radius:5px;padding:3px;min-height:40px;cursor:pointer;transition:background .12s}
+      .cdv{border-radius:5px;padding:5px;min-width:0;min-height:72px;cursor:pointer;transition:background .12s;overflow:hidden}
+      .calendar-load{color:#4ade80;font-size:10px;line-height:1.35;overflow-wrap:anywhere}
       .cdv:hover{background:#0d2212!important}
       .tbl-tight th{padding:8px 8px}
       .tbl-tight td{padding:7px 8px}
@@ -339,6 +344,9 @@ function App(){
         .log-table-wrap{display:none}
         .log-cards{display:block}
       }
+      @media(max-width:1100px){
+        .logbook-map-grid{grid-template-columns:minmax(0,1fr)}
+      }
       @media(max-width:600px){
         .g4{grid-template-columns:repeat(2,1fr)}
         .g12{grid-template-columns:1fr}
@@ -350,6 +358,7 @@ function App(){
         .section{padding:14px 12px}
         .card{padding:14px}
         .btn,.btn-g{min-height:42px}
+        .calendar-inner{min-width:720px}
       }
     `;
     document.head.appendChild(s);
@@ -369,7 +378,7 @@ function App(){
   const [logF,setLogF]=useState(blankLog);
   const [addLog,setAddLog]=useState(false);
   const [editingLogId,setEditingLogId]=useState(null);
-  const [route,setRoute]=useState(SEED);
+  const [route,setRoute]=useState(null);
   const [selectedWeek,setSelectedWeek]=useState(null);
   const [bal,setBal]=useState('26341');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
   const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('26341');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');
@@ -434,7 +443,7 @@ function App(){
   const loadLocal=()=>{
     const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
     if(w)setW(w);if(l)setLeads(l);
-    if(lg){setLog(lg);if(lg[0])setRoute(lg[0]);}
+    if(lg)setLog(lg);
     if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}}
     if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
   };
@@ -450,7 +459,7 @@ function App(){
       ]);
       if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||5.15),mpg:String(r.mpg||9),tg:String(r.tg||5000)});}
       if(lR?.length)setLeads(lR.map(l=>({...l,callbackDate:l.callback_date||''})));
-      if(lgR?.length){setLog(lgR);setRoute(prev=>prev&&lgR.find(x=>x.id===prev.id)?lgR.find(x=>x.id===prev.id):(prev||lgR[0]));}
+      if(lgR?.length){setLog(lgR);setRoute(prev=>prev?lgR.find(x=>x.id===prev.id)||null:null);}
       const cfg=Object.fromEntries((cfR||[]).map(r=>[r.key,r.value]));
       if(cfg.truck_balance){setBal(cfg.truck_balance);setTBal(cfg.truck_balance);}
       if(cfg.maintenance_reserve){setMaint2(cfg.maintenance_reserve);setTMaint(cfg.maintenance_reserve);}
@@ -1183,36 +1192,40 @@ function App(){
 
         <div className="card" style={{marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}}>
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>IFTA State Miles <span style={{color:DIM,fontWeight:400,fontSize:10}}>— {selectedWeek?'week '+weekFilterLabel:selMonth!=='all'?monthLabel(selMonth):'all loads'}</span></div>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>State Mileage <span style={{color:DIM,fontWeight:400,fontSize:10}}>— optional / future IFTA support · {selectedWeek?'week '+weekFilterLabel:selMonth!=='all'?monthLabel(selMonth):'all loads'}</span></div>
             <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={exportIFTA}>⬇ IFTA CSV</button>
           </div>
           {Object.keys(iftaAgg.agg).length===0&&iftaAgg.un.miles===0?<div style={{color:DIM,fontSize:11}}>No miles in this filter. Tag loads with state miles (e.g. <span style={{color:G}}>GA:120, SC:80</span>) in the load form to build quarterly IFTA totals.</div>:<>
             <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:10}}>
               {Object.keys(iftaAgg.agg).sort().map(s=><span key={s} style={{background:'rgba(57,255,107,.06)',color:G,padding:'5px 12px',borderRadius:20,fontSize:11,border:'1px solid rgba(57,255,107,.18)',fontWeight:700}}>{s} <span style={{color:'#dceede'}}>{Math.round(iftaAgg.agg[s]*10)/10}mi</span></span>)}
-              {iftaAgg.un.miles>0&&<span style={{background:'rgba(251,191,36,.07)',color:'#fbbf24',padding:'5px 12px',borderRadius:20,fontSize:11,border:'1px solid rgba(251,191,36,.25)',fontWeight:700}}>UNTAGGED <span>{Math.round(iftaAgg.un.miles*10)/10}mi · {iftaAgg.un.loads} loads</span></span>}
+              {iftaAgg.un.miles>0&&<span style={{background:'rgba(74,109,82,.08)',color:MUT,padding:'5px 12px',borderRadius:20,fontSize:11,border:'1px solid '+BD,fontWeight:700}}>NOT TRACKED <span>{Math.round(iftaAgg.un.miles*10)/10}mi · {iftaAgg.un.loads} loads</span></span>}
             </div>
             {(iftaAgg.un.loads>0||iftaAgg.mismatch>0)&&<div style={{color:DIM,fontSize:10,lineHeight:1.6}}>
-              {iftaAgg.un.loads>0&&<span>⚠ <span style={{color:'#fbbf24'}}>{iftaAgg.un.loads} load{iftaAgg.un.loads>1?'s':''}</span> missing state tags — edit them and fill "State Miles (IFTA)" like <span style={{color:G}}>GA:120, SC:80</span>. </span>}
+              {iftaAgg.un.loads>0&&<span>Optional: add state mileage later by editing a load and entering <span style={{color:G}}>GA:120, SC:80</span>. </span>}
               {iftaAgg.mismatch>0&&<span>⚠ {iftaAgg.mismatch} load{iftaAgg.mismatch>1?'s':''} where state miles don't add up to total miles (±10%).</span>}
             </div>}
           </>}
         </div>
-        <div className="g11">
-          <div className="card">
+        <div className="g11 logbook-map-grid">
+          <div className="card calendar-panel">
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12}}>
               <button className="btn-g" style={{padding:'5px 11px'}} onClick={()=>setCal(cm===0?{y:cy-1,m:11}:{y:cy,m:cm-1})}>←</button>
               <span style={{color:G,fontWeight:700,fontSize:13}}>{MONTHS[cm]} {cy}</span>
               <button className="btn-g" style={{padding:'5px 11px'}} onClick={()=>setCal(cm===11?{y:cy+1,m:0}:{y:cy,m:cm+1})}>→</button>
             </div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:4}}>{DAYS.map(d=><div key={d} style={{color:DIM,fontSize:9,textAlign:'center',paddingBottom:5,fontWeight:700}}>{d}</div>)}</div>
-            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2}}>
+            <div className="calendar-scroll">
+            <div className="calendar-inner">
+            <div className="calendar-grid" style={{marginBottom:4}}>{DAYS.map(d=><div key={d} style={{color:DIM,fontSize:10,textAlign:'center',paddingBottom:5,fontWeight:700}}>{d}</div>)}</div>
+            <div className="calendar-grid">
               {Array(fd).fill(null).map((_,i)=><div key={'e'+i}/>)}
               {Array(dim).fill(null).map((_,i)=>{const d=i+1,dl=dLogs(d),isT=d===nowD.getDate()&&cm===nowD.getMonth()&&cy===nowD.getFullYear();
                 return <div key={d} className="cdv" style={{border:isT?'1px solid rgba(57,255,107,.6)':`1px solid ${dl.length?BD:'transparent'}`,background:dl.length?'rgba(57,255,107,.04)':'transparent',boxShadow:isT?'0 0 12px rgba(57,255,107,.2)':'none'}}>
                   <div style={{color:isT?G:DIM,fontSize:10,marginBottom:1,fontWeight:isT?700:400}}>{d}</div>
-                  {dl.slice(0,1).map(e=><div key={e.id} style={{color:'#4ade80',fontSize:8.5,lineHeight:1.35}}>{e.pickup?.split(',')[0]}→{e.dropoff?.split(',')[0]}<br/><span style={{color:G,fontWeight:700}}>${e.pay}</span></div>)}
+                  {dl.slice(0,1).map(e=><div key={e.id} className="calendar-load">{e.pickup?.split(',')[0]}→{e.dropoff?.split(',')[0]}<br/><span style={{color:G,fontWeight:700}}>${e.pay}</span></div>)}
                 </div>;
               })}
+            </div>
+            </div>
             </div>
           </div>
           <div className={'card route-panel'+(route?' open':'')} ref={routeCardRef}>
