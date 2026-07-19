@@ -26,7 +26,7 @@
 <div id="root"></div>
 <script type="text/babel">
 const {useState,useEffect,useRef}=React;
-const G='#39ff6b',BD='#1c3822',DIM='#6f8f76',MUT='#86a88e';
+const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
 
 const CITIES={
   'Augusta':[33.47,-81.97],'Augusta, GA':[33.47,-81.97],
@@ -330,55 +330,21 @@ function App(){
       .lc-stat-v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
       .lc-btn{flex:1;min-height:40px;font-size:12px;font-weight:700;border-radius:8px;font-family:inherit;cursor:pointer}
       .show-sm{display:none}
-      .bottom-nav{display:none}
       @media(max-width:700px){
         .hide-sm{display:none!important}
         .show-sm{display:inline}
         .route-cell{max-width:130px}
-        .nav{height:60px;min-height:60px;padding:0 10px;flex-wrap:nowrap;overflow:hidden}
-        .nav-logo{height:60px;padding:0 10px 0 0;margin-right:8px;border-right:0}
-        .nav-tab{display:none}
-        .nav-right{min-width:0;overflow-x:auto;gap:6px;padding:7px 0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-        .nav-right::-webkit-scrollbar{display:none}
-        .nav-right button,.nav-right>span,.nav-right>div{min-height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:8px 11px!important;font-size:13px!important;white-space:nowrap}
-        .section{padding:14px 12px 94px}
-        .sec-hd{align-items:flex-start;margin-bottom:14px}
-        .sec-hd>div:last-child{width:100%;justify-content:flex-start!important}
-        .sec-title{font-size:20px}
-        .card{padding:14px}
-        .inp{min-height:44px;font-size:16px;padding:11px 12px}
-        .btn,.btn-g,.btn-amber,.btn-danger,.icon-btn,.lc-btn{min-width:44px;min-height:44px!important;padding:10px 13px!important;font-size:13px!important;display:inline-flex;align-items:center;justify-content:center}
-        .lbl,.sb,.lc-stat-l{font-size:13px!important;line-height:1.35}
-        .lc-stat-v{font-size:14px}
-        .lc-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-        .section [style*="font-size: 9px"],.section [style*="font-size:9px"],.section [style*="font-size: 10px"],.section [style*="font-size:10px"],.section [style*="font-size: 11px"],.section [style*="font-size:11px"],.section [style*="font-size: 12px"],.section [style*="font-size:12px"]{font-size:13px!important;line-height:1.45!important}
-        .section [style*="color: rgb(61, 92, 69)"],.section [style*="color: #3d5c45"]{color:#6f8f76!important}
-        .section .card>div[style*="overflow-x: auto"],.section .card>div[style*="overflowX"]{overflow-x:visible!important}
-        .tbl{display:block;width:100%;font-size:14px;border-collapse:separate}
-        .tbl thead{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-        .tbl tbody{display:grid;gap:10px;width:100%}
-        .tbl tbody tr{display:block;width:100%;background:#08140a;border:1px solid #24492b;border-radius:10px;overflow:hidden;box-shadow:0 5px 18px rgba(0,0,0,.16)}
-        .tbl tbody tr:hover td,.tbl tbody tr.sel td{background:transparent}
-        .tbl td{display:grid;grid-template-columns:minmax(116px,40%) minmax(0,1fr);align-items:center;gap:10px;min-height:44px;padding:10px 12px!important;border-bottom:1px solid #1c3822!important;color:#dceede;font-size:14px!important;line-height:1.45!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important;width:auto!important;text-align:right!important;overflow-wrap:anywhere}
-        .tbl td:last-child{border-bottom:0!important}
-        .tbl td::before{content:attr(data-label);color:#86a88e;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:left;line-height:1.25}
-        .tbl td[data-label="Actions"]{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-        .tbl td[data-label="Actions"]::before{margin-right:auto}
-        .tbl td[data-label="Notes"],.tbl td[data-label="NOTES"]{text-align:left!important}
-        .tbl .lead-notes{min-width:0;max-width:none}
-        .lead-editor-grid{grid-template-columns:1fr!important}
-        .bottom-nav{position:fixed;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));left:0;right:0;bottom:0;z-index:350;padding:6px 6px calc(6px + env(safe-area-inset-bottom));background:rgba(4,10,5,.98);border-top:1px solid #285331;box-shadow:0 -10px 28px rgba(0,0,0,.45)}
-        .bottom-nav button{min-width:0;min-height:58px;border:0;border-radius:9px;background:transparent;color:#86a88e;font-family:inherit;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
-        .bottom-nav button.active{color:#39ff6b;background:rgba(57,255,107,.09);box-shadow:inset 0 0 0 1px rgba(57,255,107,.2)}
-        .bottom-nav .bn-icon{font-size:18px;line-height:1}
+      }
+      .route-close{display:none}
+      @media(max-width:700px){
         .route-panel{display:none}
         .route-panel.open{display:block;position:fixed;left:10px;right:10px;top:10px;bottom:10px;z-index:400;overflow-y:auto;-webkit-overflow-scrolling:touch;border-color:rgba(57,255,107,.45);box-shadow:0 0 0 100vmax rgba(2,6,3,.82),0 0 50px rgba(57,255,107,.15)}
         .route-close{display:inline-block}
+      }
+      @media(max-width:700px){
         .log-table-wrap{display:none}
         .log-cards{display:block}
       }
-      .route-close{display:none}
-      @media(max-width:700px){.route-close{display:inline-block}}
       @media(max-width:1100px){
         .logbook-map-grid{grid-template-columns:minmax(0,1fr)}
       }
@@ -386,7 +352,13 @@ function App(){
         .g4{grid-template-columns:repeat(2,1fr)}
         .g12{grid-template-columns:1fr}
         .g11{grid-template-columns:1fr}
+        .nav-tab{padding:12px 9px;font-size:10px}
         .money-grid,.log-form-grid,.maint-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+        .inp{font-size:16px;padding:11px 12px}
+        .tbl-tight th,.tbl-tight td{padding:7px 6px;font-size:10px}
+        .section{padding:14px 12px}
+        .card{padding:14px}
+        .btn,.btn-g{min-height:42px}
         .calendar-inner{min-width:720px}
       }
     `;
@@ -510,20 +482,7 @@ function App(){
   },[]);
 
   const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
-  const navTo=id=>{
-    window.scrollTo({top:0,left:0,behavior:'auto'});
-    setSec(id);
-    requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'auto'})));
-  };
-  useEffect(()=>{
-    const applyTableLabels=()=>document.querySelectorAll('table.tbl').forEach(table=>{
-      const headers=[...table.querySelectorAll('thead th')].map((th,i)=>th.textContent.trim()||((i===table.querySelectorAll('thead th').length-1)?'Actions':'Field'));
-      table.querySelectorAll('tbody tr').forEach(row=>[...row.children].forEach((cell,i)=>cell.setAttribute('data-label',headers[i]||'Field')));
-    });
-    const frame=requestAnimationFrame(applyTableLabels);
-    const timer=setTimeout(applyTableLabels,250);
-    return()=>{cancelAnimationFrame(frame);clearTimeout(timer);};
-  },[sec,log,leads,maintLog,weekHistory,selMonth,selectedWeek,showAllLoads,search,statusFilter]);
+  const navTo=id=>{setSec(id);setTimeout(()=>refs[id]?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
   const openWeek=w=>{
     if(!w?.weekStart)return;
     const week={start:w.weekStart,end:w.weekEnd||addDays(w.weekStart,6)};
@@ -893,10 +852,6 @@ function App(){
         </div>
       </div>
 
-      <nav className="bottom-nav" aria-label="Primary dashboard navigation">
-        {[{id:'overview',icon:'⌂',label:'Home'},{id:'dispatch',icon:'◈',label:'Dispatch'},{id:'pipeline',icon:'◎',label:'Pipeline'},{id:'logbook',icon:'▤',label:'Logbook'},{id:'maintenance',icon:'⚙',label:'Service'}].map(item=><button key={item.id} type="button" className={sec===item.id?'active':''} aria-current={sec===item.id?'page':undefined} aria-label={item.label} onClick={()=>navTo(item.id)}><span className="bn-icon" aria-hidden="true">{item.icon}</span><span>{item.label}</span></button>)}
-      </nav>
-
       {/* OVERVIEW */}
       {sec==='overview'&&<div className="section" ref={refs.overview}>
         <SH t="Overview" right={showReset?<div style={{display:'flex',gap:6,alignItems:'center',padding:'6px 12px',background:'rgba(251,191,36,.07)',border:'1px solid rgba(251,191,36,.2)',borderRadius:8}}>
@@ -1077,7 +1032,7 @@ function App(){
         <div className="card">
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:10}}>Your lanes (what Dispatch negotiates from)</div>
           {laneStats.length===0?<div style={{color:DIM,fontSize:12,padding:'8px 0',textAlign:'center'}}>No lanes yet — log loads and Dispatch gets smarter with every one.</div>:<div style={{overflowX:'auto'}}>
-            <table className="tbl" style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
+            <table style={{width:'100%',borderCollapse:'collapse',fontSize:11}}>
               <thead><tr>{['Lane','Loads','Net $/mi','Gross $/mi','Avg Miles'].map(h=><th key={h} style={{textAlign:h==='Lane'?'left':'right',color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',padding:'4px 8px',borderBottom:'1px solid #1c3822'}}>{h}</th>)}</tr></thead>
               <tbody>{laneStats.map(l=><tr key={l.lane}>
                 <td style={{color:'#c8e0cc',padding:'6px 8px',whiteSpace:'nowrap'}}>{l.lane}</td>
@@ -1123,7 +1078,7 @@ function App(){
         </div>
         <div className="card">
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Update Lead #{lf.num}{leads.find(l=>l.id===parseInt(lf.num))?' — '+leads.find(l=>l.id===parseInt(lf.num))?.name:''}</div>
-          <div className="lead-editor-grid" style={{display:'grid',gridTemplateColumns:'80px 160px 1fr auto',gap:10,alignItems:'flex-end',marginBottom:10}}>
+          <div style={{display:'grid',gridTemplateColumns:'80px 160px 1fr auto',gap:10,alignItems:'flex-end',marginBottom:10}}>
             <div><span className="lbl">Lead #</span><input className="inp" value={lf.num} onChange={e=>{const l=leads.find(x=>x.id===parseInt(e.target.value));setLf({num:e.target.value,status:l?.status||'Not called',notes:l?.notes||'',callbackDate:l?.callbackDate||''});}} inputMode="numeric"/></div>
             <div><span className="lbl">Status</span><select className="inp" value={lf.status} onChange={e=>setLf({...lf,status:e.target.value})}>{STATUSES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
             <div><span className="lbl">Notes</span><input className="inp" value={lf.notes} onChange={e=>setLf({...lf,notes:e.target.value})} placeholder="Decision maker, best time to call..."/></div>
