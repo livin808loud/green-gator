@@ -599,8 +599,14 @@ function App(){
   const monthOptions=(()=>{const set=new Set([curKey]);log.forEach(e=>{const k=String(e.date||'').slice(0,7);if(/^\d{4}-\d{2}$/.test(k))set.add(k);});return [...set].sort((a,b)=>b.localeCompare(a));})();
   const monthLabel=k=>{const[y,m]=String(k).split('-');return (MONTHS[parseInt(m,10)-1]||'?')+' '+y;};
   const prevMonthKey=k=>{let[y,m]=String(k).split('-').map(Number);m-=1;if(m===0){m=12;y-=1;}return `${y}-${String(m).padStart(2,'0')}`;};
-  const monthStats=k=>{
-    const ls=log.filter(e=>String(e.date||'').startsWith(k));
+  const monthStats=(k,throughDay=null)=>{
+    const ls=log.filter(e=>{
+      const date=String(e.date||'');
+      if(!date.startsWith(k))return false;
+      if(throughDay===null)return true;
+      const day=parseInt(date.slice(8,10),10);
+      return Number.isFinite(day)&&day<=throughDay;
+    });
     const gross=ls.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
     const fuel=ls.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
     const miles=ls.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
@@ -611,7 +617,16 @@ function App(){
   const moName=monthLabel(moKey);
   const prevKey=prevMonthKey(moKey);
   const prevName=monthLabel(prevKey);
-  const M1=monthStats(moKey),M0=monthStats(prevKey);
+  const isCurrentMonth=moKey===curKey;
+  const compareDay=isCurrentMonth?nowD.getDate():null;
+  const [prevYear,prevMonth]=prevKey.split('-').map(Number);
+  const prevMonthLastDay=new Date(prevYear,prevMonth,0).getDate();
+  const prevCompareDay=compareDay===null?null:Math.min(compareDay,prevMonthLastDay);
+  const M1=monthStats(moKey,compareDay),M0=monthStats(prevKey,prevCompareDay);
+  const periodLabel=(name,day)=>day===null?name.toUpperCase():(name.split(' ')[0]+' 1–'+day).toUpperCase();
+  const currentPeriodLabel=periodLabel(moName,compareDay);
+  const previousPeriodLabel=periodLabel(prevName,prevCompareDay);
+  const comparisonTitle=isCurrentMonth?'Month-to-Date — '+moName.split(' ')[0]+' 1–'+compareDay+' vs '+prevName.split(' ')[0]+' 1–'+prevCompareDay:'Month vs Month — '+moName+' vs '+prevName;
   const moLogs=M1.logs,moGross=M1.gross,moFuel=M1.fuel,moNet=M1.net,moMiles=M1.miles;
   const moProfit=moNet-2331;
   // Deadhead ratio for the selected month
@@ -1155,12 +1170,12 @@ function App(){
         {shownLog.length===0&&<div className="card" style={{color:DIM,fontSize:12,textAlign:'center',marginBottom:12}}>No loads found for this filter.</div>}
         <div className="card" style={{marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>Month vs Month — {moName} <span style={{color:DIM}}>vs</span> {prevName}</div>
+            <div><div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>{comparisonTitle}</div>{isCurrentMonth&&<div style={{color:'#6f8f76',fontSize:11,lineHeight:1.45,marginTop:4}}>Apples-to-apples comparison through day {compareDay}; the rest of {prevName.split(' ')[0]} is excluded.</div>}</div>
             {M0.loads===0&&<span style={{color:DIM,fontSize:10}}>No data logged for {prevName}</span>}
           </div>
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
-              <thead><tr>{['METRIC',moName.toUpperCase(),prevName.toUpperCase(),'CHANGE'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <thead><tr>{['METRIC',currentPeriodLabel,previousPeriodLabel,'CHANGE'].map(h=><th key={h}>{h}</th>)}</tr></thead>
               <tbody>
                 {(()=>{
                   const money=v=>'$'+(Math.round(v*100)/100).toLocaleString();
