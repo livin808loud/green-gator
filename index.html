@@ -27,6 +27,15 @@
 <script type="text/babel">
 const {useState,useEffect,useRef}=React;
 const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
+const FUEL_PRICE_PER_GALLON=4.89;
+const TRUCK_MPG=9.9;
+const fuelEstimateForMiles=(miles,mpg=TRUCK_MPG,price=FUEL_PRICE_PER_GALLON)=>{
+  const totalMiles=Math.max(0,parseFloat(miles)||0);
+  const safeMpg=parseFloat(mpg)>0?parseFloat(mpg):TRUCK_MPG;
+  const safePrice=parseFloat(price)>0?parseFloat(price):FUEL_PRICE_PER_GALLON;
+  const gallons=totalMiles/safeMpg;
+  return{totalMiles,gallons,cost:gallons*safePrice,mpg:safeMpg,price:safePrice};
+};
 
 const CITIES={
   'Augusta':[33.47,-81.97],'Augusta, GA':[33.47,-81.97],
@@ -369,7 +378,7 @@ function App(){
   const [appState,setAppState]=useState('init');
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('overview');
-  const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:'5.15',mpg:'9',tg:'5000'});
+  const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
   const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:'Not called',notes:'',callbackDate:''})));
   const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
   const [search,setSearch]=useState('');
@@ -458,7 +467,7 @@ function App(){
         d.get('gg_maintenance?select=*&order=created_at.desc').catch(()=>[]),
         d.get('gg_weekly_history?select=*&order=week_end.desc&limit=8').catch(()=>[]),
       ]);
-      if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||5.15),mpg:String(r.mpg||9),tg:String(r.tg||5000)});}
+      if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||FUEL_PRICE_PER_GALLON),mpg:String(r.mpg||TRUCK_MPG),tg:String(r.tg||5000)});}
       if(lR?.length)setLeads(lR.map(l=>({...l,callbackDate:l.callback_date||''})));
       if(lgR?.length){setLog(lgR);setRoute(prev=>prev?lgR.find(x=>x.id===prev.id)||null:null);}
       const cfg=Object.fromEntries((cfR||[]).map(r=>[r.key,r.value]));
@@ -495,7 +504,7 @@ function App(){
 
   const saveW=async(k,v)=>{
     const u={...W,[k]:v};setW(u);ss('gg-w',u);
-    if(db)try{await db.post('gg_weekly',{id:1,ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||5.15,mpg:parseFloat(u.mpg)||9,tg:parseFloat(u.tg)||5000},true);}catch{}
+    if(db)try{await db.post('gg_weekly',{id:1,ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true);}catch{}
   };
   const saveLead=async()=>{
     const i=parseInt(lf.num)-1;if(i<0||i>=leads.length)return;
@@ -563,7 +572,7 @@ function App(){
     setWeekResetDate(today);
     ss('gg-wrd',today);ss('gg-w',cleared);ss('gg-wh',h2);
     if(db)try{
-      await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||5.15,mpg:parseFloat(W.mpg)||9,tg:parseFloat(W.tg)||5000},true);
+      await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(W.mpg)||TRUCK_MPG,tg:parseFloat(W.tg)||5000},true);
       await db.post('gg_config',{key:'week_reset_date',value:today},true);
       try{await db.post('gg_weekly_history',{id:snap.id,week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true);}catch{}
     }catch{}
@@ -590,7 +599,10 @@ function App(){
   const mi=_mm>0?_mm:_am;
   const useF=_mf>0?_mf:_af;
   const tgt=parseFloat(W.tg)||5000,gap=Math.max(0,tgt-gross);
-  const mpg=parseFloat(W.mpg)||9,fp=parseFloat(W.fp)||5.15;
+  const mpg=parseFloat(W.mpg)||TRUCK_MPG,fp=parseFloat(W.fp)||FUEL_PRICE_PER_GALLON;
+  const weeklyFuelEstimate=fuelEstimateForMiles(mi,mpg,fp);
+  const draftTotalMiles=(parseFloat(logF.miles)||0)+(parseFloat(logF.dh)||0);
+  const draftFuelEstimate=fuelEstimateForMiles(draftTotalMiles,mpg,fp);
   const net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
   const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
   const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
@@ -746,7 +758,7 @@ function App(){
   };
   const fuelFlag=e=>{
     const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);if(tot<=0)return null;
-    const mpgV=parseFloat(W.mpg)||9,fpV=parseFloat(W.fp)||5.15;
+    const mpgV=parseFloat(W.mpg)||TRUCK_MPG,fpV=parseFloat(W.fp)||FUEL_PRICE_PER_GALLON;
     const est=(tot/mpgV)*fpV,f=parseFloat(e.fuel)||0;
     if(f===0)return tot>50?{t:'none',est}:null;
     const dev=Math.abs(f-est);
@@ -939,6 +951,11 @@ function App(){
             <div className="money-grid">
               {[{l:'Amazon Relay',k:'ar'},{l:'DAT Gross',k:'dg'},{l:'Direct Local',k:'dl'},{l:'Fuel Spend',k:'fs'},{l:'Miles Driven',k:'mi'},{l:'Fuel $/Gal',k:'fp'},{l:'MPG',k:'mpg'},{l:'Target Gross',k:'tg'}].map(({l,k})=><div key={k}><span className="lbl">{l}</span><input className="inp" value={W[k]} onChange={e=>saveW(k,e.target.value)} inputMode="decimal"/></div>)}
             </div>
+            <div style={{marginTop:12,padding:'11px 12px',border:'1px solid rgba(251,191,36,.28)',borderRadius:8,background:'rgba(251,191,36,.055)'}}>
+              <div style={{color:'#fbbf24',fontSize:10,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>Estimated Fuel Consumption</div>
+              {weeklyFuelEstimate.totalMiles>0?<div style={{display:'flex',gap:16,alignItems:'baseline',flexWrap:'wrap'}}><span style={{color:'#dceede',fontSize:17,fontWeight:700}}>{weeklyFuelEstimate.gallons.toFixed(1)} gal</span><span style={{color:'#fbbf24',fontSize:15,fontWeight:700}}>${weeklyFuelEstimate.cost.toFixed(2)}</span><span style={{color:DIM,fontSize:10}}>for {weeklyFuelEstimate.totalMiles.toLocaleString()} total miles · ${weeklyFuelEstimate.price.toFixed(2)}/gal · {weeklyFuelEstimate.mpg.toFixed(1)} MPG</span></div>:<div style={{color:DIM,fontSize:10}}>Enter weekly miles to estimate gallons and fuel cost.</div>}
+              <div style={{color:DIM,fontSize:9,marginTop:4}}>Planning estimate only. Actual fuel spend remains separate.</div>
+            </div>
           </div>
         </div>
 
@@ -1116,6 +1133,7 @@ function App(){
           <div className="log-form-grid" style={{marginBottom:10}}>
             {[{l:'Date',k:'date',t:'text',p:'07/05/2026 or 7/5/26'},{l:'Pickup City',k:'pickup'},{l:'Dropoff City',k:'dropoff'},{l:'Loaded Miles',k:'miles',t:'number'},{l:'Deadhead',k:'dh',t:'number'},{l:'Rate/Mile',k:'rpm',t:'number'},{l:'Total Pay',k:'pay',t:'number'},{l:'Fuel Cost',k:'fuel',t:'number'},{l:'State Miles (IFTA)',k:'states',p:'GA:120, SC:80'}].map(({l,k,t,p})=><div key={k}><span className="lbl">{l}</span><input className="inp" type={t||'text'} value={logF[k]} placeholder={p||''} onChange={e=>setLogF({...logF,[k]:e.target.value})} onBlur={k==='date'?e=>{const nd=normalizeDateInput(e.target.value);if(nd)setLogF(f=>({...f,date:fmtDate(nd)}));}:undefined} inputMode={k==='date'?'numeric':t==='number'?'decimal':undefined}/></div>)}
           </div>
+          {draftTotalMiles>0&&<div style={{marginBottom:10,padding:'9px 11px',border:'1px solid rgba(251,191,36,.28)',borderRadius:7,background:'rgba(251,191,36,.05)',color:'#dceede',fontSize:11}}><b style={{color:'#fbbf24'}}>Estimated fuel:</b> {draftFuelEstimate.gallons.toFixed(1)} gallons · <b style={{color:'#fbbf24'}}>${draftFuelEstimate.cost.toFixed(2)}</b> for {draftFuelEstimate.totalMiles.toFixed(0)} total miles <span style={{color:DIM}}>({parseFloat(logF.miles)||0} loaded + {parseFloat(logF.dh)||0} deadhead · ${draftFuelEstimate.price.toFixed(2)}/gal · {draftFuelEstimate.mpg.toFixed(1)} MPG)</span></div>}
           <div style={{marginBottom:12}}><span className="lbl">Load Source</span><select className="inp" value={logF.source} onChange={e=>setLogF({...logF,source:e.target.value})}><option value="">— Select source —</option>{SOURCES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
           <div style={{marginBottom:12}}><span className="lbl">Comments</span><textarea className="inp" style={{height:52,resize:'vertical'}} value={logF.comments} onChange={e=>setLogF({...logF,comments:e.target.value})} placeholder="Broker, load#, detention, notes..."/></div>
           <div style={{display:'flex',gap:8}}><button className="btn" onClick={doAddLog}>{editingLogId?'Save Changes':'Add to Logbook'}</button>{editingLogId&&<button className="btn-g" onClick={cancelLogEdit}>Cancel Edit</button>}</div>
@@ -1124,15 +1142,16 @@ function App(){
           <div className="log-table-wrap">
           <table className="tbl tbl-tight" style={{tableLayout:'auto'}}>
             <thead><tr>
-              <th>DATE</th><th>ROUTE</th><th className="num">MILES</th><th className="num">GROSS</th><th className="num hide-sm">FUEL</th><th className="num">NET</th><th className="num hide-sm">NET RPM</th><th style={{textAlign:'right'}}></th>
+              <th>DATE</th><th>ROUTE</th><th className="num">MILES</th><th className="num">GROSS</th><th className="num hide-sm">EST. FUEL</th><th className="num hide-sm">ACTUAL FUEL</th><th className="num">NET</th><th className="num hide-sm">NET RPM</th><th style={{textAlign:'right'}}></th>
             </tr></thead>
-            <tbody>{(showAllLoads?shownLog:shownLog.slice(0,8)).map(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const nr=tot>0?((parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0))/tot:0;const np=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);
+            <tbody>{(showAllLoads?shownLog:shownLog.slice(0,8)).map(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const nr=tot>0?((parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0))/tot:0;const np=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);const fe=fuelEstimateForMiles(tot,mpg,fp);
               return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
                 <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{fmtDate(e.date)}</td>
                 <td className="route-cell" title={(e.pickup||'')+' → '+(e.dropoff||'')}>{e.pickup?.split(',')[0]}<span className="route-arrow">→</span>{e.dropoff?.split(',')[0]}</td>
                 <td className="num" style={{whiteSpace:'nowrap'}}>{tot}<span style={{color:DIM,fontSize:9}}>mi</span>{(e.dh||0)>0&&<span className="hide-sm" style={{color:DIM,fontSize:9}}> ({e.dh}dh)</span>}</td>
                 <td className="num" style={{color:G,fontWeight:700,whiteSpace:'nowrap'}}>${Number(e.pay||0).toLocaleString()}</td>
-                <td className="num hide-sm" style={{color:'#f87171',whiteSpace:'nowrap'}}>${e.fuel}{(()=>{const fl=fuelFlag(e);if(!fl)return null;const tot2=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const msg=fl.t==='none'?'No fuel logged on this load. A '+tot2+'mi trip at your '+(W.mpg||9)+' MPG and $'+(W.fp||'5.15')+'/gal usually burns about $'+fl.est.toFixed(0)+'.':'You logged $'+(e.fuel||0)+' fuel, but '+tot2+'mi at '+(W.mpg||9)+' MPG and $'+(W.fp||'5.15')+'/gal usually burns about $'+fl.est.toFixed(0)+'. Looks '+(fl.t==='high'?'high':'low')+' — double-check the entry (or ignore if you topped off the tank).';return <span title={msg} style={{cursor:'help',marginLeft:4,color:'#fbbf24'}}>⚠</span>;})()}</td>
+                <td className="num hide-sm" style={{color:'#fbbf24',whiteSpace:'nowrap'}}>{fe.gallons.toFixed(1)}gal <span style={{color:DIM}}>· ${fe.cost.toFixed(0)}</span></td>
+                <td className="num hide-sm" style={{color:'#f87171',whiteSpace:'nowrap'}}>${e.fuel}{(()=>{const fl=fuelFlag(e);if(!fl)return null;const tot2=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const msg=fl.t==='none'?'No fuel logged on this load. A '+tot2+'mi trip at your '+(W.mpg||TRUCK_MPG)+' MPG and $'+(W.fp||FUEL_PRICE_PER_GALLON)+'/gal usually burns about $'+fl.est.toFixed(0)+'.':'You logged $'+(e.fuel||0)+' fuel, but '+tot2+'mi at '+(W.mpg||TRUCK_MPG)+' MPG and $'+(W.fp||FUEL_PRICE_PER_GALLON)+'/gal usually burns about $'+fl.est.toFixed(0)+'. Looks '+(fl.t==='high'?'high':'low')+' — double-check the entry (or ignore if you topped off the tank).';return <span title={msg} style={{cursor:'help',marginLeft:4,color:'#fbbf24'}}>⚠</span>;})()}</td>
                 <td className="num" style={{color:np>=0?G:'#f87171',fontWeight:700,whiteSpace:'nowrap'}}>${np.toLocaleString()}{(()=>{const fl=fuelFlag(e);return fl?<span className="show-sm" title="Check fuel entry on this load" style={{marginLeft:3,color:'#fbbf24',fontWeight:400}}>⚠</span>:null;})()}</td>
                 <td className="num hide-sm" style={{whiteSpace:'nowrap'}}><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
                 <td style={{whiteSpace:'nowrap',textAlign:'right'}}><button className="icon-btn" title="Edit load" style={{marginRight:5}} onClick={ev=>{ev.stopPropagation();startEditLog(e);}}>✎</button><button className="icon-btn danger" title="Delete load" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>✕</button></td>
@@ -1141,7 +1160,7 @@ function App(){
           </table>
           </div>
           <div className="log-cards">
-            {(showAllLoads?shownLog:shownLog.slice(0,8)).map(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const nr=tot>0?((parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0))/tot:0;const np=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);const fl=fuelFlag(e);
+            {(showAllLoads?shownLog:shownLog.slice(0,8)).map(e=>{const tot=(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0);const nr=tot>0?((parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0))/tot:0;const np=(parseFloat(e.pay)||0)-(parseFloat(e.fuel)||0);const fl=fuelFlag(e);const fe=fuelEstimateForMiles(tot,mpg,fp);
               return <div key={e.id} className={'lc'+(route?.id===e.id?' sel':'')}>
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:8}}>
                   <span style={{color:DIM,fontSize:11,fontVariantNumeric:'tabular-nums'}}>{fmtDate(e.date)}</span>
@@ -1154,6 +1173,7 @@ function App(){
                   <div><div className="lc-stat-l">Fuel</div><div className="lc-stat-v" style={{color:'#f87171'}}>${Number(e.fuel||0).toLocaleString()}</div></div>
                   <div><div className="lc-stat-l">Net</div><div className="lc-stat-v" style={{color:np>=0?G:'#f87171'}}>${np.toLocaleString()}</div></div>
                 </div>
+                <div style={{color:'#fbbf24',fontSize:10,marginBottom:10,lineHeight:1.5}}>Estimated fuel: <b>{fe.gallons.toFixed(1)} gal · ${fe.cost.toFixed(2)}</b> <span style={{color:DIM}}>at ${fe.price.toFixed(2)}/gal and {fe.mpg.toFixed(1)} MPG</span></div>
                 {fl&&<div style={{color:'#fbbf24',fontSize:10,marginBottom:10,lineHeight:1.5}}>⚠ {fl.t==='none'?'No fuel logged — this trip usually burns ~$'+fl.est.toFixed(0)+'.':'Fuel looks '+(fl.t==='high'?'high':'low')+' — ~$'+fl.est.toFixed(0)+' is typical for these miles.'}</div>}
                 <div style={{display:'flex',gap:7}}>
                   <button className="lc-btn" style={{background:'rgba(57,255,107,.07)',color:G,border:'1px solid '+BD}} onClick={()=>viewRoute(e)}>Route 🗺</button>
@@ -1250,6 +1270,8 @@ function App(){
               {route&&<button className="btn-g route-close" style={{padding:'6px 13px',fontSize:12}} onClick={()=>setRoute(null)}>✕ Close</button>}
             </div>
             {route?(()=>{
+              const routeTotalMiles=(parseFloat(route.miles)||0)+(parseFloat(route.dh)||0);
+              const routeFuelEstimate=fuelEstimateForMiles(routeTotalMiles,mpg,fp);
               return <>
                 <div style={{borderRadius:8,overflow:'hidden',marginBottom:8,background:'#030806',border:'1px solid #1c3822'}}>
                   {mapCoords?<div ref={mapElRef} className="route-map"/>
@@ -1260,8 +1282,8 @@ function App(){
                   <span style={{color:DIM,fontSize:9}}>{mapCoords?'© OpenStreetMap contributors':mapFallback?'Backup map · Google':''} · {mapNote}</span>
                   <a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" className="btn-g" style={{textDecoration:'none',fontSize:10,padding:'5px 11px'}}>Open in Google Maps →</a>
                 </div>
-                <div className="g3">
-                  {[{l:'Total Miles',v:((parseFloat(route.miles)||0)+(parseFloat(route.dh)||0))+'mi',s:(parseFloat(route.miles)||0)+' loaded · '+(parseFloat(route.dh)||0)+' DH'},{l:'Gross Pay',v:'$'+(parseFloat(route.pay)||0),s:'⛽ $'+(parseFloat(route.fuel)||0)+' fuel',c:G},{l:'Net RPM',v:'$'+(((parseFloat(route.pay)||0)-(parseFloat(route.fuel)||0))/Math.max(1,(parseFloat(route.miles)||0)+(parseFloat(route.dh)||0))).toFixed(2),s:'net per all miles',c:rC(((parseFloat(route.pay)||0)-(parseFloat(route.fuel)||0))/Math.max(1,(parseFloat(route.miles)||0)+(parseFloat(route.dh)||0)))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
+                <div className="g-auto">
+                  {[{l:'Total Miles',v:routeTotalMiles+'mi',s:(parseFloat(route.miles)||0)+' loaded · '+(parseFloat(route.dh)||0)+' DH'},{l:'Estimated Fuel',v:routeFuelEstimate.gallons.toFixed(1)+' gal',s:'$'+routeFuelEstimate.cost.toFixed(2)+' · $'+routeFuelEstimate.price.toFixed(2)+'/gal · '+routeFuelEstimate.mpg.toFixed(1)+' MPG',c:'#fbbf24'},{l:'Gross Pay',v:'$'+(parseFloat(route.pay)||0),s:'Actual fuel: $'+(parseFloat(route.fuel)||0),c:G},{l:'Net RPM',v:'$'+(((parseFloat(route.pay)||0)-(parseFloat(route.fuel)||0))/Math.max(1,routeTotalMiles)).toFixed(2),s:'net per all miles',c:rC(((parseFloat(route.pay)||0)-(parseFloat(route.fuel)||0))/Math.max(1,routeTotalMiles))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
                 </div>
                 <div style={{marginTop:10,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
                   <button className="btn-g" onClick={()=>startEditLog(route)}>Edit Selected Load</button>
