@@ -312,6 +312,7 @@ function App(){
       .tbl-tight th{padding:8px 8px}
       .tbl-tight td{padding:7px 8px}
       .route-cell{max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .lead-notes{min-width:260px;max-width:420px;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.45}
       .route-arrow{color:#39ff6b;margin:0 4px}
       .icon-btn{background:transparent;border:1px solid #1c3822;border-radius:6px;color:#39ff6b;cursor:pointer;font-size:13px;padding:6px 11px;font-family:inherit;transition:all .15s;line-height:1}
       .icon-btn:hover{border-color:rgba(57,255,107,.4);background:rgba(57,255,107,.05)}
@@ -1054,7 +1055,7 @@ function App(){
                 <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{l.phone}</td>
                 <td><span className="sb" style={sBadge(l.status)}>{l.status}</span></td>
                 <td>{l.callbackDate?<span style={{color:cb,fontSize:10,fontWeight:700}} className={l.callbackDate===todayStr()?'cb-today':''}>{l.callbackDate===todayStr()?'TODAY':l.callbackDate<todayStr()?'⚠ '+l.callbackDate:l.callbackDate}</span>:<span style={{color:DIM,fontSize:10}}>—</span>}</td>
-                <td style={{color:DIM,fontSize:10,maxWidth:160,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{l.notes||'—'}</td>
+                <td className="lead-notes" style={{color:DIM,fontSize:11}}>{l.notes||'—'}</td>
               </tr>;})}
               </tbody>
             </table>
