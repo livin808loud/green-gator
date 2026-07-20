@@ -1,6 +1,6 @@
 // Green Gator PWA service worker — network-first so deploys show up immediately,
 // cached shell keeps the app opening offline.
-const CACHE = 'gg-shell-v7';
+const CACHE = 'gg-shell-v8';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
