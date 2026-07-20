@@ -1701,16 +1701,7 @@ function App(){
           </div>
           {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet.</div>:<>
             <div className="g-auto" style={{marginBottom:12}}>
-              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'2.5% Factoring',v:'$'+moFactoringTotal.toFixed(2),c:'#f87171',sub:'Invoice fees included'},{l:'Net Revenue',v:'$'+moNet.toFixed(2),c:G,sub:'After fuel + factoring'},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'After Fixed Costs',v:'$'+moProfit.toFixed(2),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
-            </div>
-            <div style={{padding:'11px 12px',marginBottom:12,border:'1px solid rgba(96,165,250,.25)',borderRadius:8,background:'rgba(96,165,250,.05)'}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:9}}><div style={{color:'#60a5fa',fontSize:10,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase'}}>Factored / Brokered Loads</div><div style={{color:DIM,fontSize:9}}>Identified brokered loads · 2.5% factoring + $2 each invoice</div></div>
-              <div className="g-auto">
-                <Stat l="Factored Loads" v={String(moFactoredLogs.length)} c="#60a5fa" sub="Invoices this month"/>
-                <Stat l="Factored Gross" v={'$'+moFactoredGross.toFixed(2)} c={G}/>
-                <Stat l="2.5% Factoring" v={'$'+moFactoringTotal.toFixed(2)} c="#f87171" sub={'Includes '+moFactoredLogs.length+' × $2 invoice fees'}/>
-                <Stat l="Net Factored Receipts" v={'$'+moFactoredReceipts.toFixed(2)} c={G} sub="Before fuel and fixed overhead"/>
-              </div>
+              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'Net Revenue',v:'$'+moNet.toFixed(2),c:G,sub:'After fuel + factoring'},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'After Fixed Costs',v:'$'+moProfit.toFixed(2),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)},{l:'Factored Gross',v:'$'+moFactoredGross.toFixed(2),c:G},{l:'2.5% Factoring',v:'$'+moFactoringTotal.toFixed(2),c:'#f87171',sub:'Invoice fees included'}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
             </div>
             <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
           </>}
