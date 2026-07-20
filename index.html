@@ -1219,8 +1219,8 @@ function App(){
   const [selectedMonth,setSelectedMonth]=useState('');
   const [calcM,setCalcM]=useState('');const [calcDH,setCalcDH]=useState('');const [calcR,setCalcR]=useState('');const [calcSource,setCalcSource]=useState('DAT');
   const [bal,setBal]=useState('25761');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
-  const [odometer,setOdometer]=useState('214686');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
-  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25761');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('214686');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [odometer,setOdometer]=useState('214886');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25761');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('214886');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
   const nowD=new Date();
   const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
   const [toast,setToast]=useState('');
@@ -1499,7 +1499,19 @@ function App(){
   const moLogs=log.filter(e=>e.date?.startsWith(moKey));
   const moGross=moLogs.reduce((s,e)=>s+(e.pay||0),0);
   const moFuel=moLogs.reduce((s,e)=>s+(e.fuel||0),0);
-  const moNet=moGross-moFuel;const moProfit=moNet-2331;
+  const isFactoredLoad=e=>{
+    const src=String(e.source||'').toLowerCase(),c=String(e.comments||'');
+    if(/amazon|direct/.test(src)||/amazon relay/i.test(c))return false;
+    if(/dat|broker|factored/.test(src))return true;
+    return /broker|rate confirmation|carrier tender|ascendtms|haul.n|tql|landstar|kch transportation|evans transportation|axle logistics|bergen|giltner|tforce|sage freight|highway/i.test(c);
+  };
+  const moFactoredLogs=moLogs.filter(isFactoredLoad);
+  const moFactoredGross=moFactoredLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
+  const moFactoringPct=moFactoredGross*DAT_FACTOR_RATE;
+  const moInvoiceFees=moFactoredLogs.length*DAT_INVOICE_FEE;
+  const moFactoringTotal=moFactoringPct+moInvoiceFees;
+  const moFactoredReceipts=moFactoredGross-moFactoringTotal;
+  const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-2331;
   const moMiles=moLogs.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);
   const overdue=leads.filter(l=>l.callbackDate&&l.callbackDate<todayStr());
   const dueToday=leads.filter(l=>l.callbackDate===todayStr());
@@ -1689,7 +1701,18 @@ function App(){
           </div>
           {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet.</div>:<>
             <div className="g-auto" style={{marginBottom:12}}>
-              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'Net Revenue',v:'$'+moNet.toLocaleString(),c:G},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'True Profit',v:'$'+moProfit.toLocaleString(),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'After all costs':'Below costs'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'Factoring Fees',v:'$'+moFactoringTotal.toFixed(2),c:'#f87171',sub:moFactoredLogs.length+' factored invoices'},{l:'Net Revenue',v:'$'+moNet.toFixed(2),c:G,sub:'After fuel + factoring'},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'After Fixed Costs',v:'$'+moProfit.toFixed(2),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+            </div>
+            <div style={{padding:'11px 12px',marginBottom:12,border:'1px solid rgba(96,165,250,.25)',borderRadius:8,background:'rgba(96,165,250,.05)'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,flexWrap:'wrap',marginBottom:9}}><div style={{color:'#60a5fa',fontSize:10,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase'}}>Factored / Brokered Loads</div><div style={{color:DIM,fontSize:9}}>Identified brokered loads · 2.5% factoring + $2 each invoice</div></div>
+              <div className="g-auto">
+                <Stat l="Factored Loads" v={String(moFactoredLogs.length)} c="#60a5fa" sub="Invoices this month"/>
+                <Stat l="Factored Gross" v={'$'+moFactoredGross.toFixed(2)} c={G}/>
+                <Stat l="2.5% Factoring" v={'$'+moFactoringPct.toFixed(2)} c="#f87171"/>
+                <Stat l="$2 Invoice Fees" v={'$'+moInvoiceFees.toFixed(2)} c="#f87171" sub={moFactoredLogs.length+' × $2'}/>
+                <Stat l="Total Factoring Cost" v={'$'+moFactoringTotal.toFixed(2)} c="#f87171"/>
+                <Stat l="Net Factored Receipts" v={'$'+moFactoredReceipts.toFixed(2)} c={G} sub="Before fuel and fixed overhead"/>
+              </div>
             </div>
             <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
           </>}
