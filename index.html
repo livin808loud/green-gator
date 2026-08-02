@@ -1766,11 +1766,6 @@ function App(){
             <div className="money-grid">
               {[{l:'Amazon Relay',k:'ar'},{l:'DAT Gross',k:'dg'},{l:'Direct Local',k:'dl'},{l:'Fuel Spend',k:'fs'},{l:'Miles Driven',k:'mi'},{l:'Fuel $/Gal',k:'fp'},{l:'MPG',k:'mpg'},{l:'Target Gross',k:'tg'}].map(({l,k})=><div key={k}><span className="lbl">{l}</span><input className="inp" value={W[k]} onChange={e=>saveW(k,e.target.value)} inputMode="decimal"/></div>)}
             </div>
-            <div style={{marginTop:12,padding:'11px 12px',border:'1px solid rgba(251,191,36,.28)',borderRadius:8,background:'rgba(251,191,36,.055)'}}>
-              <div style={{color:'#fbbf24',fontSize:10,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>Estimated Fuel Consumption</div>
-              {weeklyFuelEstimate.totalMiles>0?<div style={{display:'flex',gap:16,alignItems:'baseline',flexWrap:'wrap'}}><span style={{color:'#dceede',fontSize:17,fontWeight:700}}>{weeklyFuelEstimate.gallons.toFixed(1)} gal</span><span style={{color:'#fbbf24',fontSize:15,fontWeight:700}}>${weeklyFuelEstimate.cost.toFixed(2)}</span><span style={{color:DIM,fontSize:10}}>for {weeklyFuelEstimate.totalMiles.toLocaleString()} total miles · ${weeklyFuelEstimate.price.toFixed(2)}/gal · {weeklyFuelEstimate.mpg.toFixed(1)} MPG</span></div>:<div style={{color:DIM,fontSize:10}}>Add weekly miles or log a load to calculate gallons and estimated fuel cost.</div>}
-              <div style={{color:DIM,fontSize:9,marginTop:4}}>Planning estimate only. Actual fuel spend remains separate.</div>
-            </div>
           </div>
         </div>
 
