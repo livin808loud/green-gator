@@ -274,6 +274,32 @@ const LEADS=[
 ];
 
 const SEEDS=[
+{
+  "id": 80,
+  "date": "2026-07-24",
+  "pickup": "AGS5 Appling, GA 30802",
+  "dropoff": "PX23658 Chapin, SC 29036",
+  "miles": 96,
+  "dh": 144,
+  "rpm": "3.83",
+  "pay": 367.45,
+  "fuel": 57.98,
+  "source": "Amazon Relay",
+  "comments": "Amazon Relay spot load 115SXMWBT. Pickup AGS5 Appling GA 30802, Fri 2026-07-24 06:30 EDT; drop PX23658 Chapin SC 29036, Fri 2026-07-24 10:42 EDT. 26 ft truck; Special Services; live service. Screenshot showed 96 loaded miles, 4h 24m displayed duration, $367.45 pay, and displayed $3.85/loaded mi. Deadhead corrected to a provisional 144 mi from the prior Tryon NC delivery to the AGS5 Appling pickup, using OSRM city-to-city routing; replace with actual miles if different. Total estimated miles 240. Calculated loaded RPM $3.83; all-in gross RPM $1.53. Fuel pending. Driver J. Green. Truck GA C963FF. Timing conflict: this Chapin delivery at 10:42 makes the same-day GlobalTranz Calhoun load pickup in Augusta 09:00-11:00 likely impossible without broker-approved timing changes. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
+},
+{
+  "id": 79,
+  "date": "2026-07-25",
+  "pickup": "INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta, GA 30909",
+  "dropoff": "Calhoun, GA 30703 (facility/street unknown)",
+  "miles": 211,
+  "dh": 83,
+  "rpm": "4.27",
+  "pay": 900,
+  "fuel": 71.02,
+  "source": "GlobalTranz / Fila Freight",
+  "comments": "GlobalTranz / Fila Freight load #32931079, quote #4780287, ref #SLC00353681. Pickup INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta GA 30909, Fri 2026-07-24 09:00-11:00; contact Mason Amacker, 985-635-9276. Delivery facility and street are shown as unknown; destination Calhoun GA 30703, Sat 2026-07-25 09:30-11:30. Straight-truck full load; 6 pallets / 6 pieces / 5,000 lb. Liftgate and pallet jack required; driver load and unload; bring a roll of shrink wrap. Flat rate $900. Rate confirmation does not state mileage; loaded mileage provisionally estimated at 211 mi by OSRM from exact pickup to Calhoun city/ZIP. Deadhead revised 2026-07-23 to a provisional 83 mi from the newly inserted prior PX23658 Chapin delivery to the Augusta pickup using OSRM city-to-address routing; replace with actual or re-chain if another load intervenes. Total estimated miles 294; loaded RPM $4.27; all-in gross RPM $3.06. Fuel pending. Timing conflict: prior Amazon 115SXMWBT delivery in Chapin is 10:42 on 2026-07-24, while this Augusta pickup window is 09:00-11:00, so service is likely impossible unless GlobalTranz/Vivint approve later pickup or the Amazon load changes. Equipment fields conflict: trailer type says Straight Truck while size says 48 or 53; verify the 26 ft box truck is accepted. POD is due within 1 day of delivery; late POD reduces rate 1% per day. Email invoice, rate confirmation, POD, and receipts to TLinvoices@globaltranz.com. Detention starts after 2 hours at $40/hr, max $200 per stop; notify broker after 60 minutes and provide a time-stamped BOL within 48 hours. Optional 3% / 3-day Quick Pay. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
+},
   {
     "id": 78,
     "date": "2026-07-23",
@@ -1098,7 +1124,7 @@ const SEEDS=[
     "comments": "TQL rate confirmation PO# 37470905. Broker contact Stephen Bodet, 800-580-3101 x47342, MBodet@TQL.com; office staffed 24/7. Carrier Green Gator Enterprises LLC MC 1569745 / DOT 4110201. Pickup Orangeburg SC, Tue 2026-07-07 FCFS 08:00-14:00. Delivery Cameron SC, Tue 2026-07-07 FCFS 07:30-15:30. Commodity packaging materials; 1 truckload; estimated weight 5,140 lb; 26 ft straight box truck; FTL; non-hazardous; 0 pallets/0 cases shown. Loaded miles estimated from OSRM city-to-city route: 10 mi (15.4 km). Deadhead updated 2026-07-07: user confirmed 20 mi deadhead; exact pickup address not provided on rate con. Loaded RPM $15.00; all-in gross RPM $5.00. Fuel pending. Tracking required via P44, MacroPoint, or Carrier Dashboard. Deliver straight through. POD must be signed by shipper and receiver and sent to mbodet@tql.com upon delivery; submit rate confirmation, BOL/POD, receipts, and other paperwork within 24 hours to cinvoices@tql.com. Detention/accessorials require advance written approval; notify TQL at least 30 minutes before detention; detention generally starts after at least 3 hours unless agreed in writing. Late pickup/delivery may cause non-payment/special damages. No TONU unless TQL provided load details and approved travel toward pickup. Fuel updated 2026-07-07: user reported $95 fuel. Net after fuel $55.00; net per all miles $1.83."
   }
 ];
-const IFTA_BY_ID={"78":{"SC":31,"NC":2},"77":{"NC":191,"SC":37},"76":{"NC":159},"75":{"NC":43},"74":{"GA":176,"SC":146,"NC":71},"73":{"GA":190},"70":{"NC":126},"69":{"GA":59,"NC":69,"SC":149},"68":{"SC":38},"67":{"GA":7,"SC":58},"66":{"GA":39,"SC":74},"65":{"GA":131,"NC":146,"SC":154},"64":{},"1783940581495":{"GA":31,"NC":69,"SC":149},"1783835522624":{"NC":90,"SC":16},"61":{"GA":66,"NC":69,"SC":149},"60":{"GA":41},"59":{"GA":64,"SC":118},"58":{"SC":80},"57":{"GA":39,"SC":75},"56":{},"55":{"GA":108,"SC":10},"54":{"GA":59,"SC":185},"51":{"SC":191,"GA":4},"1":{"GA":63,"NC":70,"SC":151},"2":{"GA":63,"NC":70,"SC":151},"3":{"NC":112,"SC":204},"4":{"GA":272,"SC":35},"5":{"GA":161,"SC":75},"16":{"GA":62,"NC":89,"SC":149},"17":{"GA":137},"18":{"GA":60},"52":{"GA":137},"20":{"GA":45,"SC":107},"19":{"GA":1,"SC":74},"21":{"GA":172},"22":{"GA":62},"23":{"DC":10,"MD":29,"NC":182,"SC":218,"VA":182,"GA":6},"26":{"MD":50},"27":{"NC":113,"VA":225},"24":{"GA":39,"SC":68},"25":{"GA":55,"SC":95},"28":{"GA":28,"SC":4},"29":{"SC":196},"30":{"GA":83,"SC":138},"31":{"GA":1,"NC":17,"SC":155},"32":{"GA":47},"33":{"GA":65,"NC":69,"SC":149},"34":{"NC":81,"SC":120},"35":{"GA":71,"SC":113},"37":{"NC":107,"SC":90},"36":{"GA":20,"NC":12,"SC":161},"38":{"GA":107},"39":{"GA":180},"40":{"GA":118},"41":{"GA":177,"SC":148},"43":{"GA":71,"SC":245},"42":{"GA":29,"SC":48},"44":{"GA":42,"SC":157},"45":{"GA":53,"SC":243},"47":{"GA":54},"46":{"GA":40,"SC":72},"48":{"GA":63,"NC":69,"SC":149},"49":{"GA":20,"NC":12,"SC":163},"50":{"NC":135,"SC":126},"53":{"SC":30}};
+const IFTA_BY_ID={"80":{"GA":53,"SC":185,"NC":2},"79":{"GA":227,"SC":67},"78":{"SC":31,"NC":2},"77":{"NC":191,"SC":37},"76":{"NC":159},"75":{"NC":43},"74":{"GA":176,"SC":146,"NC":71},"73":{"GA":190},"70":{"NC":126},"69":{"GA":59,"NC":69,"SC":149},"68":{"SC":38},"67":{"GA":7,"SC":58},"66":{"GA":39,"SC":74},"65":{"GA":131,"NC":146,"SC":154},"64":{},"1783940581495":{"GA":31,"NC":69,"SC":149},"1783835522624":{"NC":90,"SC":16},"61":{"GA":66,"NC":69,"SC":149},"60":{"GA":41},"59":{"GA":64,"SC":118},"58":{"SC":80},"57":{"GA":39,"SC":75},"56":{},"55":{"GA":108,"SC":10},"54":{"GA":59,"SC":185},"51":{"SC":191,"GA":4},"1":{"GA":63,"NC":70,"SC":151},"2":{"GA":63,"NC":70,"SC":151},"3":{"NC":112,"SC":204},"4":{"GA":272,"SC":35},"5":{"GA":161,"SC":75},"16":{"GA":62,"NC":89,"SC":149},"17":{"GA":137},"18":{"GA":60},"52":{"GA":137},"20":{"GA":45,"SC":107},"19":{"GA":1,"SC":74},"21":{"GA":172},"22":{"GA":62},"23":{"DC":10,"MD":29,"NC":182,"SC":218,"VA":182,"GA":6},"26":{"MD":50},"27":{"NC":113,"VA":225},"24":{"GA":39,"SC":68},"25":{"GA":55,"SC":95},"28":{"GA":28,"SC":4},"29":{"SC":196},"30":{"GA":83,"SC":138},"31":{"GA":1,"NC":17,"SC":155},"32":{"GA":47},"33":{"GA":65,"NC":69,"SC":149},"34":{"NC":81,"SC":120},"35":{"GA":71,"SC":113},"37":{"NC":107,"SC":90},"36":{"GA":20,"NC":12,"SC":161},"38":{"GA":107},"39":{"GA":180},"40":{"GA":118},"41":{"GA":177,"SC":148},"43":{"GA":71,"SC":245},"42":{"GA":29,"SC":48},"44":{"GA":42,"SC":157},"45":{"GA":53,"SC":243},"47":{"GA":54},"46":{"GA":40,"SC":72},"48":{"GA":63,"NC":69,"SC":149},"49":{"GA":20,"NC":12,"SC":163},"50":{"NC":135,"SC":126},"53":{"SC":30}};
 SEEDS.forEach(e=>{e.ifta=IFTA_BY_ID[String(e.id)]??null;e.iftaStatus='calculated';});
 const SEED=SEEDS[0];
 const SU_URL='https://bzbaifskyvjhvooteowx.supabase.co';
@@ -1252,7 +1278,9 @@ function App(){
       .logbook-lower-grid>*{min-width:0}
       .g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
       .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-      .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px}
+      .g-auto{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+      .month-hero{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+      .month-hero .kpi-val{font-size:26px;font-weight:700;line-height:1.05;margin-bottom:6px}
       .money-grid,.log-form-grid,.maint-form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
       .route-map{height:clamp(280px,34vw,390px);min-height:280px;width:100%;max-width:100%;background:#030806}
       .leaflet-container{background:#030806;font-family:'Courier New',Courier,monospace;isolation:isolate}
@@ -1271,6 +1299,9 @@ function App(){
         .g4{grid-template-columns:repeat(2,1fr)}
         .g12{grid-template-columns:1fr}
         .g11{grid-template-columns:1fr}
+        .month-hero{grid-template-columns:1fr}
+        .month-hero .kpi-val{font-size:30px}
+        .g-auto{grid-template-columns:repeat(2,minmax(0,1fr))}
         .nav-tab{padding:10px 8px;font-size:9px}
         .money-grid,.log-form-grid,.maint-form-grid{grid-template-columns:1fr!important}
         .lead-editor-grid{grid-template-columns:1fr!important}
@@ -1576,20 +1607,22 @@ function App(){
   const cReady=cTot>0&&cR>0;
   const cVerdict=!cReady?{t:'Enter load details',c:DIM,b:'transparent'}:cGrossRPM>=cStrongTarget?{t:'TAKE · strong margin',c:'#4ade80',b:'rgba(74,222,128,.1)'}:cGrossRPM>=cMinimumTarget?{t:'TAKE IF QUICK · acceptable margin',c:'#86efac',b:'rgba(134,239,172,.08)'}:cGrossRPM>=cBreakEvenGross?{t:'NEGOTIATE · covers costs, misses target',c:'#fbbf24',b:'rgba(251,191,36,.1)'}:{t:'PASS · below operating floor',c:'#f87171',b:'rgba(248,113,113,.1)'};
   const currentMoKey=`${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}`;
+  const logMonths=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
   const activeOverviewMonth=overviewMonth||(()=>{
     const hasCurrent=log.some(e=>e.date?.startsWith(currentMoKey));
     if(hasCurrent)return currentMoKey;
-    const moList=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
-    return moList[0]||currentMoKey;
+    return logMonths[0]||currentMoKey;
   })();
   const [moYearStr,moMonthStr]=activeOverviewMonth.split('-');
   const moYear=parseInt(moYearStr,10)||nowD.getFullYear();
-  const moMonth=(parseInt(moMonthStr,10)-1)||nowD.getMonth();
+  const moMonthNum=parseInt(moMonthStr,10);
+  const moMonth=(Number.isFinite(moMonthNum)&&moMonthNum>=1&&moMonthNum<=12)?(moMonthNum-1):nowD.getMonth();
   const moKey=activeOverviewMonth;
   const moName=MONTHS[moMonth]+' '+moYear;
   const moLogs=log.filter(e=>e.date?.startsWith(moKey));
-  const moGross=moLogs.reduce((s,e)=>s+(e.pay||0),0);
-  const moFuel=moLogs.reduce((s,e)=>s+(e.fuel||0),0);
+  const moGross=moLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
+  const moFuel=moLogs.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
+  const moFuelAfterOnly=moGross-moFuel;
   const isFactoredLoad=e=>{
     const src=String(e.source||'').toLowerCase(),c=String(e.comments||'');
     if(/amazon|direct/.test(src)||/amazon relay/i.test(c))return false;
@@ -1603,7 +1636,16 @@ function App(){
   const moFactoringTotal=moFactoringPct+moInvoiceFees;
   const moFactoredReceipts=moFactoredGross-moFactoringTotal;
   const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-2331;
-  const moMiles=moLogs.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);
+  const moMiles=moLogs.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
+  const moFuelPending=moLogs.filter(e=>!/\b(cancel(?:led)?|tonu)\b/i.test(e.comments||'')&&((parseFloat(e.miles)||0)+(parseFloat(e.dh)||0))>0&&!(parseFloat(e.fuel)>0)).length;
+  const moIdx=logMonths.indexOf(activeOverviewMonth);
+  const moMoney=n=>'$'+(Math.round((parseFloat(n)||0)*100)/100).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+  const shiftOverviewMonth=dir=>{
+    if(!logMonths.length)return;
+    const i=moIdx>=0?moIdx:0;
+    const next=logMonths[i+dir];
+    if(next)setOverviewMonth(next);
+  };
   const overdue=leads.filter(l=>l.callbackDate&&l.callbackDate<todayStr());
   const dueToday=leads.filter(l=>l.callbackDate===todayStr());
   const filtered=leads.filter(l=>{const ms=statusFilter==='All'||l.status===statusFilter;const q=search.toLowerCase();const mq=!search||l.name.toLowerCase().includes(q)||l.phone.includes(search)||(l.notes||'').toLowerCase().includes(q);return ms&&mq;});
@@ -1618,9 +1660,12 @@ function App(){
   },{})).sort((a,b)=>b.weekStart.localeCompare(a.weekStart));
   const overviewWeeks=logWeeks.length?logWeeks:weekHistory;
   const weekOptions=[{weekStart:currentWeekStart,weekEnd:activeWeekEnd},...logWeeks.filter(w=>w.weekStart!==currentWeekStart)];
-  const logMonths=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
   const shownLog=selectedWeek?log.filter(e=>e.date>=selectedWeek.start&&e.date<=selectedWeek.end):selectedMonth?log.filter(e=>e.date?.startsWith(selectedMonth)):log;
-  const weekFilterLabel=selectedWeek?selectedWeek.start+' → '+selectedWeek.end:selectedMonth?MONTHS[parseInt(selectedMonth.slice(5,7))-1]+' '+selectedMonth.slice(0,4):'All Loads';
+  const shownGross=shownLog.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
+  const shownFuel=shownLog.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
+  const shownNet=shownGross-shownFuel;
+  const shownMiles=shownLog.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
+  const weekFilterLabel=selectedWeek?selectedWeek.start+' → '+selectedWeek.end:selectedMonth?MONTHS[parseInt(selectedMonth.slice(5,7),10)-1]+' '+selectedMonth.slice(0,4):'All Loads';
   const isCancelled=e=>/\b(cancel(?:led)?|tonu)\b/i.test(e.comments||'');
   const dataQuality={
     fuelPending:log.filter(e=>!isCancelled(e)&&((parseFloat(e.miles)||0)+(parseFloat(e.dh)||0))>0&&!(parseFloat(e.fuel)>0)).length,
@@ -1707,6 +1752,45 @@ function App(){
           </div>
         </div>
 
+        <div className="card" style={{marginBottom:12}} id="monthly-earnings">
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}}>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+              <span>Monthly Earnings</span>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <button type="button" className="btn-g" style={{padding:'4px 10px',fontSize:12}} disabled={moIdx<0||moIdx>=logMonths.length-1} onClick={()=>shiftOverviewMonth(1)} title="Older month">‹</button>
+                <select className="inp" style={{width:'auto',minWidth:140,padding:'6px 10px',fontSize:13,color:G,fontWeight:700,background:'#0a190c',borderColor:'rgba(57,255,107,.35)'}} value={activeOverviewMonth} onChange={e=>setOverviewMonth(e.target.value)}>
+                  {logMonths.map(m=>{const[y,mo]=m.split('-');return <option key={m} value={m}>{MONTHS[parseInt(mo,10)-1]} {y}</option>;})}
+                </select>
+                <button type="button" className="btn-g" style={{padding:'4px 10px',fontSize:12}} disabled={moIdx<=0} onClick={()=>shiftOverviewMonth(-1)} title="Newer month">›</button>
+              </div>
+            </div>
+            {moLogs.length>0&&<span style={{background:'rgba(57,255,107,.08)',color:G,border:'1px solid rgba(57,255,107,.2)',borderRadius:5,padding:'3px 9px',fontSize:10,fontWeight:700}}>{moLogs.length} loads · {moName}</span>}
+          </div>
+          {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet. Use ‹ › or the month menu to open a prior month.</div>:<>
+            <div className="month-hero" style={{marginBottom:12}}>
+              <div className="kpi">
+                <div style={{color:MUT,fontSize:10,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:8}}>Gross</div>
+                <div className="kpi-val" style={{color:G}}>{moMoney(moGross)}</div>
+                <div style={{color:DIM,fontSize:11}}>Factored portion {moMoney(moFactoredGross)}</div>
+              </div>
+              <div className="kpi">
+                <div style={{color:MUT,fontSize:10,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:8}}>Net Revenue</div>
+                <div className="kpi-val" style={{color:moNet>=0?G:'#f87171'}}>{moMoney(moNet)}</div>
+                <div style={{color:DIM,fontSize:11}}>After fuel + factoring · fuel-only {moMoney(moFuelAfterOnly)}</div>
+              </div>
+              <div className="kpi">
+                <div style={{color:MUT,fontSize:10,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:8}}>Fuel Spent</div>
+                <div className="kpi-val" style={{color:'#f87171'}}>{moMoney(moFuel)}</div>
+                <div style={{color:DIM,fontSize:11}}>{moFuelPending>0?moFuelPending+' load(s) still missing fuel':'All active loads have fuel logged'}{moMiles>0?' · $'+(moFuel/moMiles).toFixed(2)+'/mi':''}</div>
+              </div>
+            </div>
+            <div className="g-auto" style={{marginBottom:12}}>
+              {[{l:'2.5% Factoring',v:moMoney(moFactoringTotal),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:moMoney(moProfit),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$2,331',c:'#fbbf24',sub:'Ins+truck+addr+DAT+QB'},{l:'Miles',v:moMiles.toLocaleString(),sub:'Loaded + deadhead'},{l:'Avg Net RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM,sub:'Net ÷ total miles'},{l:'Loads',v:String(moLogs.length),sub:moName}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+            </div>
+            <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
+          </>}
+        </div>
+
         <div className="card" style={{marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6,flexWrap:'wrap',gap:8}}>
             <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8}}>🧮 Load Decision Calculator</div>
@@ -1773,32 +1857,14 @@ function App(){
           <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Weekly History from Logbook</div>
           {overviewWeeks.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No weeks logged yet.</div>:<div style={{overflowX:'auto'}}>
             <table className="tbl">
-              <thead><tr>{['WEEK','GROSS','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
+              <thead><tr>{['WEEK','GROSS','FUEL','NET','LOADS','MILES'].map(h=><th key={h}>{h}</th>)}</tr></thead>
               <tbody>{overviewWeeks.map(w=>{
                 const fmt=d=>{if(!d)return'?';const[y,m,day]=String(d).split('-');const mn=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]||'';return (mn?mn+' ':'')+parseInt(day||0);};
                 const label=w.weekStart?fmt(w.weekStart)+' – '+fmt(w.weekEnd):'Ended '+fmt(w.weekEnd);
-                return <tr key={w.id} onClick={()=>openWeek(w)} style={{cursor:'pointer'}} title="Open this week in Logbook"><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap',fontWeight:700}}>{label} <span style={{color:G}}>→</span></td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
+                return <tr key={w.id} onClick={()=>openWeek(w)} style={{cursor:'pointer'}} title="Open this week in Logbook"><td style={{color:'#c8e0cc',fontSize:10,whiteSpace:'nowrap',fontWeight:700}}>{label} <span style={{color:G}}>→</span></td><td style={{color:G,fontWeight:700}}>${(parseFloat(w.gross)||0).toLocaleString()}</td><td style={{color:'#f87171',fontWeight:700}}>${(parseFloat(w.fuel)||0).toFixed(0)}</td><td style={{color:parseFloat(w.net)>=0?G:'#f87171',fontWeight:700}}>${(parseFloat(w.net)||0).toFixed(0)}</td><td>{w.loads||0}</td><td>{(parseFloat(w.mi)||0).toLocaleString()}mi</td></tr>;
               })}</tbody>
             </table>
           </div>}
-        </div>
-
-        <div className="card" style={{marginBottom:12}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8}}>
-              <span>Monthly Earnings:</span>
-              <select className="inp" style={{width:'auto',padding:'3px 8px',fontSize:12,color:G,fontWeight:700,background:'#0a190c',borderColor:'rgba(57,255,107,.25)'}} value={activeOverviewMonth} onChange={e=>setOverviewMonth(e.target.value)}>
-                {logMonths.map(m=>{const[y,mo]=m.split('-');return <option key={m} value={m}>{MONTHS[parseInt(mo,10)-1]} {y}</option>;})}
-              </select>
-            </div>
-            {moLogs.length>0&&<span style={{background:'rgba(57,255,107,.08)',color:G,border:'1px solid rgba(57,255,107,.2)',borderRadius:5,padding:'3px 9px',fontSize:10,fontWeight:700}}>{moLogs.length} loads</span>}
-          </div>
-          {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet.</div>:<>
-            <div className="g-auto" style={{marginBottom:12}}>
-              {[{l:'Gross',v:'$'+moGross.toLocaleString(),c:G,sub:'Factored gross $'+moFactoredGross.toFixed(2)},{l:'Net Revenue',v:'$'+moNet.toFixed(2),c:G,sub:'After fuel + factoring'},{l:'Fuel',v:'$'+moFuel.toLocaleString(),c:'#f87171'},{l:'2.5% Factoring',v:'$'+moFactoringTotal.toFixed(2),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:'$'+moProfit.toFixed(2),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$2,331',c:'#fbbf24'},{l:'Miles',v:moMiles.toLocaleString()},{l:'Avg RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM},{l:'Loads',v:String(moLogs.length)}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
-            </div>
-            <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
-          </>}
         </div>
       </div>}
 
@@ -1853,16 +1919,22 @@ function App(){
       {/* LOGBOOK */}
       {sec==='logbook'&&<div className="section" ref={refs.logbook}>
         <SH t={'Load Logbook — '+weekFilterLabel} right={<>
-          {[{l:'Loads',v:shownLog.length},{l:'Total Gross',v:'$'+shownLog.reduce((s,e)=>s+(e.pay||0),0).toLocaleString()},{l:'Avg RPM',v:(()=>{const tm=shownLog.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=shownLog.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?'$'+(tn/tm).toFixed(2):'—';})()},{l:'IFTA Miles',v:iftaMiles.toLocaleString()}].map(({l,v})=><div key={l} style={{textAlign:'right'}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:G,fontWeight:700,fontSize:13}}>{v}</div></div>)}
+          {[{l:'Loads',v:String(shownLog.length),c:G},{l:'Gross',v:moMoney(shownGross),c:G},{l:'Fuel',v:moMoney(shownFuel),c:'#f87171'},{l:'Net After Fuel',v:moMoney(shownNet),c:shownNet>=0?G:'#f87171'},{l:'Avg RPM',v:shownMiles>0?'$'+(shownNet/shownMiles).toFixed(2):'—',c:shownMiles>0?rC(shownNet/shownMiles):DIM},{l:'IFTA Mi',v:iftaMiles.toLocaleString(),c:G}].map(({l,v,c})=><div key={l} style={{textAlign:'right',minWidth:72}}><div style={{color:DIM,fontSize:9,textTransform:'uppercase',letterSpacing:'.06em'}}>{l}</div><div style={{color:c||G,fontWeight:700,fontSize:14}}>{v}</div></div>)}
         </>}/>
         <div className="card" style={{padding:12,marginBottom:12,overflow:'visible'}}>
           <div style={{display:'flex',gap:10,alignItems:'flex-end',flexWrap:'wrap'}}>
             <div style={{minWidth:220,flex:'1 1 220px'}}><span className="lbl">Select Week</span><select className="inp" value={selectedWeek?.start||''} onChange={e=>{const w=weekOptions.find(x=>x.weekStart===e.target.value);if(w){setSelectedWeek({start:w.weekStart,end:w.weekEnd});setSelectedMonth('');const first=log.find(x=>x.date>=w.weekStart&&x.date<=w.weekEnd);if(first)setRoute(first);}}}><option value="" disabled>Choose a week...</option>{weekOptions.map(w=><option key={w.weekStart} value={w.weekStart}>{w.weekStart} → {w.weekEnd}{w.weekStart===currentWeekStart?' (Current)':''}</option>)}</select></div>
-            <div style={{minWidth:210,flex:'1 1 210px'}}><span className="lbl">Select Month</span><select className="inp" value={selectedMonth} onChange={e=>{const v=e.target.value;setSelectedMonth(v);setSelectedWeek(null);if(v){const[y,m]=v.split('-').map(Number);setCal({y,m:m-1});const first=log.find(x=>x.date?.startsWith(v));if(first)setRoute(first);}}}><option value="" disabled>Choose a month...</option>{logMonths.map(m=><option key={m} value={m}>{MONTHS[parseInt(m.slice(5,7))-1]} {m.slice(0,4)}</option>)}</select></div>
+            <div style={{minWidth:210,flex:'1 1 210px'}}><span className="lbl">Select Month</span><select className="inp" value={selectedMonth} onChange={e=>{const v=e.target.value;setSelectedMonth(v);setSelectedWeek(null);if(v){const[y,m]=v.split('-').map(Number);setCal({y,m:m-1});const first=log.find(x=>x.date?.startsWith(v));if(first)setRoute(first);}}}><option value="" disabled>Choose a month...</option>{logMonths.map(m=><option key={m} value={m}>{MONTHS[parseInt(m.slice(5,7),10)-1]} {m.slice(0,4)}</option>)}</select></div>
             <button className="btn-g" onClick={()=>{setSelectedWeek({start:currentWeekStart,end:activeWeekEnd});setSelectedMonth('');const first=log.find(x=>x.date>=currentWeekStart&&x.date<=activeWeekEnd);if(first)setRoute(first);}}>Current Week</button>
+            <button className="btn-g" onClick={()=>{const m=logMonths.find(x=>x!==currentMoKey)||logMonths[0];if(m){setSelectedMonth(m);setSelectedWeek(null);const[y,mo]=m.split('-').map(Number);setCal({y,m:mo-1});const first=log.find(x=>x.date?.startsWith(m));if(first)setRoute(first);}}}>Prior Month</button>
             <button className="btn-g" onClick={()=>{setSelectedWeek(null);setSelectedMonth('');}}>All Loads</button>
             <button className={addLog?'btn-g':'btn'} style={{background:addLog?'rgba(57,255,107,.06)':undefined,marginLeft:'auto'}} onClick={()=>addLog?cancelLogEdit():startAddLog()}>{addLog?'✕ Close':'+ Log New Load'}</button>
           </div>
+          {(selectedMonth||selectedWeek)&&<div className="month-hero" style={{marginTop:12}}>
+            <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>Period Gross</div><div style={{color:G,fontWeight:700,fontSize:22}}>{moMoney(shownGross)}</div></div>
+            <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>Period Fuel</div><div style={{color:'#f87171',fontWeight:700,fontSize:22}}>{moMoney(shownFuel)}</div></div>
+            <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:4}}>Net After Fuel</div><div style={{color:shownNet>=0?G:'#f87171',fontWeight:700,fontSize:22}}>{moMoney(shownNet)}</div><div style={{color:DIM,fontSize:10,marginTop:3}}>{shownMiles.toLocaleString()} mi · {shownLog.length} loads</div></div>
+          </div>}
         </div>
         <div className="card" style={{padding:12,marginBottom:12,borderColor:'rgba(251,191,36,.24)'}}>
           <div style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center',flexWrap:'wrap'}}>
