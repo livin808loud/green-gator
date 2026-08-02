@@ -1298,6 +1298,7 @@ function App(){
   const [route,setRoute]=useState(SEED);
   const [selectedWeek,setSelectedWeek]=useState(()=>{const d=new Date(),day=d.getDay(),diff=(day+6)%7,s=new Date(d);s.setDate(d.getDate()-diff);const e=new Date(s);e.setDate(s.getDate()+6);const fmt=x=>x.toISOString().slice(0,10);return{start:fmt(s),end:fmt(e)};});
   const [selectedMonth,setSelectedMonth]=useState('');
+  const [overviewMonth,setOverviewMonth]=useState('');
   const [calcM,setCalcM]=useState('');const [calcDH,setCalcDH]=useState('');const [calcR,setCalcR]=useState('');const [calcSource,setCalcSource]=useState('DAT');
   const [bal,setBal]=useState('25761');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
   const [odometer,setOdometer]=useState('217002');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
@@ -1574,8 +1575,17 @@ function App(){
   const cStrongTarget=cBreakEvenGross*1.60;
   const cReady=cTot>0&&cR>0;
   const cVerdict=!cReady?{t:'Enter load details',c:DIM,b:'transparent'}:cGrossRPM>=cStrongTarget?{t:'TAKE · strong margin',c:'#4ade80',b:'rgba(74,222,128,.1)'}:cGrossRPM>=cMinimumTarget?{t:'TAKE IF QUICK · acceptable margin',c:'#86efac',b:'rgba(134,239,172,.08)'}:cGrossRPM>=cBreakEvenGross?{t:'NEGOTIATE · covers costs, misses target',c:'#fbbf24',b:'rgba(251,191,36,.1)'}:{t:'PASS · below operating floor',c:'#f87171',b:'rgba(248,113,113,.1)'};
-  const moMonth=nowD.getMonth(),moYear=nowD.getFullYear();
-  const moKey=`${moYear}-${String(moMonth+1).padStart(2,'0')}`;
+  const currentMoKey=`${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}`;
+  const activeOverviewMonth=overviewMonth||(()=>{
+    const hasCurrent=log.some(e=>e.date?.startsWith(currentMoKey));
+    if(hasCurrent)return currentMoKey;
+    const moList=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
+    return moList[0]||currentMoKey;
+  })();
+  const [moYearStr,moMonthStr]=activeOverviewMonth.split('-');
+  const moYear=parseInt(moYearStr,10)||nowD.getFullYear();
+  const moMonth=(parseInt(moMonthStr,10)-1)||nowD.getMonth();
+  const moKey=activeOverviewMonth;
   const moName=MONTHS[moMonth]+' '+moYear;
   const moLogs=log.filter(e=>e.date?.startsWith(moKey));
   const moGross=moLogs.reduce((s,e)=>s+(e.pay||0),0);
@@ -1780,7 +1790,12 @@ function App(){
 
         <div className="card" style={{marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}}>
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13}}>{moName} — Monthly Earnings</div>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8}}>
+              <span>Monthly Earnings:</span>
+              <select className="inp" style={{width:'auto',padding:'3px 8px',fontSize:12,color:G,fontWeight:700,background:'#0a190c',borderColor:'rgba(57,255,107,.25)'}} value={activeOverviewMonth} onChange={e=>setOverviewMonth(e.target.value)}>
+                {logMonths.map(m=>{const[y,mo]=m.split('-');return <option key={m} value={m}>{MONTHS[parseInt(mo,10)-1]} {y}</option>;})}
+              </select>
+            </div>
             {moLogs.length>0&&<span style={{background:'rgba(57,255,107,.08)',color:G,border:'1px solid rgba(57,255,107,.2)',borderRadius:5,padding:'3px 9px',fontSize:10,fontWeight:700}}>{moLogs.length} loads</span>}
           </div>
           {moLogs.length===0?<div style={{color:DIM,fontSize:12,padding:'12px 0',textAlign:'center'}}>No loads logged for {moName} yet.</div>:<>
