@@ -1158,55 +1158,196 @@ const cbColor=d=>{if(!d)return null;const t=todayStr();if(d<t)return '#f87171';i
 const sg=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}};
 const ss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 
-function makeDB(url,key){
-  const H=(x={})=>({'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json',...x});
+// Session + GoTrue helpers (multi-tenant RLS requires a user JWT, not the anon key)
+const GG_SESSION_KEY='gg-session';
+const GG_ORG_ID='11111111-1111-4111-8111-111111111111'; // Green Gator tenant #1 (claim via SQL once)
+const loadSession=()=>{try{const v=localStorage.getItem(GG_SESSION_KEY);return v?JSON.parse(v):null;}catch{return null;}};
+const saveSession=s=>{try{if(s)localStorage.setItem(GG_SESSION_KEY,JSON.stringify(s));else localStorage.removeItem(GG_SESSION_KEY);}catch{}};
+const parseHashTokens=()=>{
+  const h=(window.location.hash||'').replace(/^#/,'');
+  if(!h||h.indexOf('access_token=')<0)return null;
+  const p=new URLSearchParams(h);
+  const access_token=p.get('access_token'), refresh_token=p.get('refresh_token');
+  if(!access_token)return null;
+  const expires_in=parseInt(p.get('expires_in')||'3600',10);
+  return{access_token,refresh_token,expires_at:Date.now()+expires_in*1000,token_type:p.get('token_type')||'bearer',user:null};
+};
+async function authRequest(path,body,method='POST',token=null){
+  const headers={'apikey':SU_KEY,'Content-Type':'application/json'};
+  if(token)headers['Authorization']='Bearer '+token;
+  const r=await fetch(SU_URL+'/auth/v1'+path,{method,headers,body:body==null?undefined:JSON.stringify(body)});
+  const text=await r.text();
+  let data=null;try{data=text?JSON.parse(text):null;}catch{data={message:text};}
+  if(!r.ok){
+    const msg=data?.error_description||data?.msg||data?.message||data?.error||('HTTP '+r.status);
+    throw new Error(msg);
+  }
+  return data;
+}
+async function refreshSession(sess){
+  if(!sess?.refresh_token)return null;
+  const data=await authRequest('/token?grant_type=refresh_token',{refresh_token:sess.refresh_token});
+  const next={
+    access_token:data.access_token,
+    refresh_token:data.refresh_token||sess.refresh_token,
+    expires_at:Date.now()+((data.expires_in||3600)*1000),
+    token_type:data.token_type||'bearer',
+    user:data.user||sess.user||null,
+  };
+  saveSession(next);return next;
+}
+async function ensureFreshSession(sess){
+  if(!sess?.access_token)return null;
+  // refresh 60s early
+  if(sess.expires_at && Date.now()<sess.expires_at-60000)return sess;
+  try{return await refreshSession(sess);}catch(e){console.warn('session refresh failed',e);saveSession(null);return null;}
+}
+async function fetchAuthUser(accessToken){
+  return authRequest('/user',null,'GET',accessToken);
+}
+async function signInWithPassword(email,password){
+  const data=await authRequest('/token?grant_type=password',{email,password});
+  const sess={
+    access_token:data.access_token,
+    refresh_token:data.refresh_token,
+    expires_at:Date.now()+((data.expires_in||3600)*1000),
+    token_type:data.token_type||'bearer',
+    user:data.user||null,
+  };
+  if(!sess.user){try{sess.user=await fetchAuthUser(sess.access_token);}catch{}}
+  saveSession(sess);return sess;
+}
+async function signInWithOtp(email){
+  await authRequest('/otp',{email,create_user:true,data:{},redirect_to:window.location.href.split('#')[0]});
+  // Prefer PKCE-less magiclink; redirect handled by Supabase Site URL config
+  return true;
+}
+async function signOutSession(sess){
+  try{if(sess?.access_token)await authRequest('/logout',{},'POST',sess.access_token);}catch{}
+  saveSession(null);
+}
+
+function makeDB(url,anonKey,getAccessToken){
+  const token=()=>{
+    try{const t=typeof getAccessToken==='function'?getAccessToken():null;return t||anonKey;}catch{return anonKey;}
+  };
+  const H=(x={})=>({'apikey':anonKey,'Authorization':'Bearer '+token(),'Content-Type':'application/json',...x});
   const base=url+'/rest/v1';
+  const withConflict=(p,onConflict)=>{
+    if(!onConflict)return p;
+    return p+(p.includes('?')?'&':'?')+'on_conflict='+encodeURIComponent(onConflict);
+  };
   return{
     get:async p=>{const r=await fetch(base+'/'+p,{headers:H()});if(!r.ok)throw new Error(r.status);return r.json();},
-    post:async(p,b,u=false)=>{const ex=u?{'Prefer':'resolution=merge-duplicates,return=representation'}:{'Prefer':'return=representation'};const r=await fetch(base+'/'+p,{method:'POST',headers:H(ex),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null;},
-    patch:async(p,b)=>{const r=await fetch(base+'/'+p,{method:'PATCH',headers:H(),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);},
-    del:async p=>{const r=await fetch(base+'/'+p,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(r.status);}
+    // u=true upsert. onConflict e.g. 'org_id' or 'org_id,key' required when PK is not the natural key.
+    post:async(p,b,u=false,onConflict=null)=>{
+      const ex=u?{'Prefer':'resolution=merge-duplicates,return=representation'}:{'Prefer':'return=representation'};
+      const r=await fetch(base+'/'+withConflict(p,u?onConflict:null),{method:'POST',headers:H(ex),body:JSON.stringify(b)});
+      if(!r.ok){const t=await r.text();throw new Error(r.status+(t?': '+t.slice(0,180):''));}
+      const t=await r.text();return t?JSON.parse(t):null;
+    },
+    patch:async(p,b)=>{const r=await fetch(base+'/'+p,{method:'PATCH',headers:H({'Prefer':'return=minimal'}),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);},
+    del:async p=>{const r=await fetch(base+'/'+p,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(r.status);},
+    rpc:async(fn,args={})=>{
+      const r=await fetch(url+'/rest/v1/rpc/'+fn,{method:'POST',headers:H({'Prefer':'return=representation'}),body:JSON.stringify(args)});
+      if(!r.ok){const t=await r.text();throw new Error(r.status+(t?': '+t.slice(0,180):''));}
+      const t=await r.text();return t?JSON.parse(t):null;
+    }
   };
 }
 
-function SetupScreen({onConnect,onSkip}){
-  const [url,setUrl]=useState('');const [key,setKey]=useState('');const [testing,setTesting]=useState(false);const [err,setErr]=useState('');
-  const connect=async()=>{
-    if(!url.trim()||!key.trim()){setErr('Both fields required.');return;}
-    const u=url.trim().replace(/\/$/,'');setTesting(true);setErr('');
+function AuthScreen({onAuthed}){
+  const [mode,setMode]=useState('password'); // password | magic
+  const [email,setEmail]=useState('');
+  const [password,setPassword]=useState('');
+  const [busy,setBusy]=useState(false);
+  const [err,setErr]=useState('');
+  const [sent,setSent]=useState(false);
+  const submit=async()=>{
+    setErr('');setBusy(true);
     try{
-      const r=await fetch(u+'/rest/v1/gg_weekly?id=eq.1',{headers:{'apikey':key.trim(),'Authorization':'Bearer '+key.trim()}});
-      if(!r.ok)throw new Error('HTTP '+r.status+' — check URL/key and run supabase_setup.sql first');
-      ss('gg-su',u);ss('gg-sk',key.trim());
-      onConnect(u,key.trim());
-    }catch(e){setErr(e.message);}
-    setTesting(false);
+      const em=email.trim().toLowerCase();
+      if(!em||!em.includes('@'))throw new Error('Enter a valid email');
+      if(mode==='password'){
+        if(!password)throw new Error('Enter your password');
+        const sess=await signInWithPassword(em,password);
+        onAuthed(sess);
+      }else{
+        // Magic link — requires Supabase Auth URL config + email provider enabled
+        await signInWithOtp(em);
+        setSent(true);
+      }
+    }catch(e){setErr(e.message||String(e));}
+    setBusy(false);
   };
   return(
     <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
-      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:460,width:'100%'}}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:420,width:'100%'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18}}>
           <span style={{fontSize:24}}>🐊</span>
           <div>
-            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Connect <span style={{color:G}}>Green Gator</span> to Cloud</div>
-            <div style={{color:DIM,fontSize:11,marginTop:2}}>Supabase powers Telegram bot sync</div>
+            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Sign in to <span style={{color:G}}>Green Gator</span></div>
+            <div style={{color:DIM,fontSize:11,marginTop:2}}>Multi-tenant cloud — your carrier data only</div>
           </div>
         </div>
-        <div style={{marginBottom:12}}>
-          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Supabase Project URL</span>
-          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://xxxxxxxxxxxx.supabase.co"/>
+        <div style={{display:'flex',gap:8,marginBottom:14}}>
+          <button type="button" onClick={()=>{setMode('password');setSent(false);setErr('');}} style={{flex:1,background:mode==='password'?G:'transparent',color:mode==='password'?'#030803':G,border:`1px solid ${BD}`,borderRadius:7,padding:'8px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Password</button>
+          <button type="button" onClick={()=>{setMode('magic');setErr('');}} style={{flex:1,background:mode==='magic'?G:'transparent',color:mode==='magic'?'#030803':G,border:`1px solid ${BD}`,borderRadius:7,padding:'8px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Magic link</button>
         </div>
-        <div style={{marginBottom:16}}>
-          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Anon / Public Key</span>
-          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={key} onChange={e=>setKey(e.target.value)} placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."/>
-        </div>
-        {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6,border:'1px solid rgba(248,113,113,.2)'}}>⚠ {err}</div>}
-        <div style={{display:'flex',gap:8}}>
-          <button onClick={connect} disabled={testing} style={{flex:1,background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:testing?.6:1}}>{testing?'Testing...':'Connect Dashboard →'}</button>
-          <button onClick={onSkip} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Skip</button>
-        </div>
+        {sent?(
+          <div style={{color:G,fontSize:12,lineHeight:1.6,padding:'12px 14px',background:'rgba(57,255,107,.06)',border:`1px solid rgba(57,255,107,.2)`,borderRadius:8}}>
+            Check <b>{email}</b> for your sign-in link. Leave this tab open on mobile if your mail app opens a different browser — copy the link back here if needed.
+          </div>
+        ):(
+          <>
+            <div style={{marginBottom:12}}>
+              <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Email</span>
+              <input autoComplete="username" inputMode="email" style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'12px 13px',fontSize:16,width:'100%',outline:'none',fontFamily:'monospace'}} value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} placeholder="you@carrier.com"/>
+            </div>
+            {mode==='password'&&(
+              <div style={{marginBottom:16}}>
+                <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Password</span>
+                <input autoComplete="current-password" type="password" style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'12px 13px',fontSize:16,width:'100%',outline:'none',fontFamily:'monospace'}} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} placeholder="••••••••"/>
+              </div>
+            )}
+            {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6,border:'1px solid rgba(248,113,113,.2)'}}>⚠ {err}</div>}
+            <button type="button" onClick={submit} disabled={busy} style={{width:'100%',background:G,color:'#030803',border:'none',borderRadius:7,padding:'12px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:13,opacity:busy?.6:1}}>{busy?'Working…':(mode==='password'?'Sign in →':'Send magic link →')}</button>
+          </>
+        )}
         <div style={{marginTop:14,padding:'10px 12px',background:'rgba(57,255,107,.04)',border:'1px solid rgba(57,255,107,.1)',borderRadius:7,fontSize:10,color:DIM,lineHeight:1.7}}>
-          <span style={{color:G,fontWeight:700}}>Setup:</span> supabase.com → New Project → SQL Editor → run supabase_setup.sql → Settings → API → copy URL + anon key.
+          <span style={{color:G,fontWeight:700}}>Owner setup:</span> Supabase → Authentication → Users → Add user (auto-confirm). Then SQL Editor: insert into org_members for tenant 11111111-… with your user UUID as owner.
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NoOrgScreen({session,onSignOut,onRetry}){
+  const [busy,setBusy]=useState(false);
+  const [err,setErr]=useState('');
+  const email=session?.user?.email||'signed-in user';
+  const claimHint=`insert into public.org_members (org_id, user_id, role)\nvalues ('${GG_ORG_ID}', '${session?.user?.id||'YOUR-USER-UUID'}', 'owner');`;
+  return(
+    <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:520,width:'100%'}}>
+        <div style={{fontSize:16,fontWeight:700,color:'#dceede',marginBottom:8}}>🐊 No carrier linked</div>
+        <div style={{color:DIM,fontSize:12,lineHeight:1.6,marginBottom:14}}>
+          Signed in as <span style={{color:G}}>{email}</span>, but this account is not on an org yet. RLS is working — cloud data stays locked until you claim Green Gator (tenant #1) or create a new carrier org.
+        </div>
+        {session?.user?.id&&(
+          <div style={{marginBottom:12}}>
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Your user id</div>
+            <code style={{display:'block',padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',fontSize:11,wordBreak:'break-all'}}>{session.user.id}</code>
+          </div>
+        )}
+        <div style={{marginBottom:14}}>
+          <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Claim tenant #1 (SQL Editor)</div>
+          <pre style={{margin:0,padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#9fd6ad',fontSize:10,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{claimHint}</pre>
+        </div>
+        {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12}}>⚠ {err}</div>}
+        <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+          <button type="button" className="btn" onClick={async()=>{setBusy(true);setErr('');try{await onRetry();}catch(e){setErr(e.message||String(e));}setBusy(false);}} style={{background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:busy?.6:1}}>{busy?'Checking…':'I ran the SQL — retry'}</button>
+          <button type="button" onClick={onSignOut} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Sign out</button>
         </div>
       </div>
     </div>
@@ -1314,6 +1455,10 @@ function App(){
   },[]);
 
   const [appState,setAppState]=useState('init');
+  const [session,setSession]=useState(null);
+  const [orgId,setOrgId]=useState(null);
+  const sessionRef=useRef(null);
+  useEffect(()=>{sessionRef.current=session;},[session]);
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('overview');
   const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
@@ -1413,7 +1558,7 @@ function App(){
   const loadSupa=async(d)=>{
     try{
       const [wR,lR,lgR,cfR,mlR,whR]=await Promise.all([
-        d.get('gg_weekly?id=eq.1&select=*'),
+        d.get('gg_weekly?select=*&limit=1'),
         d.get('gg_leads?select=*&order=id'),
         d.get('gg_log?select=*&order=created_at.desc'),
         d.get('gg_config?select=key,value'),
@@ -1436,14 +1581,60 @@ function App(){
     }catch(e){console.log('Supa err',e);loadLocal();}
   };
 
+  const readyRef=useRef(false);
+  useEffect(()=>{readyRef.current=appState==='ready';},[appState]);
+  const appStateRefReady=()=>readyRef.current;
+  const buildDb=(sess)=>makeDB(SU_URL,SU_KEY,()=>(sess||sessionRef.current)?.access_token||null);
+  const resolveOrg=async(d)=>{
+    const rows=await d.get('org_members?select=org_id,role&limit=1');
+    return rows?.[0]?.org_id||null;
+  };
+  const startCloud=async(sess)=>{
+    const fresh=await ensureFreshSession(sess);
+    if(!fresh){setSession(null);setOrgId(null);setDb(null);setAppState('auth');return null;}
+    if(!fresh.user){try{fresh.user=await fetchAuthUser(fresh.access_token);saveSession(fresh);}catch{}}
+    setSession(fresh);
+    const d=buildDb(fresh);setDb(d);
+    ss('gg-su',SU_URL);
+    let oid=null;
+    try{oid=await resolveOrg(d);}catch(e){console.warn('org resolve',e);oid=null;}
+    setOrgId(oid);
+    if(!oid){setAppState('noorg');return fresh;}
+    await loadSupa(d);
+    setAppState('ready');
+    return fresh;
+  };
   useEffect(()=>{
-    loadLocal();
-    const su=SU_URL,sk=SU_KEY;
-    ss('gg-su',su);ss('gg-sk',sk);
-    const d=makeDB(su,sk);setDb(d);
-    loadSupa(d).then(()=>setAppState('ready')).catch(()=>setAppState('ready'));
-    const t=setInterval(()=>{loadSupa(d).catch(()=>{});},30000);
-    return ()=>clearInterval(t);
+    let alive=true;
+    let poll=null;
+    (async()=>{
+      loadLocal();
+      // Capture magic-link tokens from URL hash before React router noise
+      let sess=parseHashTokens();
+      if(sess){
+        try{sess.user=await fetchAuthUser(sess.access_token);}catch{}
+        saveSession(sess);
+        // strip tokens from address bar
+        try{history.replaceState(null,'',window.location.pathname+window.location.search);}catch{}
+      }else{
+        sess=loadSession();
+      }
+      if(!alive)return;
+      if(!sess?.access_token){setAppState('auth');return;}
+      await startCloud(sess);
+      poll=setInterval(async()=>{
+        const cur=sessionRef.current||loadSession();
+        if(!cur)return;
+        const fresh=await ensureFreshSession(cur);
+        if(!fresh){setSession(null);setDb(null);setOrgId(null);setAppState('auth');return;}
+        if(fresh.access_token!==cur.access_token){setSession(fresh);setDb(buildDb(fresh));}
+        if(appStateRefReady()){
+          const d=buildDb(fresh);
+          loadSupa(d).catch(()=>{});
+        }
+      },30000);
+    })().catch(e=>{console.error(e);if(alive)setAppState('auth');});
+    return ()=>{alive=false;if(poll)clearInterval(poll);};
   },[]);
 
   const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
@@ -1461,7 +1652,7 @@ function App(){
 
   const saveW=async(k,v)=>{
     const u={...W,[k]:v};setW(u);
-    if(db)try{await db.post('gg_weekly',{id:1,ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true);}catch{}
+    if(db)try{await db.post('gg_weekly',{ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true,'org_id');}catch(e){console.warn('saveW',e);}
     else ss('gg-w',u);
   };
   const saveLead=async()=>{
@@ -1505,14 +1696,14 @@ function App(){
     setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);setOdometer(cleanOdo);setTOdometer(cleanOdo);setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);
     ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice,o:cleanOdo,mc:cleanCpm});
     if(db)try{await Promise.all([
-      db.post('gg_config',{key:'truck_balance',value:tBal},true),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true)
-    ]);}catch{flash('Saved on device; cloud config sync failed');}
+      db.post('gg_config',{key:'truck_balance',value:tBal},true,'org_id,key'),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true,'org_id,key'),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true,'org_id,key'),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true,'org_id,key'),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key')
+    ]);}catch(e){console.warn('saveCfg',e);flash('Saved on device; cloud config sync failed');}
     setEditCfg(false);flash('Config saved');
   };
   const saveOdometer=async()=>{
     const clean=String(Math.max(0,parseFloat(tOdometer)||0));setOdometer(clean);setTOdometer(clean);
     ss('gg-c',{b:bal,m:maint2,p:buyPrice,o:clean,mc:maintCpm});
-    if(db)try{await db.post('gg_config',{key:'current_odometer',value:clean},true);}catch{flash('Odometer saved on device; cloud sync failed');return;}
+    if(db)try{await db.post('gg_config',{key:'current_odometer',value:clean},true,'org_id,key');}catch(e){console.warn('saveOdo',e);flash('Odometer saved on device; cloud sync failed');return;}
     flash('Odometer updated');
   };
   const resetMaintForm=()=>{setAddMaint(false);setEditingMaintId(null);setMaintF({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});};
@@ -1540,15 +1731,17 @@ function App(){
     setWeekResetDate(today);
     ss('gg-wrd',today);ss('gg-w',cleared);ss('gg-wh',h2);
     if(db)try{
-      await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(W.mpg)||TRUCK_MPG,tg:parseFloat(W.tg)||5000},true);
-      await db.post('gg_config',{key:'week_reset_date',value:today},true);
-      try{await db.post('gg_weekly_history',{id:snap.id,week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true);}catch{}
-    }catch{}
+      await db.post('gg_weekly',{ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(W.mpg)||TRUCK_MPG,tg:parseFloat(W.tg)||5000},true,'org_id');
+      await db.post('gg_config',{key:'week_reset_date',value:today},true,'org_id,key');
+      try{await db.post('gg_weekly_history',{week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true,'org_id,week_end');}catch(e){console.warn('week hist',e);}
+    }catch(e){console.warn('week reset',e);}
     setShowReset(false);flash('Week archived & tracker reset');
   };
   const disconnectSupa=async()=>{
+    await signOutSession(sessionRef.current||loadSession());
+    setSession(null);setOrgId(null);setDb(null);
     try{localStorage.removeItem('gg-su');localStorage.removeItem('gg-sk');}catch{}
-    setDb(null);flash('Disconnected from Supabase');
+    setAppState('auth');flash('Signed out');
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
@@ -1688,7 +1881,8 @@ function App(){
   const iftaText=e=>Object.entries(e?.ifta||{}).map(([st,mi])=>st+' '+mi).join(' · ');
 
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
-  if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
+  if(appState==='auth')return <AuthScreen onAuthed={async(sess)=>{setAppState('init');await startCloud(sess);}}/>;
+  if(appState==='noorg')return <NoOrgScreen session={session} onSignOut={disconnectSupa} onRetry={async()=>{setAppState('init');await startCloud(sessionRef.current||loadSession());}}/>;
 
   const SH=({t,right})=><div className="sec-hd"><div className="sec-title">{t}</div>{right&&<div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>{right}</div>}</div>;
   const Stat=({l,v,c,sub})=><div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:4}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:15,lineHeight:1}}>{v}</div>{sub&&<div style={{color:DIM,fontSize:10,marginTop:3}}>{sub}</div>}</div>;
@@ -1706,9 +1900,10 @@ function App(){
         <div className="nav-right">
           {(overdue.length>0||dueToday.length>0)&&<span style={{color:overdue.length>0?'#f87171':'#fbbf24',fontSize:10,padding:'3px 9px',border:`1px solid ${overdue.length>0?'rgba(248,113,113,.25)':'rgba(251,191,36,.25)'}`,borderRadius:5,background:overdue.length>0?'rgba(248,113,113,.06)':'rgba(251,191,36,.06)',cursor:'pointer'}} onClick={()=>navTo('pipeline')}>{overdue.length>0?`⚠ ${overdue.length} overdue`:`${dueToday.length} due today`}</span>}
           {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
-          {db?<>
+          {db&&session?<>
             <button onClick={refreshSupa} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>↻ Sync</button>
             <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 9px',border:'1px solid rgba(57,255,107,.2)',borderRadius:6,background:'rgba(57,255,107,.05)'}}><span className="ld"/><span style={{color:G,fontSize:9,fontWeight:700,letterSpacing:'.1em'}}>CLOUD</span></div>
+            <button onClick={disconnectSupa} title={session?.user?.email||'Sign out'} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>Sign out</button>
           </>:<span style={{color:'#fbbf24',fontSize:9,padding:'4px 9px',border:'1px solid rgba(251,191,36,.2)',borderRadius:6}}>connecting...</span>}
         </div>
       </div>
