@@ -1460,7 +1460,7 @@ function App(){
   const sessionRef=useRef(null);
   useEffect(()=>{sessionRef.current=session;},[session]);
   const [db,setDb]=useState(null);
-  const [sec,setSec]=useState('dispatch');
+  const [sec,setSec]=useState('overview');
   const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
   const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:l.status||'Not called',notes:l.notes||'',callbackDate:''})));
   const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
@@ -1921,7 +1921,7 @@ function App(){
     ]);}catch(e){console.warn('onboard save',e);}
     // Seed a demo load so first verdict is immediate
     if(!calcM&&!calcR){setCalcM('250');setCalcDH('40');setCalcR('750');setCalcSource('DAT');}
-    setSec('dispatch');
+    setSec('overview');
     flash('Gator Dispatch is live — run your numbers');
   };
 
@@ -1949,7 +1949,7 @@ function App(){
           Preview floor: <b style={{color:G}}>${(( (parseFloat(W.fp)>0?parseFloat(W.fp):FUEL_PRICE_PER_GALLON) / (parseFloat(W.mpg)>0?parseFloat(W.mpg):TRUCK_MPG) ) + (Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM)) + ((Math.max(0,parseFloat(tFixedMo)||2331))/Math.max(1000,parseFloat(estMilesHint)||8000))).toFixed(2)}/mi</b> before factoring · box truck O/O economics, not 53ft van fantasy.
         </div>
         <button type="button" onClick={finishOnboard} style={{width:'100%',background:G,color:'#030803',border:'none',borderRadius:8,padding:'12px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:13,marginBottom:8}}>Start dispatching →</button>
-        <button type="button" onClick={()=>{ss('gg-onboarded',true);setOnboarded(true);setSec('dispatch');}} style={{width:'100%',background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:8,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Skip for now</button>
+        <button type="button" onClick={()=>{ss('gg-onboarded',true);setOnboarded(true);setSec('overview');}} style={{width:'100%',background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:8,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Skip for now</button>
       </div>
     </div>
   );
