@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Green Gator Enterprises — Ops Dashboard</title>
+<title>Gator Dispatch — Green Gator</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
@@ -1460,7 +1460,7 @@ function App(){
   const sessionRef=useRef(null);
   useEffect(()=>{sessionRef.current=session;},[session]);
   const [db,setDb]=useState(null);
-  const [sec,setSec]=useState('overview');
+  const [sec,setSec]=useState('dispatch');
   const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
   const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:l.status||'Not called',notes:l.notes||'',callbackDate:''})));
   const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
@@ -1476,6 +1476,9 @@ function App(){
   const [selectedMonth,setSelectedMonth]=useState('');
   const [overviewMonth,setOverviewMonth]=useState('');
   const [calcM,setCalcM]=useState('');const [calcDH,setCalcDH]=useState('');const [calcR,setCalcR]=useState('');const [calcSource,setCalcSource]=useState('DAT');
+  const [fixedMo,setFixedMo]=useState('2331');const [tFixedMo,setTFixedMo]=useState('2331');
+  const [estMilesHint,setEstMilesHint]=useState('8000');
+  const [onboarded,setOnboarded]=useState(()=>!!sg('gg-onboarded'));
   const [bal,setBal]=useState('25761');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
   const [odometer,setOdometer]=useState('217002');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
   const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25761');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('217002');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
@@ -1491,7 +1494,7 @@ function App(){
   const mapElRef=useRef(null);const leafletMapRef=useRef(null);
   const [weekHistory,setWeekHistory]=useState([]);
   const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||'2026-05-11');
-  const refs={overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
+  const refs={dispatch:useRef(),overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
 
   useEffect(()=>{
     let off=false;
@@ -1576,8 +1579,13 @@ function App(){
       if(cfg.current_odometer){setOdometer(cfg.current_odometer);setTOdometer(cfg.current_odometer);}
       if(cfg.maintenance_cpm){setMaintCpm(cfg.maintenance_cpm);setTMaintCpm(cfg.maintenance_cpm);}
       if(cfg.week_reset_date){setWeekResetDate(cfg.week_reset_date);ss('gg-wrd',cfg.week_reset_date);}
+      if(cfg.fixed_monthly){setFixedMo(String(cfg.fixed_monthly));setTFixedMo(String(cfg.fixed_monthly));}
+      if(cfg.est_monthly_miles){setEstMilesHint(String(cfg.est_monthly_miles));}
+      if(cfg.saas_onboarded==='1'||cfg.saas_onboarded==='true'){setOnboarded(true);ss('gg-onboarded',true);}
       if(mlR?.length)setMaintLog(mlR);
       if(whR?.length)setWeekHistory(whR.map(w=>({...w,weekEnd:w.weekEnd||w.week_end,weekStart:w.weekStart||w.week_start})));
+      // Existing operators with history skip SaaS onboarding wizard
+      if((lgR?.length||0)>=3){setOnboarded(true);ss('gg-onboarded',true);}
     }catch(e){console.log('Supa err',e);loadLocal();}
   };
 
@@ -1693,10 +1701,11 @@ function App(){
   const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(editingLogId===id)cancelLogEdit();if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
   const saveCfg=async()=>{
     const cleanOdo=String(Math.max(0,parseFloat(tOdometer)||0));const cleanCpm=String(Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM));
-    setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);setOdometer(cleanOdo);setTOdometer(cleanOdo);setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);
-    ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice,o:cleanOdo,mc:cleanCpm});
+    const cleanFixed=String(Math.max(0,parseFloat(tFixedMo)||2331));
+    setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);setOdometer(cleanOdo);setTOdometer(cleanOdo);setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);setFixedMo(cleanFixed);setTFixedMo(cleanFixed);
+    ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice,o:cleanOdo,mc:cleanCpm,fm:cleanFixed});
     if(db)try{await Promise.all([
-      db.post('gg_config',{key:'truck_balance',value:tBal},true,'org_id,key'),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true,'org_id,key'),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true,'org_id,key'),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true,'org_id,key'),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key')
+      db.post('gg_config',{key:'truck_balance',value:tBal},true,'org_id,key'),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true,'org_id,key'),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true,'org_id,key'),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true,'org_id,key'),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key'),db.post('gg_config',{key:'fixed_monthly',value:cleanFixed},true,'org_id,key')
     ]);}catch(e){console.warn('saveCfg',e);flash('Saved on device; cloud config sync failed');}
     setEditCfg(false);flash('Config saved');
   };
@@ -1766,10 +1775,10 @@ function App(){
   const draftFuelEstimate=fuelEstimateForMiles(draftTotalMiles,mpg,fp);
   const net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
   const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
-  const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
+  const fixedMonthly=Math.max(0,parseFloat(fixedMo)||2331);
+  const fixedWk=fixedMonthly/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
   const avgRpm=(()=>{const tm=log.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=log.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?tn/tm:0;})();
-  // Load decision calculator — actual mileage pace since the first dashboard log.
-  // Current-week miles are excluded so the baseline rolls forward once each Monday.
+  // Gator Dispatch — pace from logbook; fall back to onboard estimate for new carriers
   const calcDatedLogs=log.filter(e=>/^\d{4}-\d{2}-\d{2}$/.test(String(e.date||''))).slice().sort((a,b)=>a.date.localeCompare(b.date));
   const calcBaselineStart=calcDatedLogs[0]?.date||currentWeekStart;
   const calcCompletedLogs=calcDatedLogs.filter(e=>e.date>=calcBaselineStart&&e.date<currentWeekStart);
@@ -1777,9 +1786,11 @@ function App(){
   const calcElapsedDays=Math.max(7,(new Date(currentWeekStart+'T00:00:00')-new Date(calcBaselineStart+'T00:00:00'))/86400000);
   const calcElapsedWeeks=calcElapsedDays/7;
   const calcAvgWeeklyMiles=calcBaselineMiles/calcElapsedWeeks;
-  const estMoMiles=calcAvgWeeklyMiles*52/12;
+  const loggedMoMiles=calcAvgWeeklyMiles*52/12;
+  const hintMoMiles=Math.max(1000,parseFloat(estMilesHint)||8000);
+  const estMoMiles=loggedMoMiles>0?loggedMoMiles:hintMoMiles;
   const calcThrough=addDays(currentWeekStart,-1);
-  const ohPerMi=estMoMiles>0?2331/estMoMiles:0;
+  const ohPerMi=estMoMiles>0?fixedMonthly/estMoMiles:0;
   const fuelPerMi=mpg>0?fp/mpg:0;
   const maintenancePerMi=Math.max(0,parseFloat(maintCpm)||DEFAULT_MAINT_CPM);
   const beRPM=fuelPerMi+ohPerMi+maintenancePerMi;
@@ -1798,7 +1809,17 @@ function App(){
   const cMinimumTarget=cBreakEvenGross*1.30;
   const cStrongTarget=cBreakEvenGross*1.60;
   const cReady=cTot>0&&cR>0;
-  const cVerdict=!cReady?{t:'Enter load details',c:DIM,b:'transparent'}:cGrossRPM>=cStrongTarget?{t:'TAKE · strong margin',c:'#4ade80',b:'rgba(74,222,128,.1)'}:cGrossRPM>=cMinimumTarget?{t:'TAKE IF QUICK · acceptable margin',c:'#86efac',b:'rgba(134,239,172,.08)'}:cGrossRPM>=cBreakEvenGross?{t:'NEGOTIATE · covers costs, misses target',c:'#fbbf24',b:'rgba(251,191,36,.1)'}:{t:'PASS · below operating floor',c:'#f87171',b:'rgba(248,113,113,.1)'};
+  const cCounterPay=cTot>0?Math.ceil(cMinimumTarget*cTot):0;
+  const cPassPay=cTot>0?Math.ceil(cBreakEvenGross*cTot):0;
+  const cVerdict=!cReady
+    ?{code:'READY',t:'ENTER LOAD',sub:'Miles + rate → instant verdict',c:DIM,b:'transparent'}
+    :cGrossRPM>=cStrongTarget
+      ?{code:'TAKE',t:'TAKE',sub:'Strong margin — book it',c:'#4ade80',b:'rgba(74,222,128,.12)'}
+      :cGrossRPM>=cMinimumTarget
+        ?{code:'TAKE',t:'TAKE',sub:'Acceptable margin — book if empty',c:'#86efac',b:'rgba(134,239,172,.10)'}
+        :cGrossRPM>=cBreakEvenGross
+          ?{code:'COUNTER',t:'COUNTER',sub:'Covers costs, misses target — ask $'+cCounterPay.toLocaleString()+'+',c:'#fbbf24',b:'rgba(251,191,36,.12)'}
+          :{code:'PASS',t:'PASS',sub:'Below operating floor ($'+cPassPay.toLocaleString()+' break-even)',c:'#f87171',b:'rgba(248,113,113,.12)'};
   const currentMoKey=`${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}`;
   const logMonths=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
   const activeOverviewMonth=overviewMonth||(()=>{
@@ -1828,7 +1849,7 @@ function App(){
   const moInvoiceFees=moFactoredLogs.length*DAT_INVOICE_FEE;
   const moFactoringTotal=moFactoringPct+moInvoiceFees;
   const moFactoredReceipts=moFactoredGross-moFactoringTotal;
-  const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-2331;
+  const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-fixedMonthly;
   const moMiles=moLogs.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
   const moFuelPending=moLogs.filter(e=>!/\b(cancel(?:led)?|tonu)\b/i.test(e.comments||'')&&((parseFloat(e.miles)||0)+(parseFloat(e.dh)||0))>0&&!(parseFloat(e.fuel)>0)).length;
   const moIdx=logMonths.indexOf(activeOverviewMonth);
@@ -1880,9 +1901,58 @@ function App(){
   ].filter(Boolean).map(r=>({...r,remaining:r.due-currentOdometer}));
   const iftaText=e=>Object.entries(e?.ifta||{}).map(([st,mi])=>st+' '+mi).join(' · ');
 
+  const finishOnboard=async()=>{
+    const cleanFixed=String(Math.max(0,parseFloat(tFixedMo)||2331));
+    const cleanMpg=String(Math.max(1,parseFloat(W.mpg)||TRUCK_MPG));
+    const cleanFp=String(Math.max(0.1,parseFloat(W.fp)||FUEL_PRICE_PER_GALLON));
+    const cleanCpm=String(Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM));
+    const cleanMiles=String(Math.max(1000,parseFloat(estMilesHint)||8000));
+    setFixedMo(cleanFixed);setTFixedMo(cleanFixed);
+    setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);
+    setEstMilesHint(cleanMiles);
+    setW(w=>({...w,mpg:cleanMpg,fp:cleanFp}));
+    ss('gg-onboarded',true);setOnboarded(true);
+    if(db)try{await Promise.all([
+      db.post('gg_config',{key:'fixed_monthly',value:cleanFixed},true,'org_id,key'),
+      db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key'),
+      db.post('gg_config',{key:'est_monthly_miles',value:cleanMiles},true,'org_id,key'),
+      db.post('gg_config',{key:'saas_onboarded',value:'1'},true,'org_id,key'),
+      db.post('gg_weekly',{ar:parseFloat(W.ar)||0,dg:parseFloat(W.dg)||0,dl:parseFloat(W.dl)||0,fs:parseFloat(W.fs)||0,mi:parseFloat(W.mi)||0,fp:parseFloat(cleanFp),mpg:parseFloat(cleanMpg),tg:parseFloat(W.tg)||5000},true,'org_id'),
+    ]);}catch(e){console.warn('onboard save',e);}
+    // Seed a demo load so first verdict is immediate
+    if(!calcM&&!calcR){setCalcM('250');setCalcDH('40');setCalcR('750');setCalcSource('DAT');}
+    setSec('dispatch');
+    flash('Gator Dispatch is live — run your numbers');
+  };
+
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
   if(appState==='auth')return <AuthScreen onAuthed={async(sess)=>{setAppState('init');await startCloud(sess);}}/>;
   if(appState==='noorg')return <NoOrgScreen session={session} onSignOut={disconnectSupa} onRetry={async()=>{setAppState('init');await startCloud(sessionRef.current||loadSession());}}/>;
+  if(appState==='ready'&&!onboarded)return (
+    <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:480,width:'100%'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}><span style={{fontSize:26}}>🐊</span><div style={{fontSize:18,fontWeight:700,color:G,letterSpacing:'.04em'}}>GATOR DISPATCH</div></div>
+        <div style={{color:'#c8e0cc',fontSize:14,fontWeight:700,marginBottom:6}}>Set your real cost per mile</div>
+        <div style={{color:DIM,fontSize:12,lineHeight:1.6,marginBottom:16}}>One-time setup. We use these numbers for every TAKE / COUNTER / PASS verdict. Wrong CPM = wrong money decisions.</div>
+        <div style={{display:'grid',gap:10,marginBottom:14}}>
+          <div><span className="lbl">Fixed costs / month ($)</span><input className="inp" value={tFixedMo} onChange={e=>setTFixedMo(e.target.value)} inputMode="decimal" placeholder="Insurance + truck + parking + DAT + software"/></div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div><span className="lbl">MPG</span><input className="inp" value={W.mpg} onChange={e=>setW(w=>({...w,mpg:e.target.value}))} inputMode="decimal"/></div>
+            <div><span className="lbl">Fuel $/gal</span><input className="inp" value={W.fp} onChange={e=>setW(w=>({...w,fp:e.target.value}))} inputMode="decimal"/></div>
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+            <div><span className="lbl">Maint reserve $/mi</span><input className="inp" value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/></div>
+            <div><span className="lbl">Est. miles / month</span><input className="inp" value={estMilesHint} onChange={e=>setEstMilesHint(e.target.value)} inputMode="decimal"/></div>
+          </div>
+        </div>
+        <div style={{padding:'10px 12px',borderRadius:8,background:'rgba(57,255,107,.05)',border:`1px solid rgba(57,255,107,.15)`,marginBottom:14,fontSize:11,color:DIM,lineHeight:1.6}}>
+          Preview floor: <b style={{color:G}}>${(( (parseFloat(W.fp)>0?parseFloat(W.fp):FUEL_PRICE_PER_GALLON) / (parseFloat(W.mpg)>0?parseFloat(W.mpg):TRUCK_MPG) ) + (Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM)) + ((Math.max(0,parseFloat(tFixedMo)||2331))/Math.max(1000,parseFloat(estMilesHint)||8000))).toFixed(2)}/mi</b> before factoring · box truck O/O economics, not 53ft van fantasy.
+        </div>
+        <button type="button" onClick={finishOnboard} style={{width:'100%',background:G,color:'#030803',border:'none',borderRadius:8,padding:'12px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:13,marginBottom:8}}>Start dispatching →</button>
+        <button type="button" onClick={()=>{ss('gg-onboarded',true);setOnboarded(true);setSec('dispatch');}} style={{width:'100%',background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:8,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Skip for now</button>
+      </div>
+    </div>
+  );
 
   const SH=({t,right})=><div className="sec-hd"><div className="sec-title">{t}</div>{right&&<div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>{right}</div>}</div>;
   const Stat=({l,v,c,sub})=><div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:4}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:15,lineHeight:1}}>{v}</div>{sub&&<div style={{color:DIM,fontSize:10,marginTop:3}}>{sub}</div>}</div>;
@@ -1894,9 +1964,9 @@ function App(){
       <div className="nav">
         <div className="nav-logo">
           <span style={{fontSize:18}}>🐊</span>
-          <div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div>
+          <div><div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div><div style={{fontSize:8,color:MUT,letterSpacing:'.12em',textTransform:'uppercase'}}>Gator Dispatch</div></div>
         </div>
-        {['overview','pipeline','logbook','maintenance'].map(id=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{id.charAt(0).toUpperCase()+id.slice(1)}</div>)}
+        {[['dispatch','Dispatch'],['overview','Overview'],['pipeline','Pipeline'],['logbook','Logbook'],['maintenance','Maint']].map(([id,label])=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{label}</div>)}
         <div className="nav-right">
           {(overdue.length>0||dueToday.length>0)&&<span style={{color:overdue.length>0?'#f87171':'#fbbf24',fontSize:10,padding:'3px 9px',border:`1px solid ${overdue.length>0?'rgba(248,113,113,.25)':'rgba(251,191,36,.25)'}`,borderRadius:5,background:overdue.length>0?'rgba(248,113,113,.06)':'rgba(251,191,36,.06)',cursor:'pointer'}} onClick={()=>navTo('pipeline')}>{overdue.length>0?`⚠ ${overdue.length} overdue`:`${dueToday.length} due today`}</span>}
           {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
@@ -1907,6 +1977,73 @@ function App(){
           </>:<span style={{color:'#fbbf24',fontSize:9,padding:'4px 9px',border:'1px solid rgba(251,191,36,.2)',borderRadius:6}}>connecting...</span>}
         </div>
       </div>
+
+      {/* DISPATCH — product wedge */}
+      {sec==='dispatch'&&<div className="section" ref={refs.dispatch}>
+        <SH t="Gator Dispatch" right={<span style={{color:DIM,fontSize:10}}>TAKE · COUNTER · PASS using your CPM</span>}/>
+        <div className="card" style={{marginBottom:12,padding:'16px 16px 14px'}}>
+          <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:10}}>
+            <div>
+              <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>Operating floor</div>
+              <div style={{fontSize:28,fontWeight:700,color:G}}>${beRPM.toFixed(2)}<span style={{fontSize:13,color:DIM}}>/mi</span></div>
+              <div style={{color:DIM,fontSize:10,marginTop:4}}>fuel ${fuelPerMi.toFixed(2)} · maint ${maintenancePerMi.toFixed(2)} · overhead ${ohPerMi.toFixed(2)} · {estMoMiles.toLocaleString(undefined,{maximumFractionDigits:0})} mi/mo pace · ${fixedMonthly.toLocaleString()}/mo fixed</div>
+            </div>
+            <div style={{textAlign:'right'}}>
+              <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>Your recent avg net</div>
+              <div style={{fontSize:22,fontWeight:700,color:avgRpm>0?rC(avgRpm):DIM}}>{avgRpm>0?('$'+avgRpm.toFixed(2)+'/mi'):'—'}</div>
+              <div style={{color:DIM,fontSize:10,marginTop:4}}>{loggedMoMiles>0?'From logbook pace':'Using estimate until you log loads'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:14,marginBottom:4}}>Load offer</div>
+          <div style={{color:DIM,fontSize:11,marginBottom:12}}>Punch the broker number before you say yes. Verdict uses <b style={{color:'#c8e0cc'}}>your</b> costs — not market fantasy RPM.</div>
+          <div className="maint-form-grid" style={{marginBottom:14}}>
+            <div><span className="lbl">Loaded Miles</span><input className="inp" value={calcM} onChange={e=>setCalcM(e.target.value)} inputMode="decimal" placeholder="e.g. 250"/></div>
+            <div><span className="lbl">Deadhead Miles</span><input className="inp" value={calcDH} onChange={e=>setCalcDH(e.target.value)} inputMode="decimal" placeholder="e.g. 40"/></div>
+            <div><span className="lbl">Offered Rate ($)</span><input className="inp" value={calcR} onChange={e=>setCalcR(e.target.value)} inputMode="decimal" placeholder="e.g. 750"/></div>
+            <div><span className="lbl">Load Type</span><select className="inp" value={calcSource} onChange={e=>setCalcSource(e.target.value)}><option value="DAT">DAT / Brokered · Factored</option><option value="OTHER">Amazon / Direct · No Factoring</option></select></div>
+            <div style={{display:'flex',alignItems:'flex-end'}}><button className="btn-g" style={{fontSize:11,padding:'8px 12px',width:'100%'}} onClick={()=>{setCalcM('');setCalcDH('');setCalcR('');setCalcSource('DAT');}}>Clear</button></div>
+          </div>
+
+          <div style={{padding:'16px 16px',borderRadius:10,background:cVerdict.b,border:`1px solid ${cVerdict.c}55`,marginBottom:14}}>
+            <div style={{display:'flex',alignItems:'baseline',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
+              <div style={{color:cVerdict.c,fontWeight:800,fontSize:32,letterSpacing:'.08em'}}>{cVerdict.t}</div>
+              {cVerdict.code==='COUNTER'&&<div style={{color:cVerdict.c,fontWeight:700,fontSize:16}}>Ask ${cCounterPay.toLocaleString()}+</div>}
+            </div>
+            <div style={{color:'#c8e0cc',fontSize:13,marginTop:6}}>{cVerdict.sub}</div>
+            {cReady&&<div style={{color:DIM,fontSize:10,marginTop:8}}>Gross ${cGrossRPM.toFixed(2)}/mi · floor ${cBreakEvenGross.toFixed(2)} · min target ${cMinimumTarget.toFixed(2)} · strong ${cStrongTarget.toFixed(2)}{calcSource==='DAT'?' · includes 2.5% + $2 invoice':''}</div>}
+          </div>
+
+          {cReady?<>
+            <div className="g-auto">
+              <Stat l="Total Miles" v={cTot.toLocaleString()}/>
+              <Stat l="Gross $/mi" v={'$'+cGrossRPM.toFixed(2)} c={rC(cGrossRPM)}/>
+              <Stat l="Fuel Est" v={'$'+cFuel.toFixed(0)} c="#f87171" sub={mpg+'MPG @ $'+fp}/>
+              <Stat l="Net After Fuel" v={'$'+cNetF.toFixed(0)} c={cNetF>=0?G:'#f87171'} sub={'$'+cNetRPM.toFixed(2)+'/mi'}/>
+              <Stat l="Factoring + Invoice" v={'$'+cFactoring.toFixed(2)} c={cFactoring>0?'#f87171':DIM} sub={calcSource==='DAT'?'2.5% + $2 invoice':'Not applied'}/>
+              <Stat l="Maintenance Wear" v={'$'+cMaintWear.toFixed(0)} c="#fbbf24" sub={'$'+maintenancePerMi.toFixed(2)+'/mi reserve'}/>
+              <Stat l="Overhead Share" v={'$'+cOH.toFixed(0)} c="#fbbf24" sub={'$'+ohPerMi.toFixed(2)+'/mi'}/>
+              <Stat l="Operating Profit" v={'$'+cOperatingProfit.toFixed(0)} c={cOperatingProfit>=0?'#4ade80':'#f87171'} sub={'$'+cOperatingRPM.toFixed(2)+'/mi after all-in costs'}/>
+            </div>
+            <div style={{marginTop:14,display:'flex',gap:8,flexWrap:'wrap'}}>
+              <button className="btn" style={{fontSize:11,padding:'8px 14px'}} onClick={()=>{setLogF({date:todayStr(),pickup:'',dropoff:'',miles:String(calcM||''),dh:String(calcDH||''),rpm:cTot>0?(cR/cTot).toFixed(2):'',pay:String(calcR||''),fuel:cFuel?cFuel.toFixed(0):'',comments:'From Gator Dispatch · '+(calcSource==='DAT'?'DAT/factored':'direct')});setAddLog(true);setSec('logbook');flash('Prefilled logbook from dispatch');}}>Log this load →</button>
+              <button className="btn-g" style={{fontSize:11,padding:'8px 14px'}} onClick={()=>navTo('overview')}>Weekly money</button>
+            </div>
+          </>:<div style={{color:DIM,fontSize:12,lineHeight:1.6}}>Enter loaded miles, deadhead, and the offered rate. DAT offers auto-include factoring drag so you do not get fooled by the headline number.</div>}
+        </div>
+
+        <div className="card">
+          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:8}}>How verdicts work</div>
+          <div style={{display:'grid',gap:8,fontSize:11,color:DIM,lineHeight:1.55}}>
+            <div><b style={{color:'#4ade80'}}>TAKE</b> — at or above 1.3× break-even gross RPM (1.6× = strong).</div>
+            <div><b style={{color:'#fbbf24'}}>COUNTER</b> — covers fuel+maint+overhead but misses target. We show the dollar ask.</div>
+            <div><b style={{color:'#f87171'}}>PASS</b> — below your operating floor. Walking is profit.</div>
+            <div style={{color:MUT}}>Informational only — you own the booking decision. Baseline miles: {calcBaselineMiles.toLocaleString()} since {calcBaselineStart}{loggedMoMiles>0?(' through '+calcThrough):''}.</div>
+          </div>
+        </div>
+      </div>}
 
       {/* OVERVIEW */}
       {sec==='overview'&&<div className="section" ref={refs.overview}>
@@ -1980,42 +2117,24 @@ function App(){
               </div>
             </div>
             <div className="g-auto" style={{marginBottom:12}}>
-              {[{l:'2.5% Factoring',v:moMoney(moFactoringTotal),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:moMoney(moProfit),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$2,331',c:'#fbbf24',sub:'Ins+truck+addr+DAT+QB'},{l:'Miles',v:moMiles.toLocaleString(),sub:'Loaded + deadhead'},{l:'Avg Net RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM,sub:'Net ÷ total miles'},{l:'Loads',v:String(moLogs.length),sub:moName}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+              {[{l:'2.5% Factoring',v:moMoney(moFactoringTotal),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:moMoney(moProfit),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$'+fixedMonthly.toLocaleString(),c:'#fbbf24',sub:'Ins+truck+addr+DAT+QB'},{l:'Miles',v:moMiles.toLocaleString(),sub:'Loaded + deadhead'},{l:'Avg Net RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM,sub:'Net ÷ total miles'},{l:'Loads',v:String(moLogs.length),sub:moName}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
             </div>
             <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
           </>}
         </div>
 
-        <div className="card" style={{marginBottom:12}}>
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6,flexWrap:'wrap',gap:8}}>
-            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8}}>🧮 Load Decision Calculator</div>
-            <span style={{color:DIM,fontSize:10}}>Base operating floor ${beRPM.toFixed(2)}/mi · actual pace {estMoMiles.toLocaleString(undefined,{maximumFractionDigits:0})}mi/mo · {mpg}MPG @ ${fp}/gal</span>
-          </div>
-          <div style={{color:DIM,fontSize:10,marginBottom:12}}>Punch in an offered load to see net $/mi after fuel and overhead before you book it. Mileage baseline: {calcBaselineMiles.toLocaleString()} miles logged since {calcBaselineStart}, measured through {calcThrough}; recalculates every Monday.</div>
-          <div className="maint-form-grid" style={{marginBottom:14}}>
-            <div><span className="lbl">Loaded Miles</span><input className="inp" value={calcM} onChange={e=>setCalcM(e.target.value)} inputMode="decimal" placeholder="e.g. 250"/></div>
-            <div><span className="lbl">Deadhead Miles</span><input className="inp" value={calcDH} onChange={e=>setCalcDH(e.target.value)} inputMode="decimal" placeholder="e.g. 30"/></div>
-            <div><span className="lbl">Offered Rate ($)</span><input className="inp" value={calcR} onChange={e=>setCalcR(e.target.value)} inputMode="decimal" placeholder="e.g. 800"/></div>
-            <div><span className="lbl">Load Type</span><select className="inp" value={calcSource} onChange={e=>setCalcSource(e.target.value)}><option value="DAT">DAT / Brokered · Factored</option><option value="OTHER">Amazon / Direct · No Factoring</option></select></div>
-            <div style={{display:'flex',alignItems:'flex-end'}}><button className="btn-g" style={{fontSize:11,padding:'8px 12px',width:'100%'}} onClick={()=>{setCalcM('');setCalcDH('');setCalcR('');setCalcSource('DAT');}}>Clear</button></div>
-          </div>
-          {cReady?<>
-            <div style={{padding:'10px 14px',borderRadius:8,background:cVerdict.b,border:`1px solid ${cVerdict.c}44`,marginBottom:12,display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
-              <span style={{color:cVerdict.c,fontWeight:700,fontSize:14,letterSpacing:'.03em'}}>{cVerdict.t}</span>
-              <span style={{color:DIM,fontSize:10,marginLeft:'auto'}}>your recent avg net ${avgRpm.toFixed(2)}/mi</span>
+        <div className="card" style={{marginBottom:12,cursor:'pointer'}} onClick={()=>navTo('dispatch')}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
+            <div>
+              <div style={{fontWeight:700,color:G,fontSize:14,letterSpacing:'.04em'}}>🐊 GATOR DISPATCH</div>
+              <div style={{color:DIM,fontSize:11,marginTop:4}}>TAKE / COUNTER / PASS on your CPM · floor ${beRPM.toFixed(2)}/mi</div>
             </div>
-            <div style={{color:DIM,fontSize:10,marginBottom:10}}>Gross RPM targets: floor <b style={{color:'#f87171'}}>${cBreakEvenGross.toFixed(2)}</b> · minimum <b style={{color:'#fbbf24'}}>${cMinimumTarget.toFixed(2)}</b> · strong <b style={{color:G}}>${cStrongTarget.toFixed(2)}</b>. DAT cost includes 2.5% factoring plus $2 per invoice.</div>
-            <div className="g-auto">
-              <Stat l="Total Miles" v={cTot.toLocaleString()}/>
-              <Stat l="Gross $/mi" v={'$'+cGrossRPM.toFixed(2)} c={rC(cGrossRPM)}/>
-              <Stat l="Fuel Est" v={'$'+cFuel.toFixed(0)} c="#f87171" sub={mpg+'MPG @ $'+fp}/>
-              <Stat l="Net After Fuel" v={'$'+cNetF.toFixed(0)} c={cNetF>=0?G:'#f87171'} sub={'$'+cNetRPM.toFixed(2)+'/mi'}/>
-              <Stat l="Factoring + Invoice" v={'$'+cFactoring.toFixed(2)} c={cFactoring>0?'#f87171':DIM} sub={calcSource==='DAT'?'2.5% + $2 invoice':'Not applied'}/>
-              <Stat l="Maintenance Wear" v={'$'+cMaintWear.toFixed(0)} c="#fbbf24" sub={'$'+maintenancePerMi.toFixed(2)+'/mi reserve'}/>
-              <Stat l="Overhead Share" v={'$'+cOH.toFixed(0)} c="#fbbf24" sub={'$'+ohPerMi.toFixed(2)+'/mi'}/>
-              <Stat l="Estimated Operating Profit" v={'$'+cOperatingProfit.toFixed(0)} c={cOperatingProfit>=0?'#4ade80':'#f87171'} sub={'$'+cOperatingRPM.toFixed(2)+'/mi after fuel, maintenance, factoring and fixed overhead'}/>
-            </div>
-          </>:<div style={{color:DIM,fontSize:11,padding:'6px 0'}}>Base operating floor is ${beRPM.toFixed(2)}/mi — fuel (${fuelPerMi.toFixed(2)}) + maintenance reserve (${maintenancePerMi.toFixed(2)}) + fixed overhead (${ohPerMi.toFixed(2)}) per mile. DAT loads also add 2.5% factoring and a $2 invoice charge.</div>}
+            <button className="btn" style={{fontSize:11,padding:'8px 14px'}} onClick={e=>{e.stopPropagation();navTo('dispatch');}}>Open Dispatch →</button>
+          </div>
+          {cReady&&<div style={{marginTop:12,padding:'8px 12px',borderRadius:8,background:cVerdict.b,border:`1px solid ${cVerdict.c}44`,display:'flex',justifyContent:'space-between',gap:8,flexWrap:'wrap'}}>
+            <span style={{color:cVerdict.c,fontWeight:800,letterSpacing:'.06em'}}>{cVerdict.t}</span>
+            <span style={{color:DIM,fontSize:11}}>{cVerdict.sub}</span>
+          </div>}
         </div>
 
         <div className="g12" style={{marginBottom:12}}>
@@ -2028,16 +2147,17 @@ function App(){
               <span className="lbl">Original Purchase Price ($)</span><input className="inp" style={{marginBottom:8}} value={tBuyPrice} onChange={e=>setTBuyPrice(e.target.value)} inputMode="decimal"/>
               <span className="lbl">Current Odometer (mi)</span><input className="inp" style={{marginBottom:8}} value={tOdometer} onChange={e=>setTOdometer(e.target.value)} inputMode="numeric"/>
               <span className="lbl">Maint. Reserve Balance ($)</span><input className="inp" style={{marginBottom:8}} value={tMaint} onChange={e=>setTMaint(e.target.value)} inputMode="decimal"/>
-              <span className="lbl">Maintenance Reserve Per Mile ($)</span><input className="inp" style={{marginBottom:10}} value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/>
+              <span className="lbl">Maintenance Reserve Per Mile ($)</span><input className="inp" style={{marginBottom:8}} value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/>
+              <span className="lbl">Fixed Monthly Overhead ($)</span><input className="inp" style={{marginBottom:10}} value={tFixedMo} onChange={e=>setTFixedMo(e.target.value)} inputMode="decimal"/>
               <div style={{display:'flex',gap:7}}><button className="btn" style={{fontSize:11,padding:'7px 14px'}} onClick={saveCfg}>Save</button><button className="btn-g" style={{fontSize:11,padding:'7px 14px'}} onClick={()=>setEditCfg(false)}>Cancel</button></div>
             </>:<>
               <div className="g-auto" style={{marginBottom:12}}>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Maint. Reserve</div><div style={{color:G,fontWeight:700,fontSize:16}}>${parseFloat(maint2).toLocaleString()}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Protected.</div></div>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Current Odometer</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>{currentOdometer.toLocaleString()} mi</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Manual dash reading.</div></div>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Maintenance / Mile</div><div style={{color:'#fbbf24',fontWeight:700,fontSize:16}}>${maintenancePerMi.toFixed(2)}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Reserved on every total mile.</div></div>
-                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Fixed Monthly</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>$2,331</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Ins+truck+addr+DAT+QB</div></div>
+                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Fixed Monthly</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>${fixedMonthly.toLocaleString()}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Ins+truck+addr+DAT+QB</div></div>
               </div>
-              <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>{setTBal(bal);setTMaint(maint2);setTBuyPrice(buyPrice);setTOdometer(odometer);setTMaintCpm(maintCpm);setEditCfg(true);}}>Edit Config</button>
+              <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>{setTBal(bal);setTMaint(maint2);setTBuyPrice(buyPrice);setTOdometer(odometer);setTMaintCpm(maintCpm);setTFixedMo(fixedMo);setEditCfg(true);}}>Edit Config</button>
             </>}
           </div>
           <div className="card">
