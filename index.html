@@ -125,1013 +125,14 @@ const geocodePlace=async place=>{
   cache[clean]=coords;writeGeoCache(cache);return{coords,source};
 };
 
-const LEADS=[
-  {id:1,name:"Jim Whitehead's Best One Tire",phone:"706-738-5126"},
-  {id:2,name:"Wingfoot Commercial Tire",phone:"706-738-4517"},
-  {id:3,name:"G&A Tires",phone:"706-750-0707 / 706-798-3377"},
-  {id:4,name:"Deluxe Car Care Wholesale Used Tires",phone:"706-526-0446"},
-  {id:5,name:"Smith Tire Co.",phone:"706-724-8277"},
-  {id:6,name:"Broad Street Tires",phone:"706-922-3022 / 706-364-5109"},
-  {id:7,name:"RNR Tire Express",phone:"706-860-6811"},
-  {id:8,name:"Goodyear Auto Service — Martinez",phone:"706-860-6200"},
-  {id:9,name:"Goodyear Auto Service — Belair Rd",phone:"706-228-5452"},
-  {id:10,name:"Aiken Discount Tire",phone:"803-642-6349"},
-  {id:11,name:"McKinney Tire Service",phone:"803-648-4040"},
-  {id:12,name:"Tyler's Tire & Auto Center",phone:"803-648-7201 / 803-642-0704"},
-  {id:13,name:"Gate 2 Tire & Auto Center",phone:"706-651-0500"},
-  {id:14,name:"Morris Tire & Auto",phone:"803-642-8251"},
-  {id:15,name:"Belair Building Supply",phone:"706-863-3447"},
-  {id:16,name:"Mulherin Lumber",phone:"706-863-6070 / 706-736-2039"},
-  {id:17,name:"Bradley Floorings of Augusta",phone:"762-246-6718"},
-  {id:18,name:"Augusta Carpet Mart",phone:"706-793-6629"},
-  {id:19,name:"Kelley Appliance Center",phone:"706-863-7098",status:"Emailed",notes:"Email: customerservice@kelleyappliance.com Outreach email sent 2026-07-19."},
-  {id:20,name:"Howard's Appliance",phone:"706-738-7751"},
-  {id:21,name:"Dave's Appliance Warehouse",phone:"706-305-1832"},
-  {id:22,name:"Weinberger's Furniture Warehouse",phone:"706-922-8163"},
-  {id:23,name:"Furniture Warehouse",phone:"706-651-1127"},
-  {id:24,name:"Precision Pallet",phone:"706-793-3200"},
-  {id:25,name:"CHEF'STORE Augusta",phone:"762-383-6900"},
-  {id:26,name:"Homefolks Wholesale / HFW Distributor",phone:"706-868-0055 / 800-762-7588"},
-  {id:27,name:"Sunbelt Rentals Augusta",phone:"706-772-4859"},
-  {id:28,name:"United Rentals — Mike Padgett Hwy",phone:"706-650-9898"},
-  {id:29,name:"United Rentals — Tubman Home Rd",phone:"706-796-6402"},
-  {id:30,name:"Herc Rentals Augusta",phone:"706-796-0823"},
-  {id:31,name:"Celebrations Party Rental",phone:"706-725-4386"},
-  {id:32,name:"A1 Bestway Logistics / Warehousing",phone:"706-793-1312"},
-  {id:33,name:"Thomson Plastics",phone:"706-595-0658"},
-  {id:34,name:"Newsome Distributing LLC",phone:"706-288-4845"},
-  {id:35,name:"Advance Auto Parts DC",phone:"706-597-7100"},
-  {id:36,name:"Samson's Manufacturing Corp",phone:"706-554-2129"},
-  {id:37,name:"CMS Waynesboro LLC",phone:"706-437-8390"},
-  {id:38,name:"Baker Distributing Company",phone:"803-648-3225"},
-  {id:39,name:"Ken's Warehouse Furniture",phone:"803-646-7650"},
-  {id:40,name:"A B Beverage Co",phone:"803-649-6243 / 706-855-8555",notes:"Aiken — beverage distributor, ask about overflow/keg moves | Email: kdvarnadore@abbeverage.com (company-domain contact published by SC Beer Wholesalers Association) | Address: 1983 Richland Ave E, Aiken, SC 29801 | Alternate phone: 706-855-8555."},
-  {id:41,name:"Home Outlet",phone:"706-736-4103"},
-  {id:42,name:"Davis Appliance & Furniture",phone:"706-796-0500"},
-  {id:43,name:"Augusta Furniture Outlet",phone:"706-250-3924"},
-  {id:44,name:"American Freight Furniture & Mattress",phone:"706-733-7444"},
-  {id:45,name:"Household Rentals & Sales",phone:"706-855-2037 / North Augusta: 803-202-9995"},
-  {id:46,name:"Coleman Worldwide Moving",phone:"877-693-7060"},
-  {id:47,name:"Hustle and Muscle Moving",phone:"706-755-7663"},
-  {id:48,name:"Maner Builders Supply — Martinez",phone:"706-863-6191"},
-  {id:49,name:"ABC Supply Co",phone:"706-724-7040"},
-  {id:50,name:"Richards Building Supply",phone:"706-303-1339"},
-  {id:51,name:"Foundation Building Materials",phone:"706-722-2020"},
-  {id:52,name:"Southern Wholesale Inc",phone:"706-733-4444",status:"Emailed",notes:"Email: sales@southern-wholesale.com | Outreach email sent 2026-07-16."},
-  {id:53,name:"Tucker Materials",phone:"706-826-4848",status:"Emailed",notes:"Email: sesales@gms.com | Outreach email sent 2026-07-16."},
-  {id:54,name:"RBW Logistics (HQ)",phone:"877-724-0106",status:"Emailed",notes:"Email: info@rbwlogistics.com | Outreach email sent 2026-07-16."},
-  {id:55,name:"Bennett Distribution Services",phone:"706-772-4729 / Don Davis: 470-381-3779",status:"Emailed",notes:"Email: don.davis@bennettig.com | Outreach email sent 2026-07-16."},
-  {id:56,name:"Crown LSP Group — Augusta",phone:"252-985-1070",status:"Emailed",notes:"Email: sales@crownlspgroup.com; transportation@crownlspgroup.com; warehousing@crownlspgroup.com | Outreach email sent 2026-07-16."},
-  {id:57,name:"Estes Express Lines — Augusta Terminal",phone:"706-560-0682"},
-  {id:58,name:"Old Dominion Freight Line — Augusta",phone:"706-828-4863"},
-  {id:59,name:"Southeastern Freight Lines — North Augusta Terminal",phone:"803-278-2071"},
-  {id:60,name:"F&W Transportation",phone:"706-796-3342"},
-  {id:61,name:"Turner Transport Specialist",phone:"706-722-6025"},
-  {id:62,name:"Cadle Trucking LLC",phone:"706-305-1311"},
-  {id:63,name:"XPO — North Augusta Terminal",phone:"803-278-0244",notes:"Contact route: XPO official form — https://www.xpo.com/contact-us/ | Facility: 11026 Atomic Rd, North Augusta, SC 29841. No public facility email found."},
-  {id:64,name:"Saia LTL Freight — Augusta Terminal",phone:"803-593-1970",notes:"Contact route: Saia official form — https://www.saia.com/contact-us | Facility: 4505 Jefferson Davis Hwy, North Augusta, SC 29841. No public terminal email found."},
-  {id:65,name:"Fastenal Fulfillment Center — Augusta",phone:"706-722-3598",notes:"Contact route: official Fastenal branch locator — https://www.fastenal.com/locations | Facility: 909 Hardy Ct, Augusta, GA 30901. No verified public facility email found."},
-  {id:66,name:"Augusta Delivery Services",phone:"706-855-7343",notes:"Contact route: phone. Facility listing: 3956 Goshen Industrial Blvd, Augusta, GA 30906. No authoritative website or verified public email found; confirm identity by phone."},
-  {id:67,name:"Courier Express — Augusta",phone:"855-425-6037",status:"Emailed",notes:"Email: sales@courierexpress.net; generalinquiry@courierexpress.net | Official form: https://courierexpress.net/contact-us | Facility: 3105 B-1 Spring Grove Dr, Augusta, GA 30906. Outreach email sent 2026-07-19."},
-  {id:68,name:"Grammer Logistics — Augusta Terminal",phone:"800-333-7410",notes:"Email: pricing@grammerlogistics.com | Official form: https://grammerlogistics.com/contact/ | Facility: 4727 Mike Padgett Hwy, Augusta, GA 30906. Corrected prior spelling/name from Grammar Industries."},
-  {id:69,name:"ADSI Moving Systems",phone:"706-793-0186",notes:"Contact route: official form — https://adsiunited.com/contact-adsi-moving-systems/ | Facility: 3122 Mike Padgett Hwy, Augusta, GA 30906. No public general-sales email found."},
-  {id:70,name:"Tri-State Distributors — Augusta",phone:"706-736-2922",notes:"Email: tsdroyston@tsdsupply.com (corporate office, not Augusta-specific) | Official form: https://www.tri-statedistributors.com/forms/Contact_US | Augusta branch: 1825 Gordon Hwy."},
-  {id:71,name:"U.S. AutoForce — North Augusta",phone:"800-490-4901",notes:"Contact route: official form — https://www.usautoforce.com/contact-us/ | Facility: 155 Twin Hills Rd, North Augusta, SC 29860. U.S. AutoForce is the local U.S. Venture business; no local public email found."},
-  {id:72,name:"Modern Roofing — Augusta",phone:"706-551-7766",notes:"Email: corporate@modernusa.pro | Official form: https://modernroofingusa.com/contact-us/ | Augusta office: 1209 Roy St. Official page also shows 706-551-9933; primary listing/form number used."},
-  {id:73,name:"ABF Freight — Beech Island (Augusta Area)",phone:"803-279-4891",notes:"Email: pfeczko@abf.com (published Operations/Sales/Transportation); augustacustomerservice@abf.com | Facility: 118 Revco Rd, Beech Island, SC 29842."},
-  {id:74,name:"KSB GIW — Grovetown",phone:"706-863-1011",notes:"Email: GIW-Marketing@ksb.com | Facility: 5000 Wrightsboro Rd, Grovetown, GA 30813. Official facility mailbox is general/marketing, not shipping-specific."},
-  {id:75,name:"Empire Auto Parts — Augusta",phone:"800-318-5030",notes:"Email: info@empireautoparts.com | Augusta satellite: 3105 Spring Grove Dr, Suite I-2, Augusta, GA 30906. Corporate number/email; no local direct mailbox found."},
-  {id:76,name:"Milsco — Thomson",phone:"706-597-9680",notes:"Contact route: official form — https://www.milsco.com/contact/ | Facility listing: 1094 Superior Way, Thomson, GA 30824. Local number comes from an unclaimed public listing; confirm before outreach."},
-  {id:77,name:"R. A. Dudley Nurseries — Thomson",phone:"800-542-4484",notes:"Email: info@radudley.com | Facility: 2417 Washington Rd, Thomson, GA 30824. Alternate number in official site data: 706-595-3300."},
-  {id:78,name:"Amick Farms — Batesburg",phone:"803-532-1400 / 800-926-4251",notes:"Contact route: official form — https://www.amickfarms.com/contact-us/ | Main location: 7155 Batesburg Hwy, Batesburg, SC 29006. Ask for transportation or shipping; farm-partner emails excluded."},
-  {id:79,name:"Carolina CoverTech — North Augusta",phone:"800-763-0243",notes:"Email: info@carolinacovertech.com | Facility: 114 Shortcut Rd, North Augusta, SC 29860. Alternate public listing number: 803-278-4141."},
-  {id:80,name:"Bridgestone — Aiken County ORR Plant",phone:"803-232-4500",notes:"Contact route: official form — https://www.bridgestoneamericas.com/en/contact-us/write-to-us | Plant: 7777 Giant Tire Pkwy, Trenton, SC 29847. No plant-specific public email found; use switchboard first."},
-  {id:81,name:"Columbia Vehicle Group — Aiken",phone:"800-222-4653",notes:"Email: info@columbiausa.com | Official form: https://www.columbiavehiclegroup.com/contactus | Manufacturer: 2063 University Pkwy, Aiken, SC 29801. General company contact; ask for shipping/receiving."},
-  {id:82,name:"AGY — Aiken",phone:"803-648-8351 / 888-434-0945",notes:"Email: asktheexperts@agy.com | Official form: https://www.agy.com/contact-us/ | Facility: 2556 Wagener Rd, Aiken, SC 29801. General inquiry route; ask for shipping or carrier onboarding."},
-  {id:83,name:"UNIS — Corporate Contact (Augusta Unverified)",phone:"800-858-9889",notes:"Email: info@unisco.com | Official form: https://www.unisco.com/contact-us | UNIS official directory does not list Augusta; Georgia sites are Douglasville, Garden City, Pooler, and Savannah. Confirm intended facility before outreach."},
-  {id:84,name:"NOVO Logistics — Columbia Regional Office",phone:"803-334-3021 / 775-825-2995",status:"Emailed",notes:"Contact route: official form — https://novo-usa.com/contact/ | Regional office: 615 Lady St, Columbia, SC 29201. NOVO official directory does not list Augusta; confirm intended facility before outreach. Outreach email sent 2026-07-19."},
-  {id:85,name:"H&H Distribution Services — Augusta Service Area",phone:"704-394-9099",notes:"Email: sales@hhdist.com; Cs@hhdist.com | Official form: https://www.hhdist.com/contact/ | Charlotte-based 3PL whose official service area includes Augusta; no Augusta facility is published. Confirm this is the intended H&H."},
-  {id:86,name:"Carole Fabrics — Augusta",phone:"800-241-0920",notes:"Contact route: official form — https://www.carolefabrics.com/contact/ | Facility: 633 NW Frontage Rd, Augusta, GA 30907. No suitable public general email found; exact-facility phone is from the public business listing."},
-  {id:87,name:"Augusta Sportswear / Momentec Brands — Grovetown",phone:"888-871-0990",notes:"Email: stock@momentecbrands.com (blank-stock orders/questions) | Official contact: https://resources.momentecbrands.com/en_us/contact-us-S1vn5j1ulx | Facility: 425 Park West Dr, Grovetown, GA 30813. Ask for outbound transportation."},
-  {id:88,name:"Palmetto Industries — Grovetown",phone:"706-737-7999 / 888-293-5245",notes:"Email: info@palmetto-industries.com | Official form: https://www.palmetto-industries.com/contact-us/ | Facility: 6050 Horizon West Pkwy, Grovetown, GA 30813. General office contact; ask for shipping/receiving."},
-  {id:89,name:"OXERRA Americas — Augusta",phone:"855-422-8429",status:"Emailed",notes:"Outreach email sent 2026-07-19. Official site: https://americas.oxerra.com/contact | Augusta pigment manufacturing/distribution facility: 1895 Doug Barnard Pkwy, Augusta, GA 30906. New 120,000-sq-ft warehouse announced in 2025 to strengthen U.S. distribution; good local overflow/pallet prospect."},
-  {id:90,name:"U.S. Battery",phone:"",status:"Emailed",notes:"Outreach email sent 2026-07-19."},
-  {id:91,name:"Starbucks Soluble & Roasting Plant — Augusta",phone:"706-826-7399 / 706-826-7401",status:"Not called",notes:"Address: 11 Valencia Way, Augusta, GA 30906. Contact route: Starbucks manufacturing/careers — https://careers.starbucks.com/discover-opportunities/manufacturing-distribution/ | First company-owned soluble-products plant; VIA, Frappuccino and packaged coffee production. Ask for shipping/receiving, transportation or local overflow carrier onboarding."},
-  {id:92,name:"Aurubis Richmond — Augusta",phone:"706-550-4740",status:"Not called",notes:"Address: 439 Valencia Way, Augusta, GA 30906. Official contact: https://www.aurubis.com/richmond/contact | Multimetal recycling/smelter; public hiring for shipping/receiving and logistics confirms active freight operations. High-priority plant-supply, parts and overflow prospect."},
-  {id:93,name:"GF Casting Solutions — Augusta",phone:"",status:"Not called",notes:"Address: 430 Valencia Way, Augusta, GA 30906. Official company route: https://www.gfcs.com/en/contact | New 351,979-sq-ft high-pressure die-casting facility for aluminum mobility/energy parts; operations expected 2027. No verified local phone published yet; early supplier/carrier onboarding prospect."},
-  {id:94,name:"Clearwater Paper — Augusta Mill",phone:"706-798-5711 / 706-798-5455",status:"Not called",notes:"Address: 4278 Mike Padgett Hwy, Augusta, GA 30906. Official contact form: https://www.clearwaterpaper.com/contact-us | Paperboard mill acquired from Graphic Packaging in 2024; strong recurring packaging, pallet, mill-supply and urgent-parts freight fit."},
-  {id:95,name:"W. A. Bragg & Co. — Augusta Warehouse",phone:"706-798-8257",status:"Not called",notes:"Address: 2513 Mike Padgett Hwy, Augusta, GA 30906. Official branch page: https://www.wabragg.com/locations/augusta | Fully staffed warehouse for plumbing, electrical, irrigation, appliance inventory and out-of-town shipments. Ask for warehouse/receiving manager."},
-  {id:96,name:"Industrial Rubber & Supply — Augusta",phone:"706-790-6550",status:"Not called",notes:"Email: sales@irsaug.com | Official contact: https://www.irsaug.com/contact | Address: 3326 Mike Padgett Hwy, Augusta, GA 30906. Industrial gaskets, hose, PPE and plant supplies; strong same-day plant-delivery and replenishment fit."},
-  {id:97,name:"Thompson Industrial Services — Augusta",phone:"706-828-4420",status:"Not called",notes:"Address: 4119 Mike Padgett Hwy, Augusta, GA 30906. Official locations page: https://industrial.thompsonind.com/locations | Industrial cleaning/maintenance operation serving plants; fit for equipment, consumables, emergency parts and jobsite transfers."},
-  {id:98,name:"Riverside Refreshments / Canteen — Augusta",phone:"706-793-2723",status:"Not called",notes:"Address: 2719 Mike Padgett Hwy, Augusta, GA 30906. Official contact: https://riversiderefreshments.com/contact | Local vending, micro-market, coffee, water and office-snack distributor; fit for route overflow, replenishment and pallet transfers."},
-  {id:99,name:"Ferrara Candy / Ferrero — Augusta Plant",phone:"706-798-8600",status:"Not called",notes:"Address: 1550 Marvin Griffin Rd, Augusta, GA 30906. Official contact: https://www.ferrara.com/us/en/contact-us | Confectionery manufacturing/packaging operation; strong ingredients, packaging, finished-goods and urgent-parts freight fit."},
-  {id:100,name:"Textron Specialized Vehicles — Augusta",phone:"706-798-4311 / 706-792-5746",status:"Not called",notes:"Address: 1451 Marvin Griffin Rd, Augusta, GA 30906. Official contact: https://cushman.txtsv.com/about/contact | Manufacturer of E-Z-GO/Cushman utility and specialty vehicles. Official Textron material also confirms a Graniteville fulfillment operation associated with 1043 Global Ave; verify current suite/receiving before outreach. Strong components, service parts, dealer transfer and overflow freight fit."},
-  {id:101,name:"Cardinal Health — Marvin Griffin Distribution",phone:"706-793-3030",status:"Not called",notes:"Address: 1430 Marvin Griffin Rd, Augusta, GA 30906. Official contact: https://www.cardinalhealth.com/en/about-us/contact-us.html | Medical products/distribution location. Ask for transportation, receiving or facility operations; time-sensitive healthcare freight fit."},
-  {id:102,name:"Augusta Coca-Cola Bottling Company",phone:"706-736-2211",status:"Not called",notes:"Address: 1901 North Leg Rd, Augusta, GA 30909. Official location: https://cocacolaunited.com/locations/augusta/ | Beverage distribution center; fit for emergency replenishment, event inventory, damaged-load recovery and local store transfers."},
-  {id:103,name:"FPL Food — Augusta Plant",phone:"706-722-2694",status:"Not called",notes:"Email: info@fplfood.com | Official site: https://fplfood.com/contact-us/ | Address: 1301 New Savannah Rd, Augusta, GA 30901. Beef processing/food manufacturing; refrigerated requirements may limit core work, but dry packaging, plant supplies and urgent parts fit the 26-ft box truck."},
-  {id:104,name:"Nutrien Augusta Nitrogen",phone:"706-469-1200",status:"Not called",notes:"Address: 1460 Columbia Nitrogen Dr, Augusta, GA 30901. Official location/contact: https://www.nutrien.com/about/our-business/locations | Fertilizer/nitrogen plant; prioritize non-hazardous plant supplies, maintenance parts and approved vendor freight only."},
-  {id:105,name:"Syensqo Specialty Polymers — Augusta",phone:"706-790-3100",status:"Not called",notes:"Address: 3702 Clanton Rd, Augusta, GA 30906. Official locations route: https://www.syensqo.com/en/syensqo-around-the-world/usa | Expanding EV-material/PVDF production; strong approved-vendor plant supplies, parts and non-hazardous overflow freight prospect."},
-  {id:106,name:"Thermal Ceramics — Augusta",phone:"706-796-4200",status:"Not called",notes:"Address: 2102 Old Savannah Rd, Augusta, GA 30906. Official contact: https://www.morganthermalceramics.com/en-gb/contact-us | Industrial insulation/refractory manufacturing; fit for palletized materials, plant supplies, samples and urgent maintenance parts."},
-  {id:107,name:"Pepsi Bottling Group — Augusta",phone:"706-650-5300",status:"Not called",notes:"Address: 3904 Old Trail Rd, Augusta, GA 30907 (some directories show 501 Bobby Jones Expy). Official contact: https://contact.pepsico.com/pepsi/contact-us | Beverage distribution; ask for local warehouse/transportation manager regarding store-transfer and overflow routes."},
-  {id:108,name:"Club Car — Augusta Manufacturing",phone:"800-258-2227",status:"Not called",notes:"Address: 4125 Washington Rd, Augusta, GA 30907. Official contact: https://www.clubcar.com/en-us/contact-us | Augusta-based golf/utility vehicle manufacturer; fit for components, dealer transfers, service parts and urgent plant freight."},
-  {id:109,name:"Generac Southeast Distribution Center — Augusta",phone:"888-436-3722",status:"Not called",notes:"Address: 3464 Mike Padgett Hwy, Augusta, GA 30906. Official contact: https://www.generac.com/about/contact-us | New 500,000-sq-ft Southeast distribution center and primary storm-logistics hub; ships standby/portable generators, transfer switches and energy components. Top-priority overflow/recovery prospect; ask for transportation or DC operations."},
-  {id:110,name:"Wise Warehousing Solutions / Help, Inc. — Aiken",phone:"803-648-8521 / Help alt: 803-648-5725",status:"Not called",notes:"Email: info@wisewarehousingsolutions.com | Official: https://wisewarehousingsolutions.com/ | HQ/warehouse: 285 Main Dr, Aiken, SC 29801; additional Aiken/Graniteville warehouses. Wise is a division of Help, Inc. Top-priority warehouse/3PL overflow prospect."},
-  {id:111,name:"Get To It Transport Inc. (GTI Transport) — Aiken",phone:"800-238-5133 / local listing: 803-649-0229",status:"Not called",notes:"Official form: https://gettoittransport.com/contact | Office: 118 Laurens St NW, Ste 202, Aiken, SC 29801. Active FMCSA broker USDOT 2234279 / MC 524173 with no power units. No public email found; official toll-free number preferred. Selective fit for expedited enclosed partials; core business is open-deck/oversize freight."},
-  {id:112,name:"Central States Manufacturing — Graniteville",phone:"803-830-7272 / listing alt: 803-602-3552",status:"Not called",notes:"Official contact: https://centralstatesco.com/contact-us/ | Plant: 4025 Central States Way, Graniteville, SC 29829. No suitable plant-specific public email found; request shipping/receiving or transportation. Metal roofing/siding manufacturer; high-priority pallet, parts and overflow prospect."},
-  {id:113,name:"E3 Pallet Solutions — Augusta",phone:"762-895-9663",status:"Not called",notes:"Official form: https://e3pallets.com/contact/ | Yard: 2400 Doughty Rd, Augusta, GA 30906; official page also shows 1697 Broad St Unit 1D, so confirm shipping-yard address. Pallet recycling, repair, retrieval and haul-off; excellent shuttle/return prospect."},
-  {id:114,name:"Star Appliance — North Augusta",phone:"803-442-7850 / directory alt: 855-609-7971",status:"Not called",notes:"Contact route: local phone only — no verified public email or official website found. Address: 635 Edgefield Rd, North Augusta, SC 29841. The 803 number is the repeatedly published local line; confirm current ownership/receiving hours. Appliance delivery, transfer, return and overflow prospect."},
-  {id:115,name:"Southern Accent Cabinetry — North Augusta",phone:"803-442-3868 / cell: 706-829-5092",status:"Not called",notes:"Email: hello@southernaccentcabinetry.com | Official: https://southernaccentcabinetry.com/ | Shop: 75 Pineview Ave, North Augusta, SC 29841. Custom cabinetry since 1984; strong shop-to-jobsite delivery prospect."},
-  {id:116,name:"K&L Johnson Granite and Marble — North Augusta",phone:"803-634-0089",status:"Not called",notes:"Email: JohnsonStoneRepair@comcast.net (public company post from 2019; confirm before outreach) | Company page: https://www.facebook.com/JohnsonStoneRepair/ | Address: 1006 Pinon Rd, North Augusta, SC 29841. Stone fabrication/restoration and protected jobsite delivery prospect."},
-  {id:117,name:"Affordable Quality Marble & Granite — Aiken",phone:"803-642-5416",status:"Not called",notes:"Email: sales@aikengranite.com; info@southcarolinagranite.com | Official: https://southcarolinagranite.com/ | Address: 1272 Powderhouse Rd SE, Aiken, SC 29803. Countertops, cabinets and tile; strong jobsite-delivery prospect."},
-  {id:118,name:"Barnhart's Feed & Seed — Hephzibah",phone:"706-804-2461",status:"Not called",notes:"Email: barnhartsfeed@gmail.com | Official: https://www.barnhartsfeedandseed.com/contact.html | Address: 2327 Highway 88, Hephzibah, GA 30815. Call or text. Feed, seed, hay, farm-supply replenishment and special-order delivery prospect."},
-  {id:119,name:"REFT Equipment Company — Aiken",phone:"803-644-7368",status:"Not called",notes:"Email: reftequip@yahoo.com | Official: https://reftequipment.com/contact-us/ | Address: 3175 Whiskey Rd, Aiken, SC 29803. Corrected user spelling from REFR to REFT. Independent dealer/rental business for tractors, UTVs, trailers, mowers, generators, parts and attachments; good selected-cargo/parts prospect."},
-  {id:120,name:"Blanchard Rental Services — Aiken/Graniteville",phone:"803-220-2282 / main: 803-769-8624 / Justin: 839-273-0530",status:"Not called",notes:"Email: jrutland@blanchardmachinery.com (Justin Rutland, Machine Rental) | Official branch: https://www.blanchardmachinery.com/company/locations/aiken/ | Address: 2026 Jefferson Davis Hwy, Graniteville, SC 29829. Blanchard Rental Services is Blanchard Machinery’s rental division; do not confuse with the separate John Deere dealer. Best fit: parts, compact freight and branch transfers."},
-  {id:121,name:"Sage Mill East Industrial Park — Graniteville",phone:"803-663-8284",status:"Not called",notes:"Emails: henry@wwtwinvestments.com (Henry Goodwin); chip@wwtwinvestments.com (Chip Goforth) | Official park inquiry: https://sagemilleast.com/contact-2/ | Park: Sage Mill Pkwy, Graniteville, SC 29829; developer contact: Wyatt Realty/WWT Investments, 2240 Sage Valley Dr. Sage Mill East is a separate marketed tract; no named operating tenant was verified specifically inside that tract. Use these contacts for current tenant/development intelligence."},
-  {id:122,name:"Blanchard Equipment — Aiken (John Deere)",phone:"803-648-7884 / customer care: 803-855-4904",status:"Not called",notes:"Email: customercare@blanchardequipment.com | Official: https://blanchardequipment.com/Locations/Aiken | Address: 146 Old Wagener Rd, Aiken, SC 29801. Separate from Blanchard Machinery/Rental Services. Strong parts, attachments, compact equipment and inter-store transfer prospect; large tractors need specialized transport."},
-  {id:123,name:"Beverage South of Aiken/Columbia — West Columbia",phone:"803-799-1558",status:"Not called",notes:"Email: chad.metten@bevsouth.us | Official branch: https://bevsouth.com/distributors/beverage-south-columbia/ | Current distribution address: 265 Metropolitan Dr, West Columbia, SC 29170. Serves Aiken and 14 other SC counties; separate from A B Beverage. FMCSA legal name Beverage South of Aiken LLC, USDOT 2161880. Excellent but weight-sensitive beverage pallet/overflow prospect."},
-  {id:124,name:"Rolls-Royce Solutions America / mtu Aiken Plant — Graniteville",phone:"803-663-8831 purchasing / plant: 803-232-6000",status:"Not called",notes:"Email: purchasing@ps.rolls-royce.com | Official purchasing: https://www.mtu-solutions.com/na/en/contact/purchasing/global-purchasing-offices.html | Plant: 660 Bettis Academy Rd, Graniteville, SC 29829. Engine manufacturing/remanufacturing plant expanding for mtu Series 4000 data-center backup-power engines. High-value parts, MRO, interplant and expedited protected-freight prospect."},
-  {id:125,name:"Kimberly-Clark Beech Island Mill & Distribution Expansion",phone:"803-827-1100",status:"Not called",notes:"Official supplier route: https://www.kimberly-clark.com/en-us/suppliers/supplier-links | Address: 246 Old Jackson Hwy, Beech Island, SC 29842. Active manufacturing site adding 1.1 million sq ft of automated distribution capacity, expected online Q2 2027. Excellent high-cube paper/personal-care, packaging, MRO and expedited freight prospect. Correction: 1043 Global Ave was historical GENCO/Kimberly-Clark activity and is not verified as a current K-C receiving site."},
-  {id:126,name:"Meta Aiken Data Center — Sage Mill",phone:"Public community email; no direct site phone",status:"Not called",notes:"Email: commdev@meta.com | Official: https://datacenters.atmeta.com/2024/08/hello-south-carolina/ | Location: Sage Mill Pkwy, Graniteville, SC 29829. Under construction with target operation in 2027. Meta says it will source locally when possible; construction/vendor freight should be routed through DPR, OES and project partners rather than site security."},
-  {id:127,name:"DPR Construction — Meta Aiken Data Center Project",phone:"Supply-chain form / prequal help: 602-333-1834",status:"Not called",notes:"Official project: https://www.dpr.com/projects/meta-aiken-data-center-aiken-sc | Best motor-carrier route: https://www.dpr.com/supply-chain-partnership | General contractor for the Sage Mill Meta campus. DPR expressly lists logistics/warehousing partnerships; vendors/material suppliers do not need construction subcontractor prequalification. Request Aiken project procurement/logistics, exact gate instructions and delivery onboarding."},
-  {id:128,name:"SubAir Systems — Graniteville",phone:"866-641-6663",status:"Not called",notes:"Email: info@subairsystems.com | Official: https://subairsystems.com/contact | Address: 1164 Industrial Ave, Graniteville, SC 29829. Sage Mill-area manufacturer of turf aeration, moisture-management and fan systems. Strong pumps, blowers, fans, controls, parts and finished-system shipment prospect."},
-  {id:129,name:"OES Equipment — Aiken / Meta Project Branch",phone:"Official local-branch form; no public Aiken number",status:"Not called",notes:"Official: https://oesonline.com/contact-us | Locations: https://oesonline.com/locations | DPR-family construction consumables and equipment-rental company with a confirmed Aiken branch supporting high-demand construction activity. Excellent jobsite supplies, tool/equipment transfers and urgent delivery prospect; ask form response to route to Aiken branch manager."},
-  {id:130,name:"Aiken Electric Cooperative — Meta Utility Partner",phone:"803-649-6245",status:"Not called",notes:"Official contact: https://www.aikenco-op.org/contact-us | Address: 2790 Wagener Rd, Aiken, SC 29801. Utility partner for the Meta Aiken data center and regional industrial sites. Potential parts, transformers/accessories, contractor material and emergency-response freight; ask for purchasing, warehouse or approved-carrier contact."},
-  {id:131,name:"The Hollingsworth Companies — Sage Mill/SouthPoint Aiken Development",phone:"865-457-3600 / alt: 865-457-3601",status:"Not called",notes:"Email: info@hollingsworthcos.com | Official: https://hollingsworthcos.com/contact | Developing speculative manufacturing/warehouse buildings in the Sage Mill area and SouthPoint Aiken. Prospecting/developer lead rather than direct shipper; ask for incoming tenant names, construction logistics and property-service vendors."},
-  {id:132,name:"Legacy Pack — Graniteville",phone:"803-392-0274",status:"Not called",notes:"Official contact: https://legacypack.com/contact-us | Address: 155 Ascauga Lake Rd, Graniteville, SC 29829. Local manufacturer of mailers and specialty e-commerce shipping supplies. Excellent raw-material, packaging, finished-carton and local distribution prospect; may share the Wise Warehousing facility, so confirm receiving instructions."},
-  {id:133,name:"SpunLab / Parkdale Performance Yarns — Graniteville",phone:"803-663-3827 / listing alt: 803-663-0697",status:"Not called",notes:"Email: andy.long@spunlab.com | Contact route: https://www.spunlab.com/contact/ | Address: 418 Ascauga Lake Rd, Graniteville, SC 29829. Performance-yarn development/manufacturing facility; good fiber, samples, cones, boxed yarn, MRO and expedited protected-freight prospect."},
-  {id:134,name:"a2b Fulfillment — Graniteville",phone:"706-454-0195 / deliveries: 706-927-1058",status:"Not called",notes:"Emails: sales@a2bf.com; deliveries bizops@a2bf.com | Official location: https://www.a2bfulfillment.com/about/locations/graniteville-sc | Address: 1043 Global Ave, Graniteville, SC 29829. High-priority 3PL/omnichannel fulfillment prospect for overflow, inbound pallets, retail replenishment and regional final-mile."},
-  {id:135,name:"Burns & McDonnell — Meta Aiken Project Partner",phone:"816-333-9400 corporate",status:"Not called",notes:"Official contact: https://info.burnsmcd.com/contact-us | SC office: https://www.burnsmcd.com/locations/greenville-spartanburg | Public project updates identify Burns & McDonnell as a Meta Aiken partner. Project/vendor lead for electrical, power, controls and construction materials; ask the contact form to route to Aiken data-center procurement/logistics."},
-  {id:136,name:"ALLETT USA — Graniteville",phone:"Official email/form",status:"Not called",notes:"Email: info@allett-usa.com | Official contact: https://www.allett-usa.com/pages/contact-us | Address: 155 Ascauga Lake Rd, Graniteville, SC 29829. Commercial reel mower, parts and accessory operation; strong dealer replenishment, warranty/repair and compact-equipment freight fit. Shared warehouse address—confirm suite and receiving dock."},
-  {id:137,name:"Graniteville Specialty Fabrics",phone:"803-663-2646",status:"Not called",notes:"Official form: https://www.graniteville.net/contact.php | Address: 511 Leitner St, Graniteville, SC 29829. Specialty chemical formulator and coated-fabric manufacturer. Strong fabric rolls, finished goods, samples and production-supply prospect; confirm roll lengths and review SDS/hazmat requirements for coatings or chemicals."},
-  {id:138,name:"Gateway Tire of Aiken — Graniteville Wholesale Warehouse",phone:"803-265-5847",status:"Not called",notes:"Address: 1056 Sage Mill Pkwy, Graniteville, SC 29829. Company-managed location: https://www.facebook.com/profile.php/?id=61567292350862 | Wholesale warehouse offering local deliveries and customer pickup. Excellent high-cube tire replenishment, interwarehouse transfer and emergency dealer-delivery prospect."},
-  {id:139,name:"Recleim — Hickman Mill Appliance Recycling Plant",phone:"803-392-7808",status:"Not called",notes:"Official: https://recleim.com/ | Address: 118 Hard St, Graniteville, SC 29829. Appliance collection/recycling and recovered-component operation. Strong specialized local collection/transfer potential, but confirm liftgate, securement, refrigerant/environmental documentation and payload before accepting loads."},
-  {id:140,name:"Full Circle Aggregates — Graniteville",phone:"803-809-4735 / alt: 803-439-9712",status:"Not called",notes:"Official contact: https://fullcirclesand.com/contact-us/ | Address: 581 Rainbow Falls Rd, Graniteville, SC 29829. Core aggregate work requires dump equipment, but box-truck opportunities include bagged products, samples, tools, pumps, geotextiles and urgent contractor parts. Selective prospect only."},
-  {id:141,name:"Global Avenue Logistics Center — Graniteville",phone:"Lee 843-805-5111 / Kevin 843-805-5112 / Matthew 704-804-5762",status:"Not called",notes:"Emails: lee.allen@jll.com; kevin.coats@jll.com; matthew.greer@jll.com | Official: https://www.globalavelogistics.com/ | Address: 1043 Global Ave, Graniteville, SC 29829. 450,033-sq-ft multi-tenant logistics property; current vacancy/tenant roster is conflicting, so use JLL contacts to identify active tenants, suites and receiving contacts."},
-  {id:142,name:"Miller Electric Company — Aiken Prefab / Meta Project",phone:"904-388-8000 corporate",status:"Not called",notes:"Official contact: https://mecojax.com/contact-us | First-party 2025 hiring evidence placed Aiken Prefab at 1043 Global Ave, Suite 100-A, Graniteville, SC 29829. Strong electrical prefab racks, conduit, cable, panels and jobsite-transfer fit. Occupancy was not independently reconfirmed in 2026—call before outreach or dispatch."},
-  {id:143,name:"Novolex / former Pactiv — Beech Island Plant",phone:"803-827-5200",status:"Not called",notes:"Official location: https://novolex.com/locations/ | Contact form: https://novolex.com/contact-us/ | Supplier route: https://novolex.com/for-suppliers/ | Address: 578 Old Jackson Hwy, Jackson, SC 29831. Pactiv Evergreen became part of Novolex in April 2025. Strong high-cube foodservice-packaging, finished-carton, raw-material, MRO and urgent-parts prospect. Ask for shipping/receiving, transportation or approved local carrier onboarding. Local phone is from public plant listings; official Novolex location page confirms the address but not the number, so call before dispatch."},
-  {id:144,name:"John Deere Commercial Products / Augusta Works — Grovetown",phone:"706-854-6400 / 700 Horizon: 706-868-4040",status:"Not called",notes:"Official factory: https://www.deere.com/en-us/products-solutions/tractors/compact-tractors/augusta-georgia-factory | Prospective supplier application: https://prospectivesupplier.deere.com/ | Supplier guidance: https://jdsn.deere.com/prospective-suppliers | Primary address: 700 Horizon South Pkwy, Grovetown, GA 30813; secondary South Factory/campus gate: 234 John Deere Pkwy. Public numbers conflict: 706-854-6400 is consistently listed for the South Factory; Augusta Metro Chamber publishes 706-868-4040 for 700 Horizon. Call and confirm receiving before dispatch. Strong components, attachments, service parts, MRO, line-down/supplier-expedite and interfacility freight prospect; complete tractors require specialized transport. Ask for inbound logistics, transportation procurement, material control, shipping/receiving or local carrier onboarding. Separate from the Blanchard Equipment John Deere dealer row."},
-  {id:145,name:"Hajoca Supply — Augusta",phone:"706-868-8822",status:"Not called",notes:"Email: prf051@hajoca.com | Official: https://hajocaaugusta.com/contact-us/ | Address: 802 Scott Nixon Memorial Blvd, Augusta, GA 30907. Hours: Mon–Thu 7am–4pm; Fri 7am–3pm; after-hours emergency service advertised. Excellent plumbing/HVAC replenishment, same-day contractor/jobsite delivery, branch transfer, special-order and overflow route prospect. Hajoca has publicly documented using flexible outside same-day delivery capacity. Email first, then ask for the profit-center/branch manager or warehouse/delivery manager; confirm outside-carrier use and receiving hours before dispatch."}
-];
-
-const SEEDS=[
-{
-  "id": 80,
-  "date": "2026-07-24",
-  "pickup": "AGS5 Appling, GA 30802",
-  "dropoff": "PX23658 Chapin, SC 29036",
-  "miles": 96,
-  "dh": 144,
-  "rpm": "3.83",
-  "pay": 367.45,
-  "fuel": 57.98,
-  "source": "Amazon Relay",
-  "comments": "Amazon Relay spot load 115SXMWBT. Pickup AGS5 Appling GA 30802, Fri 2026-07-24 06:30 EDT; drop PX23658 Chapin SC 29036, Fri 2026-07-24 10:42 EDT. 26 ft truck; Special Services; live service. Screenshot showed 96 loaded miles, 4h 24m displayed duration, $367.45 pay, and displayed $3.85/loaded mi. Deadhead corrected to a provisional 144 mi from the prior Tryon NC delivery to the AGS5 Appling pickup, using OSRM city-to-city routing; replace with actual miles if different. Total estimated miles 240. Calculated loaded RPM $3.83; all-in gross RPM $1.53. Fuel pending. Driver J. Green. Truck GA C963FF. Timing conflict: this Chapin delivery at 10:42 makes the same-day GlobalTranz Calhoun load pickup in Augusta 09:00-11:00 likely impossible without broker-approved timing changes. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
-},
-{
-  "id": 79,
-  "date": "2026-07-25",
-  "pickup": "INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta, GA 30909",
-  "dropoff": "Calhoun, GA 30703 (facility/street unknown)",
-  "miles": 211,
-  "dh": 83,
-  "rpm": "4.27",
-  "pay": 900,
-  "fuel": 71.02,
-  "source": "GlobalTranz / Fila Freight",
-  "comments": "GlobalTranz / Fila Freight load #32931079, quote #4780287, ref #SLC00353681. Pickup INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta GA 30909, Fri 2026-07-24 09:00-11:00; contact Mason Amacker, 985-635-9276. Delivery facility and street are shown as unknown; destination Calhoun GA 30703, Sat 2026-07-25 09:30-11:30. Straight-truck full load; 6 pallets / 6 pieces / 5,000 lb. Liftgate and pallet jack required; driver load and unload; bring a roll of shrink wrap. Flat rate $900. Rate confirmation does not state mileage; loaded mileage provisionally estimated at 211 mi by OSRM from exact pickup to Calhoun city/ZIP. Deadhead revised 2026-07-23 to a provisional 83 mi from the newly inserted prior PX23658 Chapin delivery to the Augusta pickup using OSRM city-to-address routing; replace with actual or re-chain if another load intervenes. Total estimated miles 294; loaded RPM $4.27; all-in gross RPM $3.06. Fuel pending. Timing conflict: prior Amazon 115SXMWBT delivery in Chapin is 10:42 on 2026-07-24, while this Augusta pickup window is 09:00-11:00, so service is likely impossible unless GlobalTranz/Vivint approve later pickup or the Amazon load changes. Equipment fields conflict: trailer type says Straight Truck while size says 48 or 53; verify the 26 ft box truck is accepted. POD is due within 1 day of delivery; late POD reduces rate 1% per day. Email invoice, rate confirmation, POD, and receipts to TLinvoices@globaltranz.com. Detention starts after 2 hours at $40/hr, max $200 per stop; notify broker after 60 minutes and provide a time-stamped BOL within 48 hours. Optional 3% / 3-day Quick Pay. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
-},
-  {
-    "id": 78,
-    "date": "2026-07-23",
-    "pickup": "AFF Group, 101 Groce Rd, Lyman, SC 29365",
-    "dropoff": "Tyron Finishing, 250 Screvens Rd, Tryon, NC 28782",
-    "miles": 23,
-    "dh": 10,
-    "rpm": "13.04",
-    "pay": 300,
-    "fuel": 24.02,
-    "source": "Echo Global Logistics",
-    "comments": "Echo Global Logistics load #68405740. Pickup AFF Group, 101 Groce Rd, Lyman SC 29365, available 2026-07-22 08:00 through 2026-07-23 16:00 ET. Delivery Tyron Finishing, 250 Screvens Rd, Tryon NC 28782, available through 2026-07-24 17:00 ET. Foam roller; 900 lb; 20 non-stackable pallets, 60x23x23 in. RC equipment says Van 48 ft; verify Echo accepted the 26 ft box truck and that all pallets fit. Flat rate $300; 23 loaded mi; provisional 10 mi deadhead from Signet Mills to AFF; total 33 mi; loaded RPM $13.04; all-in RPM $9.09. Fuel initially pending. Call Echo dispatch at 800-354-7993 / 855-786-3246 for required check calls. Fuel updated 2026-07-23: user reported $190.00 actual fuel for today's two-load chain; allocated $24.02 to Echo #68405740 by total truck miles (33 of 261 mi). Net after fuel $275.98; net per all miles $8.36."
-  },
-  {
-    "id": 77,
-    "date": "2026-07-23",
-    "pickup": "Apex Mills Graham, 2350 Long Dairy Rd, Graham, NC 27253",
-    "dropoff": "Signet Mills, 194 Bellew Carver Rd, Spartanburg, SC 29301",
-    "miles": 188,
-    "dh": 40,
-    "rpm": "2.39",
-    "pay": 450,
-    "fuel": 165.98,
-    "source": "eShipping / Highway",
-    "comments": "eShipping LLC / Highway load confirmation order #0726308, Highway rate confirmation ID 10843817. Contact Mitchell Large; eShipping truckload 877-770-8844 / truckload@eshipping.biz; pickup/delivery/delay emergency updates 877-772-4086. Pickup Apex Mills Graham, 2350 Long Dairy Rd, Graham NC 27253, Thu 2026-07-23 FCFS 10:00-15:00; contact David, 336-684-5883. Delivery Signet Mills, 194 Bellew Carver Rd, Spartanburg SC 29301, Thu 2026-07-23 10:00-16:00; contact Debbie Sherbert, 864-699-7253. Special instruction says same-day delivery by 16:00. Straight box truck; rolls of fabric; 1,490 lb; no driver loading or unloading. Flat rate $450; RC distance 188 mi. User confirmed 40 mi deadhead from the prior XRD4 Greensboro return to Apex Mills Graham. Total miles 228. Loaded RPM $2.39; all-in gross RPM $1.97. Fuel initially pending. Timing risk: exact-address OSRM estimates about 3h42 loaded driving, so the truck should depart Graham around noon to preserve the 16:00 delivery cutoff; a late pickup within the nominal 10:00-15:00 FCFS window would not support same-day delivery. Tracking is mandatory; failure may incur a $200 fine. Driver/dispatcher must notify eShipping of pickup, delivery, and delays. Report accessorial/extra charges within 24 hours. Detention requires signed in/out times; the rate confirmation does not state a detention rate or free-time period. No fuel advances. Combining partial loads requires eShipping permission. Send invoices to invoices@eshipping.biz. Fuel updated 2026-07-23: user reported $190.00 actual fuel for today's two-load chain; allocated $165.98 to eShipping #0726308 by total truck miles (228 of 261 mi). Net after fuel $284.02; net per all miles $1.25."
-  },
-  {
-    "id": 76,
-    "date": "2026-07-22",
-    "pickup": "XRD4 Greensboro, NC (street address not shown)",
-    "dropoff": "XRD4 Greensboro, NC — return loop (intermediate stop hidden)",
-    "miles": 149,
-    "dh": 10,
-    "rpm": "3.57",
-    "pay": 531.93,
-    "fuel": 163.72,
-    "source": "Amazon Relay",
-    "comments": "Amazon Relay upcoming spot load T-113THP1PL. Pickup stop 1 XRD4, Greensboro NC, Wed 2026-07-22 at 14:00 EDT; final stop 3 returns to XRD4, Greensboro NC, Wed 2026-07-22 at 17:30 EDT. The screenshot does not show XRD4's street address or intermediate stop 2; preserve these as unavailable rather than inventing them. 26 ft truck; Special Services; LTL / Drop / Live. Screenshot shows 149 loaded/route miles, 5h displayed duration, $531.93 pay, and displayed $3.58/mi. Driver J. Green; truck GA C963FF. Deadhead provisionally estimated at 10 mi from the prior Battleground Kia Greensboro delivery to the same-city XRD4 pickup because the facility street address is not visible; replace with actual deadhead. Total estimated miles 159. Calculated loaded RPM $3.57; all-in gross RPM $3.35. Fuel initially pending. Fuel updated 2026-07-22: user reported $208 actual fuel for today’s two-load chain; allocated $163.72 to this load by total truck miles. Net after fuel $368.21; net per all miles $2.32. The $271 fuel reported for 2026-07-21 remains allocated only to the prior day's two-load chain. Timing note: the visible 14:00 pickup-to-17:30 final-stop span is 3h30m, while the app displays 5h, likely including operational/service time not visible in the collapsed route."
-  },
-  {
-    "id": 75,
-    "date": "2026-07-22",
-    "pickup": "SAIA LTL Freight - GCO, 2904 Torrence Dr, Greensboro, NC 27406",
-    "dropoff": "Battleground Kia, 2927 Battleground Ave, Greensboro, NC 27408",
-    "miles": 9,
-    "dh": 34,
-    "rpm": "33.33",
-    "pay": 300,
-    "fuel": 44.28,
-    "source": "Trinity Logistics",
-    "comments": "Trinity Logistics shipment/rate confirmation #9743394, customer ref/PO SNT-9118305 / 156083 | KIA; rescue PRO 10921086340; VIN KNDADFS53R6027059. Logistics specialist Phillip Rowe, austinops@trinitylogistics.com, 512-347-9888. Pickup SAIA LTL Freight - GCO, 2904 Torrence Dr, Greensboro NC 27406, Wed 2026-07-22 10:00-12:00; phone 336-574-0618. Delivery Battleground Kia, 2927 Battleground Ave, Greensboro NC 27408, Wed 2026-07-22 12:00-13:00; do not contact dealership; call Trinity at 512-347-9889 with concerns. Equipment 26V / 26 ft van; over-the-road dedicated shipment. One crate battery system assembly (EV9-LR), 108x75x23 in, 1,949 lb. Flat rate $300; RC distance 9 mi. Deadhead updated 2026-07-22: user confirmed 34 mi from the prior Amara Lexington delivery to the SAIA Greensboro pickup. Total miles 43. Loaded RPM $33.33; all-in gross RPM $6.98. Fuel initially pending. Fuel updated 2026-07-22: user reported $208 actual fuel for today’s two-load chain; allocated $44.28 to this load by total truck miles. Net after fuel $255.72; net per all miles $5.95. Operational requirements: take pictures during loading and video during unloading; seal must remain intact; failure can trigger a $500 fine. Send BOL picture to tracking@trinity512.com or by text before leaving shipper. Load on tail; use 4 straps on the crate; dedicated only, no other partials. Do not self-load or self-offload, which may trigger a $500 fine and possible claim. Send signed POD to pod@trinity512.com. Submit freight bill/paperwork to carrierinvoices@trinitylogistics.com; standard payment within 25 days after uncontested paperwork. Transflo use deducts $2.50; scanned documents due within 24 hours. RC lists battery system assembly but no hazmat classification; verify the BOL and any placarding/handling requirement before departure."
-  },
-  {
-    "id": 74,
-    "date": "2026-07-21",
-    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
-    "dropoff": "Amara Industries, 2018 E US-64, Lexington, NC 27292",
-    "miles": 249,
-    "dh": 144,
-    "rpm": "3.21",
-    "pay": 800,
-    "fuel": 182.66,
-    "source": "Haul'N Loads / AscendTMS",
-    "comments": "Haul'N Loads LLC / AscendTMS load confirmation #5062, reference Amara-5062. Broker Haul'N Loads LLC, MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries GA, 130 Quality Dr, Thomson GA 30824, Tue 2026-07-21 12:00-14:00. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, Tue 2026-07-21 15:00-17:00; phone 336-370-5800. Equipment 26 ft van/box truck; commodity dry goods/general; 1,500 lb; 8 skids, 48x45x52; deliver direct only; p/# 106350400103-. Flat rate $800; RC distance 249 mi. Deadhead provisionally estimated at 144 mi from the earlier same-day Armstrong/Sigma Thermal Marietta delivery to Thomson pickup using exact-address Census geocoding plus OSRM (144.38 mi); re-chain or replace if the Armstrong delivery timing or actual deadhead differs. Total estimated miles 393. Loaded RPM $3.21; all-in gross RPM $2.04. Fuel pending. Route schedule is tight: OSRM estimates about 4h53 loaded driving, so a pickup/departure near noon is needed to reach the 17:00 delivery cutoff; loading delays or a late prior delivery threaten on-time service. Communication/updates required; tracking app if requested. More than 2 hours early/late without consent may deduct up to 20%. No layover or delayed delivery without broker consent. POD due within 30 minutes. Submit documents and billing to haulnloads.billing@gmail.com; broker does not click email links. Rate confirmation carrier section says driver not set, while signature area names Jacarr Green / 706-726-9949, signed 7/21/26. File was labeled Tulex.pdf, but the rate confirmation itself identifies Haul'N Loads and Amara Industries; no Tulex party appears on the document. Fuel updated 2026-07-21: user reported $271 actual fuel for today's two-load chain; allocated proportionally by total miles (393 of 583). Haul'N Loads #5062 fuel share $182.66. Net after fuel $617.34; net per all miles $1.57."
-  },
-  {
-    "id": 73,
-    "date": "2026-07-21",
-    "pickup": "Eastern Industrial, 1213 Nowell Dr, Augusta, GA 30901",
-    "dropoff": "Sigma Thermal, 4875 Deen Rd, Marietta, GA 30066",
-    "miles": 176,
-    "dh": 14,
-    "rpm": "2.84",
-    "pay": 500.0,
-    "fuel": 88.34,
-    "source": "Armstrong Transport / Highway",
-    "comments": "Armstrong Transport Group / Highway secure rate confirmation load #4515884-1, Highway rate confirmation ID 10764678. Broker contact Ryan Suydam, rsuydam@armstrongtransport.com. Carrier Green Gator Enterprises LLC, MC 1569745 / DOT 4110201. Pickup Eastern Industrial, 1213 Nowell Dr, Augusta GA 30901, Tue 2026-07-21 at 08:00 EST; pickup/reference S4170259.004. Delivery Sigma Thermal, 4875 Deen Rd, Marietta GA 30066, Tue 2026-07-21 FCFS 08:00-17:00 EST. Full truckload; empty dedicated 26 ft straight truck/van required; no freight and no bulkheads; no transloading. Commodity 5 pallets automated valves, 48x44x20 in, 3,563 lb; cargo value 100,000 USD. Flat rate 500.00 USD. Rate confirmation does not state mileage. Loaded miles estimated at 176 mi from an OSRM route using U.S. Census-geocoded street addresses (175.81 mi); replace if broker/actual miles differ. Deadhead estimated at 14 mi from the prior Hephzibah GA delivery area to the Augusta pickup (OSRM 13.93 mi); replace with actual deadhead. Total estimated miles 190. Estimated loaded RPM 2.84; all-in gross RPM 2.63. Fuel pending. Call/text 603-533-0647 or 603-315-8368 after hours for issues that may delay delivery; late delivery without advance notice may incur labor-related rate reductions. Invoice must reference load #4515884-1; standard terms net 30. Armstrong optional 2.5% QuickPay is 1-2 business days and requires at least 3 prior Armstrong loads. Document discrepancy: Primary Driver is misspelled as 'Jacaar Green'; signature, stop contact, and Highway audit show Jacarr Green. Truck number appears as '5331`' with a trailing mark. Ask broker to correct if needed. Fuel updated 2026-07-21: user reported $271 actual fuel for today's two-load chain; allocated proportionally by total miles (190 of 583). Armstrong load #4515884-1 fuel share $88.34. Net after fuel $411.66; net per all miles $2.17."
-  },
-  {
-    "id": 72,
-    "date": "2026-07-20",
-    "pickup": "AGS5 Appling, GA 30802",
-    "dropoff": "PX10604 Hephzibah, GA",
-    "miles": 32,
-    "dh": 18,
-    "rpm": "7.16",
-    "pay": 229.26,
-    "fuel": 115.0,
-    "source": "Amazon Relay",
-    "comments": "Amazon Relay spot load 115HDQXZ2. Pickup AGS5 Appling GA 30802, Mon 2026-07-20 06:20 EDT; drop PX10604 Hephzibah GA (ZIP truncated in screenshot), Mon 2026-07-20 07:50 EDT. 26 ft truck; Special Services; live service. Screenshot showed 32 loaded miles, 1h 42m, $229.26 pay, and displayed $7.07/mi. User confirmed 18 mi deadhead and $115.00 actual fuel. Total miles incl. deadhead: 50. Calculated loaded RPM $7.16; all-in gross RPM $4.59. Net after fuel $114.26; net per all miles $2.29. Driver J. Green. Truck GA C963FF. Timing note: the 06:20 pickup-to-07:50 delivery appointment span is 1h 30m, while the app displays 1h 42m. Fuel station, gallons, price per gallon, and odometer were not provided."
-  },
-  {
-    "id": 71,
-    "date": "2026-07-19",
-    "pickup": "AGS5 Appling, GA 30802",
-    "dropoff": "SX24682 Aiken, SC 29803",
-    "miles": 40,
-    "dh": 18,
-    "rpm": "5.00",
-    "pay": 200.13,
-    "fuel": 112.0,
-    "comments": "Amazon Relay spot load 116H3LFYP. Pickup AGS5 Appling GA 30802, Sun 2026-07-19 04:10 EDT; drop SX24682 Aiken SC 29803, Sun 2026-07-19 06:00 EDT. 26 ft truck; Special Services; live service. Screenshot showed 40 loaded miles, 2h 2m, $200.13 pay, and displayed $5.05/loaded mi. User confirmed 18 mi deadhead and $112.00 actual fuel. Total miles incl. deadhead: 58. Calculated loaded RPM $5.00; all-in gross RPM $3.45. Net after fuel $88.13; net per all miles $1.52. Driver J. Green. Truck GA C963FF. Timing note: the 04:10 pickup-to-06:00 delivery appointment span is 1h 50m, while the app displays 2h 2m. Fuel station, gallons, price per gallon, and odometer were not provided."
-  },
-  {
-    "id": 70,
-    "date": "2026-07-17",
-    "pickup": "GSO1 Kernersville, NC 27284",
-    "dropoff": "CLT9 Charlotte, NC 28214",
-    "miles": 97,
-    "dh": 29,
-    "rpm": "2.12",
-    "pay": 205.16,
-    "fuel": 100.0,
-    "comments": "Amazon Relay spot load 112L2FBZZ. Pickup GSO1, Kernersville NC 27284, Fri 2026-07-17 19:00 EDT; drop CLT9, Charlotte NC 28214, Fri 2026-07-17 22:06 EDT. 26 ft truck; Special Services; live service. Screenshot showed 97 loaded miles, 4h 21m, $205.16 pay, and $2.11/loaded mi. Deadhead estimated at 29 mi from the prior Amara Industries Lexington NC delivery to Kernersville using an OSRM city-to-city route (47.328 km / 29.41 mi); replace if actual differs. Total miles incl. estimated deadhead: 126. Calculated loaded RPM $2.12; all-in gross RPM $1.63. Fuel updated 2026-07-17: user reported $50.00 spent on the Kernersville load. Additional fuel updated 2026-07-18: user added another $50.00 to yesterday\u2019s load, bringing total load fuel to $100.00. Net after fuel $105.16; net per all miles $0.83. Driver J. Green. Truck GA C963FF. Timing note: the 19:00 pickup-to-22:06 delivery appointment span is 3h 6m, while the app displays 4h 21m."
-  },
-  {
-    "id": 69,
-    "date": "2026-07-17",
-    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
-    "dropoff": "Amara Industries, 2018 E US-64, Lexington, NC 27292",
-    "miles": 249,
-    "dh": 28,
-    "rpm": "3.21",
-    "pay": 800.0,
-    "fuel": 102.0,
-    "comments": "Haul'N Loads LLC / AscendTMS load confirmation #5039, reference Amara-5039. Broker Haul'N Loads LLC, MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries GA, 130 Quality Dr, Thomson GA 30824, Fri 2026-07-17 08:30-09:00. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, Fri 2026-07-17 13:00-14:00; phone 336-370-5800. Equipment 26 ft van/box truck; commodity dry goods/general; 1,500 lb; 6-8 skids, 48x45x52; deliver direct only; p/# 106350400103-. Flat rate $800; RC distance 249 mi. Deadhead estimated at 28 mi from prior Club Car Evans delivery area to Thomson pickup using OSRM Evans-to-Thomson city route; replace if actual differs. Total miles incl. estimated deadhead: 277. Loaded RPM $3.21; all-in gross RPM $2.89. Fuel pending. Communication/updates required; tracking app if requested. More than 2 hours early/late without consent may deduct up to 20%. No layover or delayed delivery without broker consent. POD due within 30 minutes. Submit documents and billing to haulnloads.billing@gmail.com; broker does not click email links. Rate confirmation carrier section says driver not set, while signature area lists Jacarr Green / 706-726-9949. Signed date appears as 7/16/16 instead of 7/16/26; ask broker to correct if needed. Fuel updated 2026-07-17: user reported $102.00 actual fuel for today's Haul'N Loads #5039. Net after fuel $698.00; net per all miles $2.52."
-  },
-  {
-    "id": 68,
-    "date": "2026-07-15",
-    "pickup": "PX23941, 220 S Main St, Gaston, SC 29053",
-    "dropoff": "AGS5 Appling, GA 30802",
-    "miles": 0,
-    "dh": 38,
-    "rpm": null,
-    "pay": 175.0,
-    "fuel": null,
-    "comments": "Amazon Relay TONU/canceled load 112WCLQ5M. User confirmed this was a TONU; Amazon screenshot shows canceled status and revised compensation of $175.00. Planned pickup PX23941, 220 S Main St, Gaston SC 29053, Wed 2026-07-15 17:30 EDT; planned delivery AGS5 Appling GA 30802, Wed 2026-07-15 20:00 EDT. Planned equipment 26 ft truck; Special Services; planned loaded distance 96 mi. After cancellation the app displayed $175 and $1.82/planned mile. No freight moved, so loaded miles set to 0. User previously confirmed 38 mi deadhead from the prior Orangeburg SC delivery to the Gaston pickup; counted as actual TONU travel. Total actual miles: 38. TONU revenue $175.00; all-in gross RPM $4.61. Fuel pending. Driver J. Green. Truck GA C963FF. Update deadhead to 0 if cancellation occurred before the truck traveled toward Gaston."
-  },
-  {
-    "id": 67,
-    "date": "2026-07-16",
-    "pickup": "Gen2 Aiken LLC, 450 AB Miles Dr, Aiken, SC 29805",
-    "dropoff": "Club Car Evans, 4125 Washington Rd, Evans, GA 30809",
-    "miles": 31,
-    "dh": 34,
-    "rpm": "8.06",
-    "pay": 250.0,
-    "fuel": null,
-    "comments": "KCH Transportation load #9447922 / Highway rate confirmation ID 10616347. Broker/contact Nick Rosemund, 770-526-0426, nrosemund@kchtrans.com. Carrier Green Gator Enterprises LLC; contact/driver Jacarr Green, 706-726-9949. Pickup Gen2 Aiken LLC, 450 AB Miles Drive, Aiken SC 29805, Thu 2026-07-16, shipping/receiving hours shown as 13:00-13:00, no appointment required; pickup/delivery number Club Car. Delivery CLUB CAR EVANS, 4125 Washington Rd, Evans GA 30809, Thu 2026-07-16, shipping/receiving 08:00-15:00, no appointment required. Commodity electronic parts; 12 skids, 40x48x40 in; 720 lb. Equipment listed as Straight Box Truck, 16 ft; Green Gator operates a 26 ft box truck. Dock-high note. Dedicated truck only, no partials; product must stay secure. Flat rate $250.00. Loaded miles estimated at 31 mi by OSRM from AB Miles Dr to 4125 Washington Rd. Deadhead updated 2026-07-17: user confirmed 34 mi. Total miles: 65. Loaded RPM $8.06; all-in gross RPM $3.85; fuel pending. Trucker Tools tracking must be accepted within 30 minutes and maintained or up to $250 rate reduction. Daily check call by 9am EST or $100/day penalty. POD and backup docs to POD@kchtrans.com within 24 hours or $100 deduction. Invoice/supporting docs to billing@kchtrans.com; Quick Pay paperwork to payments@kchtrans.com; payments via TriumphPay. Missed pickup/delivery may incur up to $250 per occurrence. Detention requires notice within 2 hours after appointment time and stamped/written in/out times; late pickup/delivery is not eligible. No re-brokering; seals only broken by consignee."
-  },
-  {
-    "id": 66,
-    "date": "2026-07-15",
-    "pickup": "Augusta, GA",
-    "dropoff": "Orangeburg, SC",
-    "miles": 78,
-    "dh": 35,
-    "rpm": "5.13",
-    "pay": 400.0,
-    "fuel": null,
-    "comments": "TQL rate confirmation PO# 37589459. Broker contact Quinn Jacobs, 800-580-3101 x54070, TeamSansone@tql.com; office staffed 24/7. Carrier Green Gator Enterprises LLC MC 1569745 / DOT 4110201; dispatcher/driver Jacarr Green; phone 706-726-9949; truck #5331, BOX. Factoring via Engaged Financial LLC - FCM, PO Box 775553, Chicago IL 60677-5553. Pickup Augusta GA, Wed 2026-07-15 FCFS 12:00-13:00; delivery Orangeburg SC, Wed 2026-07-15 FCFS 00:01-23:59. Commodity plastics; 1 truckload; estimated weight 4,000 lb; FTL; 16 ft Straight Box Truck; non-hazardous; 0 pallets/0 cases shown; special temp instructions Dock High. Flat rate $400.00. Loaded miles estimated by OSRM city-to-city route Augusta GA to Orangeburg SC: 78 mi (125.5 km). Deadhead estimated at 35 mi from prior Macon GA delivery area to Augusta pickup unless user later clarifies. Total miles incl. deadhead: 113. Loaded RPM $5.13; all-in gross RPM $3.54. Fuel pending. POD/invoice: submit rate con + complete BOL/POD/receipts within 24 hours of delivery to cinvoices@tql.com; 1-day Quick Pay 5%, 7-day Quick Pay 3%. Detention: notifies TQL at least 30 minutes before detention and on arrival/departure; detention generally starts after at least 3 hours unless agreed in writing. No TONU unless TQL provided load details and approved travel toward pickup. $35 fee per Comchek issued for fuel/final pay."
-  },
-  {
-    "id": 65,
-    "date": "2026-07-14",
-    "pickup": "Greensboro, NC 27409",
-    "dropoff": "Macon, GA 31216",
-    "miles": 392,
-    "dh": 39,
-    "rpm": "2.10",
-    "pay": 825.0,
-    "fuel": 390.0,
-    "comments": "Delivery app load Greensboro-Macon-20260714-825; platform and load ID not visible in screenshot. Status shown En Route to Origin at 08:33 EDT on Tue 2026-07-14; pickup Greensboro NC 27409, pickup time Now; delivery Macon GA 31216. App showed 2 stops, 392 loaded miles, and $825.00 payout. User confirmed 39 mi deadhead. Total miles incl. deadhead: 431. Loaded RPM $2.10; all-in gross RPM $1.91. Fuel updated. Exact street addresses, appointment/delivery time, commodity, equipment, and platform were not visible. Fuel updated 2026-07-14: user reported $113.00 fuel at $4.89/gal, calculated 23.108 gallons. Net after fuel $712.00; net per all miles $1.65. Additional fuel updated 2026-07-14: user reported another $91.00, bringing total load fuel to $204.00. Price per gallon was not provided for this second purchase. Net after fuel $621.00; net per all miles $1.44. Additional fuel updated 2026-07-14: user reported another $186.00, bringing total load fuel to $390.00. Price per gallon was not provided for this purchase. Net after fuel $435.00; net per all miles $1.01."
-  },
-  {
-    "id": 64,
-    "date": "2026-07-14",
-    "pickup": "CLT3 Concord, NC 28027",
-    "dropoff": "AGS5 Appling, GA 30802",
-    "miles": 0,
-    "dh": 0,
-    "rpm": "0.00",
-    "pay": 0,
-    "fuel": null,
-    "comments": "CANCELLED by Amazon before completion on 2026-07-14. No load revenue, loaded miles, or deadhead miles counted. No cancellation/TONU payment recorded; update if Amazon issues compensation. Amazon Relay spot load 1115757N6. Pickup CLT3 Concord NC 28027, Tue 2026-07-14 15:00 EDT; drop AGS5 Appling GA 30802, Tue 2026-07-14 20:00 EDT. 26 ft truck; Special Services; live service; app showed 198 mi, estimated duration 6h 15m, $406.38 pay, and $2.05/loaded mi. Deadhead estimated at 45 mi from the prior Amara Industries Lexington NC delivery to the Concord pickup, using the previously confirmed Lexington-to-Concord deadhead for the 2026-07-12 CLT5 run; replace if actual differs. Total miles incl. deadhead: 243. Loaded RPM $2.05; all-in gross RPM $1.67. Fuel pending. Driver J. Green. Truck GA C963FF. Timing note: displayed 15:00 pickup to 20:00 delivery spans 5h, while the app displays 6h 15m."
-  },
-  {
-    "id": 1783940581495,
-    "date": "2026-07-13",
-    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
-    "dropoff": "Amara Industries, 2018 E US-64, Lexington, NC 27292",
-    "miles": 249,
-    "dh": 0,
-    "rpm": "3.21",
-    "pay": 800.0,
-    "fuel": 0.0,
-    "comments": "Haul'N Loads LLC / AscendTMS load confirmation #5009, reference Amara-5009. Broker Haul'N Loads LLC, MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries GA, 130 Quality Dr, Thomson GA 30824, Mon 2026-07-13 09:30-10:00. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, Mon 2026-07-13 14:00-16:00; phone 336-370-5800. Equipment 26 ft van/box truck; commodity dry goods/general; 1,500 lb; 10-12 skids, 48x45x52; deliver direct only; p/# 106350400103-127533. Flat rate $800; RC distance 249 mi. Loaded RPM $3.21. Deadhead pending; fuel confirmed at $0.00. Communication/updates required; tracking app if requested. More than 2 hours early/late without consent may deduct up to 20%. No layover or delayed delivery without broker consent. POD due within 30 minutes. Submit documents and billing to haulnloads.billing@gmail.com; broker does not click email links. Rate confirmation driver-cell field appears to show 706-727-9949, which differs from Green Gator's known 706-726-9949; verify/correct with broker. Fuel clarified 2026-07-14: user confirmed no fuel was purchased for this Thomson-to-Lexington load; fuel cost set to $0.00. Net after fuel $800.00. Deadhead remains pending, so net per all miles remains pending."
-  },
-  {
-    "id": 1783835522624,
-    "date": "2026-07-12",
-    "pickup": "CLT5 Concord, NC 28027",
-    "dropoff": "PX24843 York, SC 29745",
-    "miles": 61,
-    "dh": 45,
-    "rpm": "5.30",
-    "pay": 323.1,
-    "fuel": 206,
-    "comments": "Amazon Relay spot load 115WLDZKW. Pickup CLT5 Concord NC 28027, Sun 2026-07-12 04:40 EDT; drop PX24843 York SC 29745, Sun 2026-07-12 07:26 EDT. Screenshot shows pickup stop 1 and delivery stop 4, indicating a multi-stop sequence; only visible endpoint locations were provided. 26 ft truck; Special Services; live service; app showed 61 mi, 2h 58m, $323.10 pay, and displayed $5.26/mi. User confirmed 45 mi deadhead. Total miles incl. deadhead: 106. Calculated loaded RPM $5.30; all-in gross RPM $3.05. Fuel updated 2026-07-12: user reported $206 fuel. Net after fuel $117.10; net per all miles $1.10. Driver J. Green. Truck GA C963FF."
-  },
-  {
-    "id": 61,
-    "date": "2026-07-11",
-    "pickup": "Amara Industries GA, Thomson, GA",
-    "dropoff": "Amara Industries, Lexington, NC",
-    "miles": 249,
-    "dh": 35,
-    "rpm": "3.21",
-    "pay": 800.0,
-    "fuel": 100.0,
-    "comments": "Haul'N Loads LLC / AscendTMS load confirmation #5005, reference Amara-5005. Broker Haul'N Loads LLC, MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries GA, 130 Quality Dr, Thomson GA 30824, Sat 2026-07-11 09:30-10:00. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, Sat 2026-07-11 14:00-16:00; phone 336-370-5800. Equipment 26 ft van/box truck; commodity dry goods/general; 756 lb; 4-5 skids, 48x45x52; deliver direct only; p/# 106350400103-. Flat rate $800; RC distance 249 mi. Deadhead estimated at 35 mi from prior Vallen/Old Savannah Rd Augusta drop to Thomson pickup via OSRM unless user clarifies. Total miles incl. deadhead: 284. Loaded RPM $3.21; all-in gross RPM $2.82. Fuel pending. Communication/updates required; tracking app if requested. More than 2 hours early/late without consent may deduct up to 20%. No layover or delayed delivery without broker consent. POD due within 30 minutes of delivery. Submit all documents and billing questions to haulnloads.billing@gmail.com; broker does not click email links. Fuel updated 2026-07-11: user reported $100 fuel. Net after fuel $700.00; net per all miles $2.46."
-  },
-  {
-    "id": 60,
-    "date": "2026-07-10",
-    "pickup": "Lowe's, Augusta, GA",
-    "dropoff": "Vallen c/o Thermal Ceramics, Augusta, GA",
-    "miles": 11,
-    "dh": 30,
-    "rpm": "36.36",
-    "pay": 400.0,
-    "fuel": null,
-    "comments": "Landstar Ranger Inc carrier tender / freight bill #1606497, posting code ZDL. Agent/contact Roy 813-771-7569 / roy@zdl-team.com; broker DOT 2212928. Pickup Lowe's, 224 Bobby Jones Expy, Augusta GA 30907, Fri 2026-07-10 08:00. Comment: driver needs liftgate and pallet jack. Delivery Vallen c/o Thermal Ceramics, 2102 Old Savannah Rd, Augusta GA 30906, Fri 2026-07-10 09:00-10:00; contact 706-796-4382. Commodity consumer goods/appliances; 9,000 lb; dimensions shown as 26 ft. Equipment D-ST. Agreed rate/pay capacity $400. Loaded miles estimated by OSRM from Lowe's to Old Savannah Rd: 11 mi. Deadhead estimated at 30 mi from prior Aiken-area delivery to Lowe's via OSRM unless user clarifies. Total miles incl. deadhead: 41. Loaded RPM $36.36; all-in gross RPM $9.76. Fuel pending. Landstar Connect/MacroPoint required before shipper; failure may cause $250 deduction and no accessorials. Must call Landstar before arriving at shipper, after loading, by 9am each day in transit, and after delivery; poor communication/missing updates may cause $250 fine/up to 50% of rate. POD must be emailed/faxed within 24 hours or 25% fine. Detention/accessorials need agent approval and in/out documents; lumper receipts after 24 hours not reimbursed. Invoice/BOL/POD required; invoice must include freight bill #1606497. No subcontracting/rebrokering."
-  },
-  {
-    "id": 59,
-    "date": "2026-07-09",
-    "pickup": "Augusta Coating, Thomson, GA",
-    "dropoff": "Batesville Tool & Die Inc.-Aiken, Aiken, SC",
-    "miles": 62,
-    "dh": 120,
-    "rpm": "4.84",
-    "pay": 300.0,
-    "fuel": null,
-    "comments": "KCH Transportation load #9444490 / BOL and PO Thomson-Aiken Direct Run. Broker/contact Nick Rosemund 770-526-0426 / nrosemund@kchtrans.com. Pickup Augusta Coating, 1048 Superior Way, Thomson GA 30824, Thu 2026-07-09, shipping/receiving 08:00-16:00, no appointment required. Delivery Batesville Tool & Die Inc.-Aiken, 555 A B Miles Drive, Aiken SC 29805, Thu 2026-07-09, shipping/receiving 08:00-19:00, no appointment required. Commodity industrial parts / not stackable; 6 pallets, 48x48x48 in; 2,500 lb. Equipment 26 ft straight box truck; special requirements: 2 straps, dock high. Flat rate $300. Loaded miles estimated by OSRM city route Thomson GA to Aiken SC: 62 mi. Deadhead estimated at 120 mi from prior Cameron-area delivery to Thomson pickup via OSRM city route unless user clarifies. Total miles incl. deadhead: 182. Loaded RPM $4.84; all-in gross RPM $1.65. Fuel pending. Dedicated shipment. POD and backup docs due to POD@kchtrans.com within 24 hours or $100 deduction; invoices/docs to billing@kchtrans.com; quick pay paperwork to payments@kchtrans.com. Daily check calls by 9am EST or $100/day penalty. Missed pickup/delivery up to $250 deduction. Tracking failure may cause $250 rate deduction. Detention requires notifying KCH within 2 hours after appointment time; in/out times must be on BOL. No re-brokering."
-  },
-  {
-    "id": 58,
-    "date": "2026-07-09",
-    "pickup": "IPS DC - Orangeburg, Orangeburg, SC",
-    "dropoff": "SIGMATEX Carbon Textile Solutions I, Cameron, SC",
-    "miles": 10,
-    "dh": 70,
-    "rpm": "52.50",
-    "pay": 525.0,
-    "fuel": 59.38,
-    "comments": "Evans Transportation contract #12418304EVL / shipment #45124. Broker/contact Jessah Davis, jdavis@evanstrans.com; tracking mplstracking@evanstrans.com; afterhours 952-213-4230 / afterhours@evanstrans.com. Pickup IPS DC - Orangeburg, 280 Global Dr, Orangeburg SC 29115, Thu 2026-07-09 08:00-17:00; contact Harry Frazier 864-862-1500 / hfrazier@ipack.com. Delivery SIGMATEX Carbon Textile Solutions I, 1 Sigmatex Way, Cameron SC 29030, Thu 2026-07-09 08:00-16:00; contact Andrew Wallace 864-862-1500 / AWALLCE@IPCK.COM. Commodity 528EA paper tubes; 11 pallets / 8,365 lb; class 250; NMFC 150560; dimensions 54x42x54 in; not stackable. BOL 384370 and 384370-1; PO 004592; sales order S2465594.001. Equipment required 26 ft box truck; TL mode. Flat rate $500. RC mileage 9.79 mi; logged loaded miles as 10. Total miles incl. deadhead: 76. Loaded RPM $50.00; all-in gross RPM $6.58.  MacroPoint/GPS tracking required before pickup and throughout transit; failure may cause $150 rate reduction/no TONU. POD with date/time and all BOL packet pages due within 48 hours. Detention after 2 hours at $35/hr max $150; notify Evans 30 min before detention and get in/out times signed. Invoice docs to carrierinvoices@evanstrans.com; invoice questions evansap@evanstrans.com; NOAs/LORs noa@evanstrans.com. Revised rate confirmation update 2026-07-09: pay increased to $525 and user confirmed 70 mi deadhead. Total miles incl. deadhead: 80. Loaded RPM $52.50; all-in gross RPM $6.56. Fuel updated 2026-07-09: user reported $144 fuel. Allocated across the 2026-07-09 load chain by total miles. This load share $59.38. Net after fuel $465.62; net per all miles $5.82."
-  },
-  {
-    "id": 57,
-    "date": "2026-07-09",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "PX23658 Chapin, SC 29036",
-    "miles": 96,
-    "dh": 18,
-    "rpm": 3.8,
-    "pay": 364.8,
-    "fuel": 84.62,
-    "comments": "Amazon Relay spot load 116H825FL. Pickup AGS5 Appling GA 30802, Thu 2026-07-09 06:30 EDT; drop PX23658 Chapin SC 29036, Thu 2026-07-09 10:42 EDT. 26ft truck; Special Services; live load/unload; screenshot showed 96 mi, 4h 24m, $364.80 pay, $3.82/mi. Deadhead estimated at 18 mi from Augusta-area/AGS5 standard unless user later clarifies. Total miles incl. deadhead: 114. Loaded RPM $3.80; all-in gross RPM $3.20.  Driver J. Green. Truck GA C963FF. Fuel updated 2026-07-09: user reported $144 fuel. Allocated across the 2026-07-09 load chain by total miles. This load share $84.62. Net after fuel $280.18; net per all miles $2.46."
-  },
-  {
-    "id": 56,
-    "date": "2026-07-08",
-    "pickup": "Harbor Freight Transpo, Bloomingdale, GA",
-    "dropoff": "Accudraft Finishing Sy, Aiken, SC",
-    "miles": 0,
-    "dh": 0,
-    "rpm": "",
-    "pay": 150.0,
-    "fuel": null,
-    "comments": "Bergenstar Inc PRO #43192 / truck ordered not used (TONU). Rate confirmation created 2026-07-08; carrier Green Gator Enterprises LLC MC 1569745 / DOT 4110201; broker contact Vasko Spasovski 201-822-9699 / vaskosp@bergenstar.com. Planned pickup Harbor Freight Transpo, 1560 Pine Barren Rd, Bloomingdale GA 31302, appointment 2026-07-07 08:00-16:00 FCFS, ref/container YMMU6553926, seal 6792887-017744. Planned delivery Accudraft Finishing Sy, 10 Windham Blvd, Aiken SC 29805, appointment 2026-07-08 08:00-13:00 FCFS. Commodity paint booth; planned 129 miles; weight 3,500 lb; 26 ft truckload. Logged as TONU/canceled: no freight moved, loaded/deadhead miles set to 0 until actual travel/fuel is provided. Total TONU rate $150. Driver signed 7/8/26. Requirements: send freight/BOL pictures once loaded when applicable; Trucker Tools mandatory; POD to operations within 24 hours after delivery; invoice with signed delivery receipt, BOL and order # to accounting@bergenstar.com; signed agreement to dispatch@bergenstar.com or fax 201-402-6291."
-  },
-  {
-    "id": 55,
-    "date": "2026-07-08",
-    "pickup": "Forest Shipping USA Inc, Savannah, GA",
-    "dropoff": "Lecangs - Ellabell, Ellabell, GA",
-    "miles": 29,
-    "dh": 89,
-    "rpm": 12.07,
-    "pay": 350.0,
-    "fuel": 69.13,
-    "comments": "Axle Logistics LLC load/order #3428277. Carrier Green Gator Enterprises LLC. Pickup Forest Shipping USA Inc, 231 Bourne Boulevard, Savannah GA 31408, Wed 2026-07-08 08:00-12:00; contact Rock, 909-456-6381; PO refs NBJX202605053 and NBJX202605070. Delivery Lecangs - Ellabell, 550 West Port Boulevard, Ellabell GA 31308, Wed 2026-07-08 09:00-15:00; contact Main, 949-627-3495. Commodity retail products; weight 5,149 lb; straight box truck; BOL ASN-CHT-260702-007; reference 16.4 m3. No driver loading or unloading. User confirmed 89 mi deadhead. Total miles incl. deadhead: 118. Loaded RPM $12.07; all-in gross RPM $2.97.  Docs/invoices to invoices@axlelogistics.com or fax 866-534-6005. Detention $30/hr after 2 hours, max 5 hours, requires Axle notice 1 hour prior and in/out times clearly marked on BOL. Lumper requires preapproval; quick pay fee 4%; no double brokering. Fuel updated 2026-07-09: user reported $212 fuel spent yesterday (2026-07-08); allocated across the 2026-07-08 load chain by total miles. This load share $69.13. Net after fuel $280.87; net per all miles $2.38."
-  },
-  {
-    "id": 54,
-    "date": "2026-07-08",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "PX24476 Ravenel, SC 29470",
-    "miles": 226,
-    "dh": 18,
-    "rpm": 2.15,
-    "pay": 485.29,
-    "fuel": 142.87,
-    "comments": "Amazon Relay spot load 112C6PXQJ. Pickup AGS5 Appling GA 30802, Wed 2026-07-08 02:20 EDT; drop PX24476 Ravenel SC 29470, Wed 2026-07-08 07:38 EDT. 26ft truck; Special Services; live load/unload; app showed 226 mi, 5h 30m, $485.29 pay, $2.15/loaded mi. Deadhead estimated at 18 mi from Augusta-area/AGS5 standard unless user later clarifies. Total miles incl. deadhead: 244. Loaded RPM $2.15; all-in gross RPM $1.99.  Driver J. Green. Truck GA C963FF. Fuel updated 2026-07-09: user reported $212 fuel spent yesterday (2026-07-08); allocated across the 2026-07-08 load chain by total miles. This load share $142.87. Net after fuel $342.42; net per all miles $1.40."
-  },
-  {
-    "id": 51,
-    "date": "2026-05-07",
-    "pickup": "Aiken, SC",
-    "dropoff": "Trenton, SC; Greer, SC",
-    "miles": 163.0,
-    "dh": 32.0,
-    "rpm": "3.37",
-    "pay": 550.0,
-    "fuel": 83.95,
-    "comments": "Booked load for 2026-05-07; 1 pickup, 2 drops. First drop Trenton, SC; second drop Greer, SC. Fuel cost estimated using 10 MPG at $5.15/gal.15/gal. Deadhead starts at Big Sky Truck Parking in Augusta, GA."
-  },
-  {
-    "id": 1,
-    "date": "2026-05-08",
-    "pickup": "Thomson, GA",
-    "dropoff": "Lexington, NC",
-    "miles": 252.0,
-    "dh": 32.0,
-    "rpm": "3.57",
-    "pay": 900.0,
-    "fuel": 125.0,
-    "comments": "Load entered from Telegram. Total miles incl. deadhead: 284. All-in RPM: $3.17. Net after fuel: $775. Net per all miles: $2.73."
-  },
-  {
-    "id": 2,
-    "date": "2026-05-11",
-    "pickup": "Thomson, GA",
-    "dropoff": "Lexington, NC",
-    "miles": 252.0,
-    "dh": 32.0,
-    "rpm": "3.17",
-    "pay": 800.0,
-    "fuel": 100.0,
-    "comments": "Repeat of 2026-05-08 Thomson GA to Lexington NC load. Pay was $800 this time. Fuel was $100. Total miles incl. deadhead: 284. All-in RPM: $2.82. Net after fuel: $700. Net per all miles: $2.46."
-  },
-  {
-    "id": 3,
-    "date": "2026-05-12",
-    "pickup": "High Point, NC",
-    "dropoff": "Beaufort, SC",
-    "miles": 296.0,
-    "dh": 20.0,
-    "rpm": "2.03",
-    "pay": 600.0,
-    "fuel": 238.0,
-    "comments": "Entered from Telegram; user clarified this was yesterday's load. Total miles incl. deadhead: 316. Loaded RPM: $2.03. All-in RPM: $1.90. Net after fuel: $362. Net per all miles: $1.15."
-  },
-  {
-    "id": 4,
-    "date": "2026-05-13",
-    "pickup": "Hardeeville, SC",
-    "dropoff": "Atlanta, GA",
-    "miles": 277.0,
-    "dh": 30.0,
-    "rpm": "2.53",
-    "pay": 700.0,
-    "fuel": 175.0,
-    "comments": "Entered from Telegram. Total miles incl. deadhead: 307. Loaded RPM: $2.53. All-in RPM: $2.28. Net after fuel: $525. Net per all miles: $1.71."
-  },
-  {
-    "id": 5,
-    "date": "2026-05-13",
-    "pickup": "Atlanta, GA",
-    "dropoff": "Columbia, SC",
-    "miles": 233.0,
-    "dh": 3.0,
-    "rpm": "1.93",
-    "pay": 450.0,
-    "fuel": 207.0,
-    "comments": "Fuel updated 2026-05-14 from Telegram: user spent $207 on fuel. Total miles incl. deadhead: 236. Loaded RPM: $1.93. All-in RPM: $1.91. Net after fuel: $243. Net per all miles: $1.03."
-  },
-  {
-    "id": 16,
-    "date": "2026-05-15",
-    "pickup": "Thomson, GA",
-    "dropoff": "Winston-Salem, NC",
-    "miles": 268.0,
-    "dh": 32.0,
-    "rpm": "2.24",
-    "pay": 600.0,
-    "fuel": 275.0,
-    "comments": "Friday load entered from WebChat on 2026-05-17. Total miles incl. deadhead: 300. Loaded RPM: $2.24. All-in RPM: $2.00. Net after fuel: $325. Net per all miles: $1.08."
-  },
-  {
-    "id": 17,
-    "date": "2026-05-18",
-    "pickup": "Port Wentworth, GA 31407",
-    "dropoff": "Savannah, GA",
-    "miles": 22.0,
-    "dh": 115.0,
-    "rpm": "2.19",
-    "pay": 300.0,
-    "fuel": 73.12,
-    "comments": "Short shuttle \u2014 137 total mi"
-  },
-  {
-    "id": 18,
-    "date": "2026-05-18",
-    "pickup": "Savannah, GA",
-    "dropoff": "Statesboro, GA",
-    "miles": 53.0,
-    "dh": 7.0,
-    "rpm": "5.66",
-    "pay": 300.0,
-    "fuel": 44.54,
-    "comments": "Load 2 entered from WebChat on 2026-05-18; user later clarified lane was Savannah, GA to Statesboro, GA. Total miles incl. deadhead: 60. Loaded RPM: $5.66. All-in RPM: $5.00. Day fuel allocated by miles from $146.24 total: $44.54. Net after allocated fuel: $255.46. Net per all miles: $4.26."
-  },
-  {
-    "id": 52,
-    "date": "2026-05-18",
-    "pickup": "Port Wentworth, GA",
-    "dropoff": "Savannah, GA",
-    "miles": 22.0,
-    "dh": 115.0,
-    "rpm": "13.64",
-    "pay": 300.0,
-    "fuel": 101.7,
-    "comments": "Load 1 entered from WebChat on 2026-05-18; user later clarified lane was Port Wentworth, GA to Savannah, GA. Total miles incl. deadhead: 137. Loaded RPM: $13.64. All-in RPM: $2.19. Day fuel allocated by miles from $146.24 total: $101.70. Net after allocated fuel: $198.30. Net per all miles: $1.45."
-  },
-  {
-    "id": 20,
-    "date": "2026-05-20",
-    "pickup": "Appling, GA",
-    "dropoff": "Cameron, SC",
-    "miles": 132.0,
-    "dh": 20.0,
-    "rpm": "3.03",
-    "pay": 459.89,
-    "fuel": 78.28,
-    "comments": "Amazon Relay 112KKGV1L \u2014 AGS5 to WSC7; 20 mi deadhead; fuel estimated at 10 MPG / $5.15"
-  },
-  {
-    "id": 19,
-    "date": "2026-05-20",
-    "pickup": "Augusta, GA",
-    "dropoff": "Blythewood, SC",
-    "miles": 75.0,
-    "dh": 0.0,
-    "rpm": "4.00",
-    "pay": 300.0,
-    "fuel": 38.63,
-    "comments": "Curri Eastern Industrial \u2014 2 items / 400 lb; loaded miles estimated from Augusta 30901 to Blythewood 29016"
-  },
-  {
-    "id": 21,
-    "date": "2026-05-26",
-    "pickup": "Eatonton, GA",
-    "dropoff": "Eatonton, GA",
-    "miles": 0.0,
-    "dh": 172.0,
-    "rpm": "5.23",
-    "pay": 900.0,
-    "fuel": 263.0,
-    "comments": "Entered from WebChat on 2026-06-01. Unloaded a 53-footer in Eatonton. User reported 86 deadhead miles out and 86 miles back. Total miles incl. deadhead: 172. All-in RPM: $5.23. Fuel updated 2026-06-01: user reported $263 spent on fuel Tuesday. Net after fuel: $637. Net per all miles: $3.70."
-  },
-  {
-    "id": 22,
-    "date": "2026-05-27",
-    "pickup": "Thomson, GA",
-    "dropoff": "North Augusta, SC",
-    "miles": 32.0,
-    "dh": 30.0,
-    "rpm": "7.81",
-    "pay": 250.0,
-    "fuel": 0.0,
-    "comments": "Entered from WebChat on 2026-06-01. Total miles incl. deadhead: 62. Loaded RPM: $7.81. All-in RPM: $4.03. Fuel cost not provided."
-  },
-  {
-    "id": 23,
-    "date": "2026-05-29",
-    "pickup": "Aiken, SC",
-    "dropoff": "Stevensville, MD",
-    "miles": 577.0,
-    "dh": 50.0,
-    "rpm": "2.95",
-    "pay": 1700.0,
-    "fuel": 412.0,
-    "comments": "Entered from WebChat on 2026-06-01. User reported 25 deadhead miles, then 25 miles back to house, then 577 miles to MD. Total miles incl. deadhead: 627. Loaded RPM: $2.95. All-in RPM: $2.71. Fuel updated 2026-06-01: user reported $412 spent on fuel yesterday (2026-05-31), linked to MD trip. Net after fuel: $1,288. Net per all miles: $2.05."
-  },
-  {
-    "id": 26,
-    "date": "2026-06-02",
-    "pickup": "Stevensville, MD",
-    "dropoff": "Halethorpe, MD",
-    "miles": 50.0,
-    "dh": 0.0,
-    "rpm": "",
-    "pay": 150.0,
-    "fuel": 0.0,
-    "comments": "tonu"
-  },
-  {
-    "id": 27,
-    "date": "2026-06-03",
-    "pickup": "Front Royal, VA",
-    "dropoff": "Kannapolis, NC",
-    "miles": 338.0,
-    "dh": 0.0,
-    "rpm": "",
-    "pay": 750.0,
-    "fuel": 231.0,
-    "comments": ""
-  },
-  {
-    "id": 24,
-    "date": "2026-06-07",
-    "pickup": "Appling, GA",
-    "dropoff": "West Columbia, SC",
-    "miles": 89.0,
-    "dh": 18.0,
-    "rpm": "4.09",
-    "pay": 363.34,
-    "fuel": 225.0,
-    "comments": "Amazon Relay spot load 114CD8BD5. AGS5 Appling, GA to PX24785 West Columbia, SC. 18 mi deadhead; 107 total miles; all-in gross RPM $3.40. Fuel pending. Fuel updated 2026-06-08: user reported $225 spent on 2026-06-07 and got a full tank. Net after fuel: $138.34. Net per all miles: $1.29."
-  },
-  {
-    "id": 25,
-    "date": "2026-06-08",
-    "pickup": "Appling, GA",
-    "dropoff": "Estill, SC",
-    "miles": 132.0,
-    "dh": 18.0,
-    "rpm": "6.58",
-    "pay": 869.08,
-    "fuel": 0.0,
-    "comments": "Amazon Relay booked load T-116PHD88S. Appling, GA 30802 to Estill, SC 29918. 26ft truck; app showed 132 mi and est. 7h 39m. Deadhead estimated at 18 mi from prior Appling runs; fuel pending. All-in gross RPM $5.79."
-  },
-  {
-    "id": 28,
-    "date": "2026-06-09",
-    "pickup": "North Augusta, SC",
-    "dropoff": "Augusta, GA",
-    "miles": 17.0,
-    "dh": 15.0,
-    "rpm": "23.53",
-    "pay": 400.0,
-    "fuel": 0.0,
-    "comments": "Swick Logistics / McGraw-Hill textbooks load. Pickup Central Transport, 120 Walnut Ln, North Augusta; delivery Glenn Hills Middle School, Augusta. User reported no fuel and no white glove because kids were on site for summer school. Total miles incl. deadhead: 32. Loaded RPM: $23.53. All-in RPM: $12.50. Net after fuel: $400.00. Net per all miles: $12.50."
-  },
-  {
-    "id": 29,
-    "date": "2026-06-10",
-    "pickup": "Sonoco Plastics, Union, SC",
-    "dropoff": "AGY Aiken LLC, Aiken, SC",
-    "miles": 92.0,
-    "dh": 104.0,
-    "rpm": "3.26",
-    "pay": 300.0,
-    "fuel": 250.0,
-    "comments": "MAG Transportation LLC load #0055005 / BOL 289205. Sonoco Plastics, Union SC to AGY Aiken LLC, Aiken SC. Rate con typo clarified by user: weight is 1,120 lb, not 11,200 lb; 2 pallets. 104 mi deadhead; 196 total miles. Loaded RPM $3.26; all-in gross RPM $1.53. Fuel pending. Fuel updated 2026-06-10: user reported $250 in fuel. Net after fuel: $50.00. Net per all miles: $0.26."
-  },
-  {
-    "id": 30,
-    "date": "2026-06-11",
-    "pickup": "Amcor - Warrenton, Warrenton, GA",
-    "dropoff": "BEDGEAR, Rock Hill, SC",
-    "miles": 181.0,
-    "dh": 40.0,
-    "rpm": "2.49",
-    "pay": 450.0,
-    "fuel": 90.31,
-    "comments": "Southland Brokerage Co. order 30077338 / Amcor PO19934. Pickup Amcor - Warrenton, 810 Macon Hwy, Warrenton GA 30828, 2026-06-11 06:30-07:00. Drop BEDGEAR, 1953 Langston St, Rock Hill SC 29730, 2026-06-11 11:00-14:00. Commodity: Mattress Film; Pillow Bags. Driver load/unload: No. Loaded miles and 40 mi deadhead confirmed by user from Martinez/home area to Warrenton pickup; fuel updated 2026-06-11: $161 total fuel reported by user, allocated proportionally by miles; this load share $90.31. Net after fuel $359.69; net per all miles $1.63. $500 late delivery fine applies if delays are not reported before appointment time."
-  },
-  {
-    "id": 31,
-    "date": "2026-06-11",
-    "pickup": "Schaefer - CLT, Charlotte, NC",
-    "dropoff": "Dunbar Sanitation, Beech Island, SC",
-    "miles": 156.0,
-    "dh": 17.0,
-    "rpm": "1.92",
-    "pay": 300.0,
-    "fuel": 70.69,
-    "comments": "Ryan Transportation Service load #6105785. Pickup Schaefer - CLT, 10124 Westlake Dr, Charlotte NC 28273, 2026-06-11 12:00-14:00. Delivery Dunbar Sanitation, 152 Caprice Lane, Beech Island SC 29842, 2026-06-12 07:00-17:00. Commodity: palletized plastic; weight 1,800 lb; straight box truck; driver load/unload: No. Trucker Tools tracking required for entire load. Driver must call Ryan for additional shipment info and weigh at first available scale. Detention: 2 hours free then $50/hr max 4 billable hours; notify broker by email 1 hour before detention starts. TONU $150 if canceled within 4 hours of pickup ETA; layover $250/day. Deadhead confirmed by user: 17 mi to Charlotte pickup from prior Rock Hill BEDGEAR drop. Fuel updated 2026-06-11: $161 total fuel reported by user, allocated proportionally by miles; this load share $70.69. Net after fuel $229.31; net per all miles $1.33. Timing note: Charlotte pickup 12:00-14:00 overlaps tight with prior Rock Hill delivery window 11:00-14:00."
-  },
-  {
-    "id": 32,
-    "date": "2026-06-12",
-    "pickup": "Thomson, GA",
-    "dropoff": "Augusta, GA",
-    "miles": 0.0,
-    "dh": 47.0,
-    "rpm": "",
-    "pay": 100.0,
-    "fuel": 0.0,
-    "comments": "TONU/canceled load: Thomson, GA to Augusta, GA. User reported it turned into a TONU for $100; no fuel; 47 total miles from pickup back home. Logged loaded miles as 0 because no freight moved. All-in gross RPM $2.13; net after fuel $100.00; net per all miles $2.13."
-  },
-  {
-    "id": 33,
-    "date": "2026-06-14",
-    "pickup": "Thomson, GA",
-    "dropoff": "Lexington, NC",
-    "miles": 249.0,
-    "dh": 34.0,
-    "rpm": "3.21",
-    "pay": 800.0,
-    "fuel": 125.0,
-    "comments": "Haul'N Loads LLC / Ascend TMS load #4850. Pickup Amara Industries, 130 Quality Dr, Thomson GA 30824, 2026-06-14 15:00-16:00. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, 2026-06-14 21:00-22:00. Commodity: dry goods/general; weight 1,200 lb; deliver direct only. User reported 34 deadhead miles and $125 fuel. Total miles incl. deadhead: 283. Loaded RPM: $3.21. All-in RPM: $2.83. Net after fuel: $675.00. Net per all miles: $2.39. Broker notes: tracking app/updates may be required; POD due within 30 minutes; up to 20% deduction risk if more than 2 hours early/late without consent."
-  },
-  {
-    "id": 34,
-    "date": "2026-06-15",
-    "pickup": "Charlotte, NC",
-    "dropoff": "Greenwood, SC",
-    "miles": 132.0,
-    "dh": 69.0,
-    "rpm": "2.27",
-    "pay": 299.24,
-    "fuel": 125.0,
-    "comments": "Amazon Relay load 116F7BFY5. Pickup CLT9, Charlotte NC 28214, Mon 2026-06-15 00:35 EDT; drop PX23987, Greenwood SC, Mon 2026-06-15 03:59 EDT. 26ft truck; Special Services; live unload/load; app showed 132 loaded miles, $299.24 pay, $2.26/loaded mi, est. 3h 36m. User reported 69 deadhead miles; total miles incl. deadhead: 201. All-in gross RPM: $1.49. Fuel updated 2026-06-15: user reported $125 spent on fuel today. Net after fuel: $174.24. Net per all miles: $0.87."
-  },
-  {
-    "id": 35,
-    "date": "2026-06-16",
-    "pickup": "Appling, GA",
-    "dropoff": "Wagener, SC",
-    "miles": 166.0,
-    "dh": 18.0,
-    "rpm": "2.53",
-    "pay": 420.56,
-    "fuel": 180.0,
-    "comments": "Amazon Relay spot load 113CTWNM7. Pickup AGS5, Appling GA 30802, Tue 2026-06-16 00:20 EDT; drop PX24761, Wagener SC 29164, Tue 2026-06-16 06:00 EDT. 26ft truck; Special Services; live load/unload; app showed 166 mi, $420.56 pay, $2.53/loaded mi, est. 5h 52m. User reported 18 deadhead miles; total miles incl. deadhead: 184. All-in gross RPM: $2.29. Fuel updated 2026-06-16: user reported $180 spent on fuel. Net after fuel: $240.56. Net per all miles: $1.31."
-  },
-  {
-    "id": 37,
-    "date": "2026-06-17",
-    "pickup": "Hickory, NC",
-    "dropoff": "Anderson, SC",
-    "miles": 144.0,
-    "dh": 53.0,
-    "rpm": "2.78",
-    "pay": 400.0,
-    "fuel": 149.0,
-    "comments": "User-reported load: Hickory NC to Anderson SC. Deadhead 53 mi; loaded miles 144; total miles 197. Pay $400.00; fuel $149.00; loaded RPM $2.78; all-in gross RPM $2.03; net after fuel $251.00; net per all miles $1.27."
-  },
-  {
-    "id": 36,
-    "date": "2026-06-17",
-    "pickup": "Premier Packaging, Augusta, GA",
-    "dropoff": "Amazon CLT2 / CLT9, Charlotte, NC",
-    "miles": 175.0,
-    "dh": 18.0,
-    "rpm": "4.57",
-    "pay": 800.0,
-    "fuel": 175.0,
-    "comments": "Worldwide Express / GlobalTranz rate confirmation load #5368933 / movement #7383607. Pickup Premier Packaging (AUGST), 2044 Forward Augusta Dr, Augusta GA 30906, Wed 2026-06-17 08:00-15:00; PU refs 1780092 and 1781877. Deliveries Thu 2026-06-18: Amazon FC CLT2, 10240 Old Dowd Rd, Charlotte NC 28214, 08:00-14:00, KK Non-Inventory no appt req, 4 pieces / 4,000 lb; then Amazon CLT9, 3620 Reeves Ridge Dr, Charlotte NC 28214, 09:00-17:00, KK Non-Inventory no appt req. Commodity: packaging materials; total 5,600 lb / 6 pieces; 26ft straight box truck. User reported 18 deadhead miles. Loaded miles estimated by OSRM route: 175 total loaded miles including CLT2 to CLT9; total miles incl. deadhead: 193. Loaded RPM: $4.57; all-in gross RPM: $4.15. Fuel updated 2026-06-17: user reported $175 fuel on first load for today. Net after fuel $625.00; net per all miles $3.24. Instructions: sign every BOL page at pickup; accept Trucker Tools tracking or $50 fine; CLT9 requires driver assist; Amazon forklifts will not enter straight trucks, use pallet jack to move freight to tail. Detention after 2 hours at $40/hr max $200; notify broker after 60 minutes waiting. POD due within 24 hours to 502-576-6065 or TLcarrierDOCS@globaltranz.com; late POD may be fined $100/day. TONU $200; layover $200."
-  },
-  {
-    "id": 38,
-    "date": "2026-06-22",
-    "pickup": "Appling, GA",
-    "dropoff": "Portal, GA",
-    "miles": 89.0,
-    "dh": 18.0,
-    "rpm": "3.97",
-    "pay": 354.12,
-    "fuel": 0.0,
-    "comments": "Amazon Relay spot load 115K3C86W. Pickup AGS5, Appling GA 30802, Mon 2026-06-22 04:40 EDT; drop PX11013, Portal GA 30450, Mon 2026-06-22 08:16 EDT. 26ft truck; Special Services; app showed 89 mi, $354.12 pay, $3.97/loaded mi, est. 4h 6m. User reported 18 deadhead miles; total miles incl. deadhead: 107. All-in gross RPM: $3.31. Fuel pending."
-  },
-  {
-    "id": 39,
-    "date": "2026-06-24",
-    "pickup": "Augusta, GA",
-    "dropoff": "Atlanta GA",
-    "miles": 165.0,
-    "dh": 15.0,
-    "rpm": "",
-    "pay": 400.0,
-    "fuel": 0.0,
-    "comments": ""
-  },
-  {
-    "id": 40,
-    "date": "2026-06-24",
-    "pickup": "Tie Down, Atlanta, GA",
-    "dropoff": "Athens Carrier Transicold, Athens, GA",
-    "miles": 70.0,
-    "dh": 48.0,
-    "rpm": "5.71",
-    "pay": 400.0,
-    "fuel": 52.0,
-    "comments": "K & L Freight Management order 4174259 / BOL 208031548. Pickup TIE DOWN, 605 Stonehill Dr / 225 Villanova Dr, Atlanta GA 30336, 2026-06-24 17:00-18:00. Delivery Athens Carrier Transicold, 700 Olympic Drive, Athens GA 30601, 2026-06-24 18:00-20:30. Commodity: building materials; 2 pieces; 1,200 lb; dock-high straight box truck; driver load/unload: No. User reported 48 mi deadhead and $52 fuel. Total miles incl. deadhead: 118. Loaded RPM: $5.71; all-in gross RPM: $3.39. Net after fuel $348.00; net per all miles $2.95. Note: pickup address on rate con showed two street lines; confirm exact address/dock if needed."
-  },
-  {
-    "id": 41,
-    "date": "2026-06-25",
-    "pickup": "Cosmo Cabinets, Eatonton, GA",
-    "dropoff": "North Charleston Site, North Charleston, SC",
-    "miles": 237.0,
-    "dh": 88.0,
-    "rpm": "4.43",
-    "pay": 1050.0,
-    "fuel": 195.0,
-    "comments": "Maybell Industries shipment MB17232 / PO LCLI-11 OVERFLOW. Cabinets, 5,000 lb. Pickup Cosmo Cabinets, 110 Industrial Blvd, Eatonton GA 31024, 2026-06-25 09:00-11:00. Delivery North Charleston Site, 2949 Ingleside Blvd, North Charleston SC 29420. User reported 88 mi deadhead and $195 fuel. Total miles incl. deadhead: 325. Loaded RPM: $4.43; all-in gross RPM: $3.23. Net after fuel $855.00; net per all miles $2.63. Rate con includes $900 freight + $150 layover; tracking required; signed paperwork due within 48 hours to AP@MAYBELLINDUSTRIES.COM."
-  },
-  {
-    "id": 43,
-    "date": "2026-06-26",
-    "pickup": "UPS Charleston, North Charleston, SC",
-    "dropoff": "Multi-stop Savannah/Pooler/Ellabell/Ridgeland/Charleston",
-    "miles": 292.0,
-    "dh": 24.0,
-    "rpm": "3.42",
-    "pay": 1000.0,
-    "fuel": 50.0,
-    "comments": "Apex Transit and Logistics load #01634. Straight truck 26 ft; distance 292 mi; flat rate $1,000. Pickup UPS Charleston, 4150 Azalea Drive, North Charleston SC 29405, 2026-06-26 09:00 live load. Multi-stop delivery route: Ivan Days, Savannah GA; Chatham Subaru, Pooler GA; Freedom Mobility Center, Savannah GA; Yancey Brothers, Pooler GA; JCB Manufacturing, Pooler GA; TES, Ellabell GA; Fiji Vegetable Oil Co, Savannah GA; Holiday Kamper Co of SC, Ridgeland SC; final UPS Charleston, North Charleston SC on 2026-06-29. User reported 24 mi deadhead and $50 fuel. Total miles incl. deadhead: 316. Loaded RPM $3.42; all-in gross RPM $3.16; net after fuel $950.00; net per all miles $3.01. MacroPoint tracking required; BOL/trailer seal photos required or $100 fee; Apex rate confirmation number must be on invoice."
-  },
-  {
-    "id": 42,
-    "date": "2026-06-27",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "PX24551 Saluda, SC",
-    "miles": 60.0,
-    "dh": 17.0,
-    "rpm": "6.19",
-    "pay": 371.17,
-    "fuel": 215.0,
-    "comments": "Amazon Relay spot load 116J4FRJ8. Pickup AGS5, 785 Innovation Pkwy, Appling GA 30802, Sat 2026-06-27 05:50 EDT; drop PX24551, Saluda SC 29138, Sat 2026-06-27 09:52 EDT. 26ft truck; Special Services; live load/unload; app showed 60 mi, $371.17 pay, $6.20/loaded mi, est. 4h 14m. User reported 17 mi deadhead and $215 fuel. Total miles incl. deadhead: 77. Loaded RPM $6.19; all-in gross RPM $4.82; net after fuel $156.17; net per all miles $2.03. Tractor ID C963FF."
-  },
-  {
-    "id": 44,
-    "date": "2026-06-29",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "SX29777 Summerville, SC",
-    "miles": 181.0,
-    "dh": 18.0,
-    "rpm": "3.39",
-    "pay": 613.68,
-    "fuel": 120.0,
-    "comments": "Amazon Relay spot load 1115Z7972. Pickup AGS5, Appling GA 30802, Sun 2026-06-28 22:10 EDT; drop SX29777, Summerville SC, Mon 2026-06-29 02:42 EDT. 26ft truck; Special Services; app showed 181 mi, $613.68 pay, $3.39/loaded mi, est. 4h 44m. User reported 18 mi deadhead; total miles incl. deadhead: 199. Loaded RPM $3.39; all-in gross RPM $3.08. Fuel updated 2026-06-29: user reported $120 fuel. Net after fuel $493.68; net per all miles $2.48. Driver J. Green. Dashboard date corrected to 2026-06-29 so the completed Monday load appears in the active weekly overview."
-  },
-  {
-    "id": 45,
-    "date": "2026-06-30",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "PX24274 Moncks Corner, SC",
-    "miles": 278.0,
-    "dh": 18.0,
-    "rpm": "3.21",
-    "pay": 892.26,
-    "fuel": 200.0,
-    "comments": "Amazon Relay spot load 1116WS23S. Pickup AGS5 Appling GA 30802, Mon 2026-06-29 21:00 EDT; drop PX24274 Moncks Corner SC, Tue 2026-06-30 06:09 EDT. 26ft truck; Special Services; app showed 278 mi, 9h 21m, $892.26 pay, $3.21/mi. Deadhead estimated at 18 mi from Augusta-area/AGS5 standard unless user later clarifies. Total miles incl. deadhead: 296. Loaded RPM $3.21; all-in gross RPM $3.01. Fuel updated 2026-06-30: user reported $200 fuel. Net after fuel $692.26; net per all miles $2.34. Driver J. Green. Dashboard date set to delivery date 2026-06-30 for cross-midnight completion."
-  },
-  {
-    "id": 47,
-    "date": "2026-07-01",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "PX10429 Evans, GA 30809",
-    "miles": 36.0,
-    "dh": 18.0,
-    "rpm": "8.21",
-    "pay": 295.62,
-    "fuel": 0.0,
-    "comments": "Amazon Relay spot load 114Y85BT5. Pickup AGS5 Appling GA 30802, Wed 2026-07-01 01:30 EDT; drop PX10429 Evans GA 30809, Wed 2026-07-01 04:00 EDT. 26ft truck; Special Services; app showed 36 mi, 2h 42m, $295.62 pay, $8.33/mi. Deadhead estimated at 18 mi from Augusta-area/AGS5 standard unless user later clarifies. Total miles incl. deadhead: 54. Loaded RPM $8.21; all-in gross RPM $5.47. Fuel pending. Driver J. Green. Truck GA C963FF."
-  },
-  {
-    "id": 46,
-    "date": "2026-07-01",
-    "pickup": "AGS5 Appling, GA",
-    "dropoff": "SX23898 Columbia, SC 29206",
-    "miles": 94.0,
-    "dh": 18.0,
-    "rpm": "3.84",
-    "pay": 361.23,
-    "fuel": 0.0,
-    "comments": "Amazon Relay spot load 1167PFRSH. Pickup AGS5 Appling GA 30802, Tue 2026-06-30 21:00 EDT; drop SX23898 Columbia SC 29206, Wed 2026-07-01 00:00 EDT. Likely USPS Forest Acres area / 4840 Forest Dr Columbia SC 29206 based on user's prior address lookup; appears to be storefront/shopping-center USPS, no gate found in public listing. 26ft truck; Special Services; app showed 94 mi, 3h 12m, $361.23 pay, $3.85/mi. Deadhead estimated at 18 mi from Augusta-area/AGS5 standard unless user later clarifies. Total miles incl. deadhead: 112. Loaded RPM $3.84; all-in gross RPM $3.23. Fuel pending. Driver J. Green. Truck GA C963FF. Dashboard date set to delivery date 2026-07-01 for cross-midnight completion."
-  },
-  {
-    "id": 48,
-    "date": "2026-07-02",
-    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
-    "dropoff": "Amara Industries, 2018 E US-64, Lexington, NC 27292",
-    "miles": 249.0,
-    "dh": 32.0,
-    "rpm": "3.21",
-    "pay": 800.0,
-    "fuel": 315.0,
-    "comments": "Haul'N Loads load confirmation #4959 (dashboard key HaulN-4959). Broker Haul'N Loads LLC, docket MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries GA, 130 Quality Dr, Thomson GA 30824, Wed 2026-07-01 22:00 ET. Delivery Amara Industries, 2018 E US-64, Lexington NC 27292, Thu 2026-07-02 03:00-04:00 ET. Equipment Van - Box Truck, 26 ft; commodity dry goods/general; weight 1200 lb. RC distance 249 mi; flat rate $800. Notes: Deliver Direct Only; p/# 106350400103-; reference Amara-4959. Driver not set on RC; logged for J. Green/Green Gator. Deadhead estimated at 32 mi from prior Evans-area drop to Thomson pickup unless user clarifies. Total miles incl. deadhead: 281. Loaded RPM $3.21; all-in gross RPM $2.85. Fuel updated 2026-07-03: user reported $150 fuel. Net after fuel $650.00; net per all miles $2.31. Dashboard date set to delivery date 2026-07-02 for cross-midnight completion. Additional fuel updated 2026-07-03: user reported another $165 fuel, bringing total fuel to $315.00. Net after fuel $485.00; net per all miles $1.73."
-  },
-  {
-    "id": 49,
-    "date": "2026-07-06",
-    "pickup": "Premier Packaging Augusta, 2044 Forward Augusta Dr, Augusta, GA 30906",
-    "dropoff": "Amazon CLT2, 10240 Old Dowd Rd, Charlotte, NC 28214",
-    "miles": 177.0,
-    "dh": 18.0,
-    "rpm": "2.54",
-    "pay": 450.0,
-    "fuel": 92.8,
-    "comments": "Giltner Logistics rate confirmation PRO/load #1488950. Broker contact John Brinn 916-900-1843 / jbrinn@giltner.com; docs@Giltner.com. Pickup Premier Packaging Augusta, 2044 Forward Augusta Dr, Augusta GA 30906, Mon 2026-07-06 08:00; PU ref 1786063; contact Mary Luke 706-829-1429. Delivery Amazon CLT2, 10240 Old Dowd Rd, Charlotte NC 28214, Mon 2026-07-06 FCFS 08:00-14:00; ref 2D-21749989; contact Non-Inventory Receiving. Commodity packaging on skids; 2 pieces / 2,200 lb. Equipment: 24/26 ft dock-height straight box truck with 2 load locks/straps; no sprinters, no hitch, no ramps to dock height. Driver unload. Tell Amazon check-in it is non-inventory product. Verify pallet count before leaving shipper. POD needed once delivered. Detention needs in/out times marked on bills and broker approval. Deadhead estimated at 18 mi from Augusta-area base unless user clarifies. Total miles incl. deadhead: 195. Loaded RPM $2.54; all-in gross RPM $2.31. Fuel pending; planning estimate at 10 MPG and $4.15/gal is about $73.46 but not logged as actual fuel. Fuel updated 2026-07-06: user reported $47 fuel and plans to fill up tomorrow with 7/11 discount; allocated proportionally across 2026-07-06 load chain by total miles. This load share $20.10. Net after fuel $429.90; net per all miles 2.20. Additional fuel updated 2026-07-07: user reported $170 fuel; allocated proportionally across the 2026-07-06 load chain by total miles. This load additional share $72.70, bringing this load fuel total to $92.80. Net after fuel $357.20; net per all miles $1.83."
-  },
-  {
-    "id": 50,
-    "date": "2026-07-06",
-    "pickup": "Amara Industries, 2018 E US-64, Lexington, NC 27292",
-    "dropoff": "Flextronics R2 Warehouse, 172 Old Elloree Rd, Orangeburg, SC 29115",
-    "miles": 195.0,
-    "dh": 66.0,
-    "rpm": "2.56",
-    "pay": 500.0,
-    "fuel": 124.2,
-    "comments": "Haul'N Loads LLC / AscendTMS load confirmation #4968 (reference Amara-4968). Broker Haul'N Loads LLC, docket MC1407042, phone 734-796-0287, billing haulnloads.billing@gmail.com. Pickup Amara Industries, 2018 E. US-64, Lexington NC 27292, Mon 2026-07-06 09:00-11:30; contact phone 336-370-5800. Delivery Flextronics R2 Warehouse, 172 Old Elloree Rd, Orangeburg SC 29115, Mon 2026-07-06 13:00-16:00. Equipment Van - Box Truck, 26 ft; commodity dry goods/general; weight 2,500 lb; notes: 15 skids stackable, 48x45. Flat rate $500; RC distance 195 mi. Driver Jacarr Green / 706-726-9949. Deadhead estimated at 66 mi from prior Amazon CLT2 Charlotte drop to Lexington pickup via OSRM unless user clarifies. Total miles incl. deadhead: 261. Loaded RPM $2.56; all-in gross RPM $1.92. Fuel pending. Requirements: communication/updates required; use tracking app if requested; notify timely if late; more than 2 hrs early/late without consent may deduct up to 20%; POD due within 30 minutes of delivery; submit docs/billing to haulnloads.billing@gmail.com; broker does not click email links. Fuel updated 2026-07-06: user reported $47 fuel and plans to fill up tomorrow with 7/11 discount; allocated proportionally across 2026-07-06 load chain by total miles. This load share $26.90. Net after fuel $473.10; net per all miles 1.81. Additional fuel updated 2026-07-07: user reported $170 fuel; allocated proportionally across the 2026-07-06 load chain by total miles. This load additional share $97.30, bringing this load fuel total to $124.20. Net after fuel $375.80; net per all miles $1.44."
-  },
-  {
-    "id": 53,
-    "date": "2026-07-07",
-    "pickup": "Orangeburg, SC",
-    "dropoff": "Cameron, SC",
-    "miles": 10.0,
-    "dh": 20.0,
-    "rpm": "15.00",
-    "pay": 150.0,
-    "fuel": 95.0,
-    "comments": "TQL rate confirmation PO# 37470905. Broker contact Stephen Bodet, 800-580-3101 x47342, MBodet@TQL.com; office staffed 24/7. Carrier Green Gator Enterprises LLC MC 1569745 / DOT 4110201. Pickup Orangeburg SC, Tue 2026-07-07 FCFS 08:00-14:00. Delivery Cameron SC, Tue 2026-07-07 FCFS 07:30-15:30. Commodity packaging materials; 1 truckload; estimated weight 5,140 lb; 26 ft straight box truck; FTL; non-hazardous; 0 pallets/0 cases shown. Loaded miles estimated from OSRM city-to-city route: 10 mi (15.4 km). Deadhead updated 2026-07-07: user confirmed 20 mi deadhead; exact pickup address not provided on rate con. Loaded RPM $15.00; all-in gross RPM $5.00. Fuel pending. Tracking required via P44, MacroPoint, or Carrier Dashboard. Deliver straight through. POD must be signed by shipper and receiver and sent to mbodet@tql.com upon delivery; submit rate confirmation, BOL/POD, receipts, and other paperwork within 24 hours to cinvoices@tql.com. Detention/accessorials require advance written approval; notify TQL at least 30 minutes before detention; detention generally starts after at least 3 hours unless agreed in writing. Late pickup/delivery may cause non-payment/special damages. No TONU unless TQL provided load details and approved travel toward pickup. Fuel updated 2026-07-07: user reported $95 fuel. Net after fuel $55.00; net per all miles $1.83."
-  }
-];
-const IFTA_BY_ID={"80":{"GA":53,"SC":185,"NC":2},"79":{"GA":227,"SC":67},"78":{"SC":31,"NC":2},"77":{"NC":191,"SC":37},"76":{"NC":159},"75":{"NC":43},"74":{"GA":176,"SC":146,"NC":71},"73":{"GA":190},"70":{"NC":126},"69":{"GA":59,"NC":69,"SC":149},"68":{"SC":38},"67":{"GA":7,"SC":58},"66":{"GA":39,"SC":74},"65":{"GA":131,"NC":146,"SC":154},"64":{},"1783940581495":{"GA":31,"NC":69,"SC":149},"1783835522624":{"NC":90,"SC":16},"61":{"GA":66,"NC":69,"SC":149},"60":{"GA":41},"59":{"GA":64,"SC":118},"58":{"SC":80},"57":{"GA":39,"SC":75},"56":{},"55":{"GA":108,"SC":10},"54":{"GA":59,"SC":185},"51":{"SC":191,"GA":4},"1":{"GA":63,"NC":70,"SC":151},"2":{"GA":63,"NC":70,"SC":151},"3":{"NC":112,"SC":204},"4":{"GA":272,"SC":35},"5":{"GA":161,"SC":75},"16":{"GA":62,"NC":89,"SC":149},"17":{"GA":137},"18":{"GA":60},"52":{"GA":137},"20":{"GA":45,"SC":107},"19":{"GA":1,"SC":74},"21":{"GA":172},"22":{"GA":62},"23":{"DC":10,"MD":29,"NC":182,"SC":218,"VA":182,"GA":6},"26":{"MD":50},"27":{"NC":113,"VA":225},"24":{"GA":39,"SC":68},"25":{"GA":55,"SC":95},"28":{"GA":28,"SC":4},"29":{"SC":196},"30":{"GA":83,"SC":138},"31":{"GA":1,"NC":17,"SC":155},"32":{"GA":47},"33":{"GA":65,"NC":69,"SC":149},"34":{"NC":81,"SC":120},"35":{"GA":71,"SC":113},"37":{"NC":107,"SC":90},"36":{"GA":20,"NC":12,"SC":161},"38":{"GA":107},"39":{"GA":180},"40":{"GA":118},"41":{"GA":177,"SC":148},"43":{"GA":71,"SC":245},"42":{"GA":29,"SC":48},"44":{"GA":42,"SC":157},"45":{"GA":53,"SC":243},"47":{"GA":54},"46":{"GA":40,"SC":72},"48":{"GA":63,"NC":69,"SC":149},"49":{"GA":20,"NC":12,"SC":163},"50":{"NC":135,"SC":126},"53":{"SC":30}};
-SEEDS.forEach(e=>{e.ifta=IFTA_BY_ID[String(e.id)]??null;e.iftaStatus='calculated';});
-const SEED=SEEDS[0];
+const LEADS=[];
+const SEEDS=[];
+const IFTA_BY_ID={};
+const SEED=null;
 const SU_URL='https://bzbaifskyvjhvooteowx.supabase.co';
 const SU_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ6YmFpZnNreXZqaHZvb3Rlb3d4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MDk5NjIsImV4cCI6MjA5Mzk4NTk2Mn0.irq-1Qh8UzdDap66zZv8AKZLDrM-YuTlKtj6mSaQ_dM';
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
-const STATUSES=['Not called','Emailed','Called - No answer','Called - Interested','Called - Not interested','Follow up','Active customer'];
 const MAINT_TYPES=['Oil Change','Tire Rotation','DEF Fill','Brake Service','Air Filter','Fuel Filter','Tire Replacement','Inspection','Transmission Service','Other'];
 const PM_INTERVAL_MI=10000;
 const AIR_FILTER_INTERVAL_MI=30000;
@@ -1286,8 +287,8 @@ function AuthScreen({onAuthed}){
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18}}>
           <span style={{fontSize:24}}>🐊</span>
           <div>
-            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Sign in to <span style={{color:G}}>Green Gator</span></div>
-            <div style={{color:DIM,fontSize:11,marginTop:2}}>Multi-tenant cloud — your carrier data only</div>
+            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Sign in to <span style={{color:G}}>Gator Dispatch</span></div>
+            <div style={{color:DIM,fontSize:11,marginTop:2}}>Your costs. Your verdicts. Your data only.</div>
           </div>
         </div>
         <div style={{display:'flex',gap:8,marginBottom:14}}>
@@ -1315,39 +316,52 @@ function AuthScreen({onAuthed}){
           </>
         )}
         <div style={{marginTop:14,padding:'10px 12px',background:'rgba(57,255,107,.04)',border:'1px solid rgba(57,255,107,.1)',borderRadius:7,fontSize:10,color:DIM,lineHeight:1.7}}>
-          <span style={{color:G,fontWeight:700}}>Owner setup:</span> Supabase → Authentication → Users → Add user (auto-confirm). Then SQL Editor: insert into org_members for tenant 11111111-… with your user UUID as owner.
+          New here? Sign in, then create your carrier workspace. Your CPM and loads stay isolated.
         </div>
       </div>
     </div>
   );
 }
 
-function NoOrgScreen({session,onSignOut,onRetry}){
+function NoOrgScreen({session,onSignOut,onCreated,db}){
+  const [name,setName]=useState('');
+  const [dot,setDot]=useState('');
+  const [home,setHome]=useState('');
   const [busy,setBusy]=useState(false);
   const [err,setErr]=useState('');
   const email=session?.user?.email||'signed-in user';
-  const claimHint=`insert into public.org_members (org_id, user_id, role)\nvalues ('${GG_ORG_ID}', '${session?.user?.id||'YOUR-USER-UUID'}', 'owner');`;
+  const create=async()=>{
+    setErr('');setBusy(true);
+    try{
+      const n=name.trim();
+      if(!n)throw new Error('Carrier name required');
+      if(!db||!db.rpc)throw new Error('Not connected');
+      await db.rpc('create_org',{
+        p_name:n,
+        p_dot_number:dot.trim()||null,
+        p_mc_number:null,
+        p_home_base:home.trim()||null,
+      });
+      await onCreated();
+    }catch(e){setErr(e.message||String(e));}
+    setBusy(false);
+  };
   return(
     <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
-      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:520,width:'100%'}}>
-        <div style={{fontSize:16,fontWeight:700,color:'#dceede',marginBottom:8}}>🐊 No carrier linked</div>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:480,width:'100%'}}>
+        <div style={{fontSize:16,fontWeight:700,color:'#dceede',marginBottom:8}}>🐊 Set up your carrier</div>
         <div style={{color:DIM,fontSize:12,lineHeight:1.6,marginBottom:14}}>
-          Signed in as <span style={{color:G}}>{email}</span>, but this account is not on an org yet. RLS is working — cloud data stays locked until you claim Green Gator (tenant #1) or create a new carrier org.
+          Signed in as <span style={{color:G}}>{email}</span>. Create your workspace — costs and load history stay private to you.
         </div>
-        {session?.user?.id&&(
-          <div style={{marginBottom:12}}>
-            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Your user id</div>
-            <code style={{display:'block',padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',fontSize:11,wordBreak:'break-all'}}>{session.user.id}</code>
-          </div>
-        )}
-        <div style={{marginBottom:14}}>
-          <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Claim tenant #1 (SQL Editor)</div>
-          <pre style={{margin:0,padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#9fd6ad',fontSize:10,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{claimHint}</pre>
+        <div style={{display:'grid',gap:10,marginBottom:12}}>
+          <div><span className="lbl">Carrier / company name</span><input className="inp" value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. River Box Logistics LLC"/></div>
+          <div><span className="lbl">DOT number (optional)</span><input className="inp" value={dot} onChange={e=>setDot(e.target.value)} placeholder="######"/></div>
+          <div><span className="lbl">Home base (optional)</span><input className="inp" value={home} onChange={e=>setHome(e.target.value)} placeholder="City, ST"/></div>
         </div>
         {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12}}>⚠ {err}</div>}
         <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-          <button type="button" className="btn" onClick={async()=>{setBusy(true);setErr('');try{await onRetry();}catch(e){setErr(e.message||String(e));}setBusy(false);}} style={{background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:busy?.6:1}}>{busy?'Checking…':'I ran the SQL — retry'}</button>
-          <button type="button" onClick={onSignOut} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Sign out</button>
+          <button type="button" onClick={create} disabled={busy} style={{flex:1,background:G,color:'#030803',border:'none',borderRadius:7,padding:'12px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:busy?.6:1}}>{busy?'Creating…':'Create workspace →'}</button>
+          <button type="button" onClick={onSignOut} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'12px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Sign out</button>
         </div>
       </div>
     </div>
@@ -1399,14 +413,6 @@ function App(){
       .tbl td{padding:8px 10px;border-bottom:1px solid #142818;transition:background .1s;color:#dceede}
       .tbl tr:hover td{background:rgba(57,255,107,.03)}
       .tbl tr.sel td{background:#0d2210}.tbl tr.sel td:first-child{border-left:2px solid rgba(57,255,107,.5)}
-      .pipeline-table{table-layout:fixed;min-width:1250px;font-size:13px}
-      .pipeline-table thead th{position:sticky;top:0;z-index:2;background:#0b1b0d}
-      .pipeline-table th{font-size:11px;padding:11px 12px}
-      .pipeline-table td{font-size:13px;padding:12px;line-height:1.45}
-      .pipeline-table .lead-contact{white-space:normal;overflow:visible;word-break:break-word;line-height:1.5;color:#a8c1ae;font-size:13px}
-      .pipeline-table .sb{font-size:11px;padding:5px 10px}
-      .pipeline-table .btn-danger{font-size:12px;padding:6px 11px}
-      .pipeline-table tr.selected td{background:rgba(57,255,107,.065)}
       .lead-notes{min-height:92px;resize:vertical;line-height:1.45}
       .lead-editor-grid{display:grid;grid-template-columns:90px 175px minmax(260px,1fr) auto;gap:10px;align-items:end;margin-bottom:10px}
       .sb{display:inline-block;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
@@ -1462,16 +468,12 @@ function App(){
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('dispatch');
   const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
-  const [leads,setLeads]=useState(LEADS.map(l=>({...l,status:l.status||'Not called',notes:l.notes||'',callbackDate:''})));
-  const [lf,setLf]=useState({num:'1',status:'Not called',notes:'',callbackDate:''});
-  const [search,setSearch]=useState('');
-  const [statusFilter,setStatusFilter]=useState('All');
-  const [log,setLog]=useState(SEEDS);
-  const blankLog={date:todayStr(),pickup:'Augusta, GA',dropoff:'Aiken, SC',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''};
+  const [log,setLog]=useState([]);
+  const blankLog={date:todayStr(),pickup:'',dropoff:'',miles:'',dh:'',rpm:'',pay:'',fuel:'',comments:''};
   const [logF,setLogF]=useState(blankLog);
   const [addLog,setAddLog]=useState(false);
   const [editingLogId,setEditingLogId]=useState(null);
-  const [route,setRoute]=useState(SEED);
+  const [route,setRoute]=useState(null);
   const [selectedWeek,setSelectedWeek]=useState(()=>{const d=new Date(),day=d.getDay(),diff=(day+6)%7,s=new Date(d);s.setDate(d.getDate()-diff);const e=new Date(s);e.setDate(s.getDate()+6);const fmt=x=>x.toISOString().slice(0,10);return{start:fmt(s),end:fmt(e)};});
   const [selectedMonth,setSelectedMonth]=useState('');
   const [overviewMonth,setOverviewMonth]=useState('');
@@ -1479,9 +481,9 @@ function App(){
   const [fixedMo,setFixedMo]=useState('2331');const [tFixedMo,setTFixedMo]=useState('2331');
   const [estMilesHint,setEstMilesHint]=useState('8000');
   const [onboarded,setOnboarded]=useState(()=>!!sg('gg-onboarded'));
-  const [bal,setBal]=useState('25761');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
-  const [odometer,setOdometer]=useState('217002');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
-  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25761');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('217002');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [bal,setBal]=useState('0');const [maint2,setMaint2]=useState('0');const [buyPrice,setBuyPrice]=useState('0');
+  const [odometer,setOdometer]=useState('0');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('0');const [tMaint,setTMaint]=useState('0');const [tBuyPrice,setTBuyPrice]=useState('0');const [tOdometer,setTOdometer]=useState('0');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
   const nowD=new Date();
   const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
   const [toast,setToast]=useState('');
@@ -1489,12 +491,12 @@ function App(){
   const [maintF,setMaintF]=useState({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});
   const [addMaint,setAddMaint]=useState(false);
   const [editingMaintId,setEditingMaintId]=useState(null);
-  const [mapCoords,setMapCoords]=useState(()=>{const p=pCoords(SEED?.pickup),d=pCoords(SEED?.dropoff);return p&&d?{pickup:p,dropoff:d}:null;});
+  const [mapCoords,setMapCoords]=useState(null);
   const [mapNote,setMapNote]=useState('');
   const mapElRef=useRef(null);const leafletMapRef=useRef(null);
   const [weekHistory,setWeekHistory]=useState([]);
-  const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||'2026-05-11');
-  const refs={dispatch:useRef(),overview:useRef(),pipeline:useRef(),logbook:useRef(),maintenance:useRef()};
+  const [showReset,setShowReset]=useState(false);const [weekResetDate,setWeekResetDate]=useState(sg('gg-wrd')||todayStr());
+  const refs={dispatch:useRef(),overview:useRef(),logbook:useRef(),maintenance:useRef()};
 
   useEffect(()=>{
     let off=false;
@@ -1551,27 +553,25 @@ function App(){
     return out.sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))||(Number(b.id||0)-Number(a.id||0)));
   };
   const loadLocal=()=>{
-    const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
-    if(w)setW(w);if(l)setLeads(l);
-    const localLog=Array.isArray(lg)?mergeLogs(SEEDS,lg):SEEDS;
-    setLog(localLog);if(localLog[0])setRoute(localLog[0]);
+    const w=sg('gg-w'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
+    if(w)setW(w);
+    const localLog=Array.isArray(lg)?lg:[];
+    setLog(localLog);if(localLog[0])setRoute(localLog[0]);else setRoute(null);
     if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}if(c.o){setOdometer(c.o);setTOdometer(c.o);}if(c.mc){setMaintCpm(c.mc);setTMaintCpm(c.mc);}}
     if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
   };
   const loadSupa=async(d)=>{
     try{
-      const [wR,lR,lgR,cfR,mlR,whR]=await Promise.all([
+      const [wR,lgR,cfR,mlR,whR]=await Promise.all([
         d.get('gg_weekly?select=*&limit=1'),
-        d.get('gg_leads?select=*&order=id'),
         d.get('gg_log?select=*&order=created_at.desc'),
         d.get('gg_config?select=key,value'),
         d.get('gg_maintenance?select=*&order=created_at.desc').catch(()=>[]),
         d.get('gg_weekly_history?select=*&order=week_end.desc&limit=8').catch(()=>[]),
       ]);
       if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||FUEL_PRICE_PER_GALLON),mpg:String(r.mpg||TRUCK_MPG),tg:String(r.tg||5000)});}
-      if(lR?.length)setLeads(lR.map(l=>({...l,callbackDate:l.callback_date||''})));
-      const mergedLog=lgR?.length?mergeLogs(SEEDS,lgR):SEEDS;
-      setLog(mergedLog);if(mergedLog[0])setRoute(mergedLog[0]);
+      const mergedLog=Array.isArray(lgR)?lgR:[];
+      setLog(mergedLog);if(mergedLog[0])setRoute(mergedLog[0]);else setRoute(null);
       const cfg=Object.fromEntries((cfR||[]).map(r=>[r.key,r.value]));
       if(cfg.truck_balance){setBal(cfg.truck_balance);setTBal(cfg.truck_balance);}
       if(cfg.maintenance_reserve){setMaint2(cfg.maintenance_reserve);setTMaint(cfg.maintenance_reserve);}
@@ -1662,21 +662,6 @@ function App(){
     const u={...W,[k]:v};setW(u);
     if(db)try{await db.post('gg_weekly',{ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true,'org_id');}catch(e){console.warn('saveW',e);}
     else ss('gg-w',u);
-  };
-  const saveLead=async()=>{
-    const leadId=parseInt(lf.num);const i=leads.findIndex(l=>l.id===leadId);if(i<0){flash('Select a valid lead');return;}
-    const u=leads.map((l,x)=>x===i?{...l,status:lf.status,notes:lf.notes,callbackDate:lf.callbackDate}:l);
-    setLeads(u);ss('gg-l',u);
-    if(db)try{await db.patch('gg_leads?id=eq.'+leadId,{status:lf.status,notes:lf.notes,callback_date:lf.callbackDate||null});}catch{flash('Saved on device; cloud sync failed');return;}
-    flash('Lead #'+lf.num+' saved');
-  };
-  const deleteLead=async id=>{
-    const lead=leads.find(l=>l.id===id);if(!lead)return;
-    if(!window.confirm('Delete '+lead.name+' from the pipeline?'))return;
-    const previous=leads;const u=leads.filter(l=>l.id!==id);setLeads(u);ss('gg-l',u);
-    if(parseInt(lf.num)===id){const next=u[0];setLf(next?{num:String(next.id),status:next.status,notes:next.notes||'',callbackDate:next.callbackDate||''}:{num:'',status:'Not called',notes:'',callbackDate:''});}
-    if(db)try{await db.del('gg_leads?id=eq.'+id);}catch{flash('Removed on this device; cloud delete failed');return;}
-    flash(lead.name+' deleted');
   };
   const startAddLog=()=>{setEditingLogId(null);setLogF(blankLog);setAddLog(true);};
   const startEditLog=e=>{setEditingLogId(e.id);setLogF({date:e.date||todayStr(),pickup:e.pickup||'',dropoff:e.dropoff||'',miles:String(e.miles??''),dh:String(e.dh??''),rpm:String(e.rpm??''),pay:String(e.pay??''),fuel:String(e.fuel??''),comments:e.comments||''});setAddLog(true);setRoute(e);setSec('logbook');setTimeout(()=>refs.logbook?.current?.scrollIntoView({behavior:'smooth',block:'start'}),50);};
@@ -1860,9 +845,6 @@ function App(){
     const next=logMonths[i+dir];
     if(next)setOverviewMonth(next);
   };
-  const overdue=leads.filter(l=>l.callbackDate&&l.callbackDate<todayStr());
-  const dueToday=leads.filter(l=>l.callbackDate===todayStr());
-  const filtered=leads.filter(l=>{const ms=statusFilter==='All'||l.status===statusFilter;const q=search.toLowerCase();const mq=!search||l.name.toLowerCase().includes(q)||l.phone.includes(search)||(l.notes||'').toLowerCase().includes(q);return ms&&mq;});
   const {y:cy,m:cm}=cal;
   const fd=new Date(cy,cm,1).getDay(),dim=new Date(cy,cm+1,0).getDate();
   const dLogs=d=>{const s=`${cy}-${String(cm+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;return log.filter(e=>e.date===s);};
@@ -1927,7 +909,7 @@ function App(){
 
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
   if(appState==='auth')return <AuthScreen onAuthed={async(sess)=>{setAppState('init');await startCloud(sess);}}/>;
-  if(appState==='noorg')return <NoOrgScreen session={session} onSignOut={disconnectSupa} onRetry={async()=>{setAppState('init');await startCloud(sessionRef.current||loadSession());}}/>;
+  if(appState==='noorg')return <NoOrgScreen session={session} db={db} onSignOut={disconnectSupa} onCreated={async()=>{setAppState('init');await startCloud(sessionRef.current||loadSession());}}/>;
   if(appState==='ready'&&!onboarded)return (
     <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
       <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:480,width:'100%'}}>
@@ -1964,11 +946,11 @@ function App(){
       <div className="nav">
         <div className="nav-logo">
           <span style={{fontSize:18}}>🐊</span>
-          <div><div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div><div style={{fontSize:8,color:MUT,letterSpacing:'.12em',textTransform:'uppercase'}}>Gator Dispatch</div></div>
+          <div><div style={{fontSize:13,fontWeight:700,color:G}}>Gator Dispatch</div><div style={{fontSize:8,color:MUT,letterSpacing:'.12em',textTransform:'uppercase'}}>Box truck decisions</div></div>
         </div>
-        {[['dispatch','Dispatch'],['overview','Overview'],['pipeline','Pipeline'],['logbook','Logbook'],['maintenance','Maint']].map(([id,label])=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{label}</div>)}
+        {[['dispatch','Dispatch'],['overview','Money'],['logbook','Loads'],['maintenance','Maint']].map(([id,label])=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{label}</div>)}
         <div className="nav-right">
-          {(overdue.length>0||dueToday.length>0)&&<span style={{color:overdue.length>0?'#f87171':'#fbbf24',fontSize:10,padding:'3px 9px',border:`1px solid ${overdue.length>0?'rgba(248,113,113,.25)':'rgba(251,191,36,.25)'}`,borderRadius:5,background:overdue.length>0?'rgba(248,113,113,.06)':'rgba(251,191,36,.06)',cursor:'pointer'}} onClick={()=>navTo('pipeline')}>{overdue.length>0?`⚠ ${overdue.length} overdue`:`${dueToday.length} due today`}</span>}
+          
           {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
           {db&&session?<>
             <button onClick={refreshSupa} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>↻ Sync</button>
@@ -2047,7 +1029,7 @@ function App(){
 
       {/* OVERVIEW */}
       {sec==='overview'&&<div className="section" ref={refs.overview}>
-        <SH t="Overview" right={showReset?<div style={{display:'flex',gap:6,alignItems:'center',padding:'6px 12px',background:'rgba(251,191,36,.07)',border:'1px solid rgba(251,191,36,.2)',borderRadius:8}}>
+        <SH t="Money" right={showReset?<div style={{display:'flex',gap:6,alignItems:'center',padding:'6px 12px',background:'rgba(251,191,36,.07)',border:'1px solid rgba(251,191,36,.2)',borderRadius:8}}>
           <span style={{color:'#fbbf24',fontSize:11}}>Archive week & clear tracker?</span>
           <button className="btn" style={{fontSize:10,padding:'5px 12px'}} onClick={doWeekReset}>Yes, Reset</button>
           <button className="btn-g" style={{fontSize:10,padding:'5px 12px'}} onClick={()=>setShowReset(false)}>Cancel</button>
@@ -2073,14 +1055,10 @@ function App(){
             <div style={{fontSize:9,color:bePct>=100?G:'#f87171'}}>{bePct>=100?'Overhead covered ✓':'$'+(fixedWk-Math.max(0,net)).toFixed(0)+' short of $'+fixedWk.toFixed(0)}</div>
           </div>
           <div className="kpi">
-            <div style={{position:'absolute',top:0,left:0,right:0,height:1,background:'linear-gradient(90deg,transparent,rgba(248,113,113,.3),transparent)'}}/>
-            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Truck Payoff</div>
-            <div style={{display:'flex',alignItems:'flex-end',justifyContent:'space-between',gap:10,flexWrap:'wrap',marginBottom:8}}>
-              <div className="gr" style={{fontSize:28,fontWeight:700,color:'#f87171',lineHeight:1}}>${parseFloat(bal).toLocaleString()}</div>
-              <div style={{color:'#f87171',fontSize:11,fontWeight:700,lineHeight:1.15,textAlign:'right'}}><span style={{display:'block',color:MUT,fontSize:8,letterSpacing:'.08em',textTransform:'uppercase',marginBottom:2}}>At current pace</span>Paid off by 3/1/27</div>
-            </div>
-            <div className="pg" style={{marginBottom:5}}><div className="pgf" style={{width:Math.max(0,Math.min(100,((parseFloat(buyPrice)-parseFloat(bal))/parseFloat(buyPrice))*100))+'%',background:'linear-gradient(90deg,#f87171aa,#f87171)'}}/></div>
-            <div style={{fontSize:9,color:DIM}}>2020 MV607 · ${(Math.max(0,parseFloat(buyPrice)-parseFloat(bal))).toLocaleString()} paid of ${parseFloat(buyPrice).toLocaleString()}</div>
+            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:8}}>Operating Floor</div>
+            <div className="gg" style={{fontSize:28,fontWeight:700,color:G,lineHeight:1,marginBottom:6}}>${beRPM.toFixed(2)}</div>
+            <div style={{color:DIM,fontSize:10}}>/mi all-in before booking</div>
+            <div style={{color:MUT,fontSize:10,marginTop:4}}>Fixed ${fixedMonthly.toLocaleString()}/mo</div>
           </div>
         </div>
 
@@ -2140,7 +1118,7 @@ function App(){
         <div className="g12" style={{marginBottom:12}}>
           <div className="card">
             <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Truck & Config</div>
-            <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:12}}>{['2020 MV607','26ft box + liftgate','2 pallet jacks','15 straps'].map(t=><span key={t} style={{background:'rgba(57,255,107,.06)',color:G,padding:'4px 10px',borderRadius:20,fontSize:10,border:'1px solid rgba(57,255,107,.18)'}}>{t}</span>)}</div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:12}}>{['Box truck','Liftgate','Owner-operator'].map(t=><span key={t} style={{background:'rgba(57,255,107,.06)',color:G,padding:'4px 10px',borderRadius:20,fontSize:10,border:'1px solid rgba(57,255,107,.18)'}}>{t}</span>)}</div>
             <div className="dv"/>
             {editCfg?<>
               <span className="lbl">Remaining Balance ($)</span><input className="inp" style={{marginBottom:8}} value={tBal} onChange={e=>setTBal(e.target.value)} inputMode="decimal"/>
@@ -2183,53 +1161,6 @@ function App(){
         </div>
       </div>}
 
-      {/* PIPELINE */}
-      {sec==='pipeline'&&<div className="section" ref={refs.pipeline}>
-        <SH t="Lead Pipeline" right={<>
-          <span style={{color:G,border:`1px solid ${BD}`,borderRadius:5,padding:'3px 8px',fontSize:9,fontWeight:700,letterSpacing:'.08em'}}>PIPELINE V2 · FULL CONTACT VIEW</span>
-          <span style={{color:DIM,fontSize:11}}>{leads.filter(l=>l.status==='Active customer').length} active · {leads.filter(l=>l.status==='Called - Interested').length} interested</span>
-          <span style={{color:DIM,fontSize:11}}>{leads.filter(l=>l.status!=='Not called'&&l.status!=='Called - Not interested').length}/{leads.length} engaged</span>
-        </>}/>
-        <div style={{marginBottom:12,display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
-          <input className="inp" style={{width:200}} placeholder="Search leads..." value={search} onChange={e=>setSearch(e.target.value)}/>
-          <select className="inp" style={{width:180}} value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option>All</option>{STATUSES.map(s=><option key={s}>{s}</option>)}</select>
-          <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:8}}>
-            <div className="pg" style={{width:120}}><div className="pgf" style={{width:(leads.filter(l=>l.status!=='Not called').length/leads.length)*100+'%',background:`linear-gradient(90deg,${G}88,${G})`}}/></div>
-            <span style={{color:DIM,fontSize:10}}>{leads.filter(l=>l.status!=='Not called').length}/{leads.length} called</span>
-          </div>
-        </div>
-        <div className="card" style={{padding:0,overflow:'hidden',marginBottom:12}}>
-          <div style={{overflowX:'auto'}}>
-            <table className="tbl pipeline-table">
-              <colgroup><col style={{width:52}}/><col style={{width:240}}/><col style={{width:185}}/><col style={{width:175}}/><col style={{width:125}}/><col/><col style={{width:82}}/></colgroup>
-              <thead><tr>{['#','BUSINESS','PHONE','STATUS','CALLBACK','EMAIL / CONTACT ROUTE','ACTION'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{filtered.map(l=>{const cb=cbColor(l.callbackDate);return <tr key={l.id} className={parseInt(lf.num)===l.id?'selected':''} style={{cursor:'pointer'}} onClick={()=>{const ld=leads.find(x=>x.id===l.id);setLf({num:String(l.id),status:ld.status,notes:ld.notes||'',callbackDate:ld.callbackDate||''});}}>
-                <td style={{color:DIM,fontSize:12,width:40}}>{l.id}</td>
-                <td style={{color:'#c8e0cc',fontWeight:700,fontSize:14}}>{l.name}</td>
-                <td style={{color:'#9ab29f',whiteSpace:'normal',overflowWrap:'anywhere',fontSize:13}}>{l.phone}</td>
-                <td><span className="sb" style={sBadge(l.status)}>{l.status}</span></td>
-                <td>{l.callbackDate?<span style={{color:cb,fontSize:12,fontWeight:700}} className={l.callbackDate===todayStr()?'cb-today':''}>{l.callbackDate===todayStr()?'TODAY':l.callbackDate<todayStr()?'⚠ '+l.callbackDate:l.callbackDate}</span>:<span style={{color:DIM,fontSize:10}}>—</span>}</td>
-                <td className="lead-contact">{l.notes||'—'}</td>
-                <td><button className="btn-danger" onClick={ev=>{ev.stopPropagation();deleteLead(l.id);}}>Del</button></td>
-              </tr>;})}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className="card">
-          <div style={{fontWeight:700,color:'#c8e0cc',fontSize:12,marginBottom:12}}>Update Lead #{lf.num}{leads.find(l=>l.id===parseInt(lf.num))?' — '+leads.find(l=>l.id===parseInt(lf.num))?.name:''}</div>
-          <div className="lead-editor-grid">
-            <div><span className="lbl">Lead #</span><input className="inp" value={lf.num} onChange={e=>{const l=leads.find(x=>x.id===parseInt(e.target.value));setLf({num:e.target.value,status:l?.status||'Not called',notes:l?.notes||'',callbackDate:l?.callbackDate||''});}} inputMode="numeric"/></div>
-            <div><span className="lbl">Status</span><select className="inp" value={lf.status} onChange={e=>setLf({...lf,status:e.target.value})}>{STATUSES.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
-            <div><span className="lbl">Full Email / Contact Route / Notes</span><textarea className="inp lead-notes" value={lf.notes} onChange={e=>setLf({...lf,notes:e.target.value})} placeholder="Email, contact form, decision maker, best time to call..."/></div>
-            <div style={{display:'grid',gap:7}}><button className="btn" onClick={saveLead}>Save</button><button className="btn-danger" style={{padding:'8px 12px'}} onClick={()=>deleteLead(parseInt(lf.num))}>Delete</button></div>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'180px 1fr',gap:10,alignItems:'center'}}>
-            <div><span className="lbl">Callback Date</span><input className="inp" type="date" value={lf.callbackDate} onChange={e=>setLf({...lf,callbackDate:e.target.value})} style={{colorScheme:'dark'}}/></div>
-            {lf.callbackDate&&<div style={{color:cbColor(lf.callbackDate),fontSize:11,fontWeight:700}}>{lf.callbackDate<todayStr()?'⚠ OVERDUE':lf.callbackDate===todayStr()?'📞 Call today':'Set for '+lf.callbackDate}</div>}
-          </div>
-        </div>
-      </div>}
 
       {/* LOGBOOK */}
       {sec==='logbook'&&<div className="section" ref={refs.logbook}>
