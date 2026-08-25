@@ -19,7 +19,7 @@
 <script type="text/babel">
 const {useState,useEffect,useRef}=React;
 const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
-const FUEL_PRICE_PER_GALLON=4.89;
+const FUEL_PRICE_PER_GALLON=5.25;
 const TRUCK_MPG=9.9;
 const fuelEstimateForMiles=(miles,mpg=TRUCK_MPG,price=FUEL_PRICE_PER_GALLON)=>{
   const totalMiles=Math.max(0,parseFloat(miles)||0);
@@ -1602,7 +1602,7 @@ function App(){
   };
   const loadLocal=()=>{
     const w=sg('gg-w'),l=sg('gg-l'),lg=sg('gg-lg'),c=sg('gg-c'),ml=sg('gg-ml'),wh=sg('gg-wh');
-    if(w)setW(w);if(l)setLeads(l);
+    if(w)setW({...w,fp:String(parseFloat(w.fp)===4.89?FUEL_PRICE_PER_GALLON:(w.fp||FUEL_PRICE_PER_GALLON))});if(l)setLeads(l);
     const localLog=Array.isArray(lg)?mergeLogs(SEEDS,lg):SEEDS;
     setLog(localLog);if(localLog[0])setRoute(localLog[0]);
     if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}if(c.o){setOdometer(c.o);setTOdometer(c.o);}if(c.mc){setMaintCpm(c.mc);setTMaintCpm(c.mc);}}
@@ -1618,7 +1618,7 @@ function App(){
         d.get('gg_maintenance?select=*&order=created_at.desc').catch(()=>[]),
         d.get('gg_weekly_history?select=*&order=week_end.desc&limit=8').catch(()=>[]),
       ]);
-      if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(r.fp||FUEL_PRICE_PER_GALLON),mpg:String(r.mpg||TRUCK_MPG),tg:String(r.tg||5000)});}
+      if(wR?.[0]){const r=wR[0];setW({ar:String(r.ar||''),dg:String(r.dg||''),dl:String(r.dl||''),fs:String(r.fs||''),mi:String(r.mi||''),fp:String(parseFloat(r.fp)===4.89?FUEL_PRICE_PER_GALLON:(r.fp||FUEL_PRICE_PER_GALLON)),mpg:String(r.mpg||TRUCK_MPG),tg:String(r.tg||5000)});}
       if(lR?.length)setLeads(lR.map(l=>({...l,callbackDate:l.callback_date||''})));
       const mergedLog=lgR?.length?mergeLogs(SEEDS,lgR):SEEDS;
       setLog(mergedLog);if(mergedLog[0])setRoute(mergedLog[0]);
