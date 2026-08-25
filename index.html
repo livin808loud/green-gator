@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Gator Dispatch — Green Gator</title>
+<title>Green Gator Enterprises — Ops Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
@@ -273,33 +273,73 @@ const LEADS=[
   {id:145,name:"Hajoca Supply — Augusta",phone:"706-868-8822",status:"Not called",notes:"Email: prf051@hajoca.com | Official: https://hajocaaugusta.com/contact-us/ | Address: 802 Scott Nixon Memorial Blvd, Augusta, GA 30907. Hours: Mon–Thu 7am–4pm; Fri 7am–3pm; after-hours emergency service advertised. Excellent plumbing/HVAC replenishment, same-day contractor/jobsite delivery, branch transfer, special-order and overflow route prospect. Hajoca has publicly documented using flexible outside same-day delivery capacity. Email first, then ask for the profit-center/branch manager or warehouse/delivery manager; confirm outside-carrier use and receiving hours before dispatch."}
 ];
 
-const SEEDS=[
-{
-  "id": 80,
-  "date": "2026-07-24",
-  "pickup": "AGS5 Appling, GA 30802",
-  "dropoff": "PX23658 Chapin, SC 29036",
-  "miles": 96,
-  "dh": 144,
-  "rpm": "3.83",
-  "pay": 367.45,
-  "fuel": 57.98,
-  "source": "Amazon Relay",
-  "comments": "Amazon Relay spot load 115SXMWBT. Pickup AGS5 Appling GA 30802, Fri 2026-07-24 06:30 EDT; drop PX23658 Chapin SC 29036, Fri 2026-07-24 10:42 EDT. 26 ft truck; Special Services; live service. Screenshot showed 96 loaded miles, 4h 24m displayed duration, $367.45 pay, and displayed $3.85/loaded mi. Deadhead corrected to a provisional 144 mi from the prior Tryon NC delivery to the AGS5 Appling pickup, using OSRM city-to-city routing; replace with actual miles if different. Total estimated miles 240. Calculated loaded RPM $3.83; all-in gross RPM $1.53. Fuel pending. Driver J. Green. Truck GA C963FF. Timing conflict: this Chapin delivery at 10:42 makes the same-day GlobalTranz Calhoun load pickup in Augusta 09:00-11:00 likely impossible without broker-approved timing changes. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
-},
-{
-  "id": 79,
-  "date": "2026-07-25",
-  "pickup": "INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta, GA 30909",
-  "dropoff": "Calhoun, GA 30703 (facility/street unknown)",
-  "miles": 211,
-  "dh": 83,
-  "rpm": "4.27",
-  "pay": 900,
-  "fuel": 71.02,
-  "source": "GlobalTranz / Fila Freight",
-  "comments": "GlobalTranz / Fila Freight load #32931079, quote #4780287, ref #SLC00353681. Pickup INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta GA 30909, Fri 2026-07-24 09:00-11:00; contact Mason Amacker, 985-635-9276. Delivery facility and street are shown as unknown; destination Calhoun GA 30703, Sat 2026-07-25 09:30-11:30. Straight-truck full load; 6 pallets / 6 pieces / 5,000 lb. Liftgate and pallet jack required; driver load and unload; bring a roll of shrink wrap. Flat rate $900. Rate confirmation does not state mileage; loaded mileage provisionally estimated at 211 mi by OSRM from exact pickup to Calhoun city/ZIP. Deadhead revised 2026-07-23 to a provisional 83 mi from the newly inserted prior PX23658 Chapin delivery to the Augusta pickup using OSRM city-to-address routing; replace with actual or re-chain if another load intervenes. Total estimated miles 294; loaded RPM $4.27; all-in gross RPM $3.06. Fuel pending. Timing conflict: prior Amazon 115SXMWBT delivery in Chapin is 10:42 on 2026-07-24, while this Augusta pickup window is 09:00-11:00, so service is likely impossible unless GlobalTranz/Vivint approve later pickup or the Amazon load changes. Equipment fields conflict: trailer type says Straight Truck while size says 48 or 53; verify the 26 ft box truck is accepted. POD is due within 1 day of delivery; late POD reduces rate 1% per day. Email invoice, rate confirmation, POD, and receipts to TLinvoices@globaltranz.com. Detention starts after 2 hours at $40/hr, max $200 per stop; notify broker after 60 minutes and provide a time-stamped BOL within 48 hours. Optional 3% / 3-day Quick Pay. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
-},
+const SEEDS=[{id:"98",date:"2026-08-14",pickup:"RBW LOGISTICS (SYENSQO), 1419 COLUMBIA NITROGEN ROAD, Augusta, GA 30901",dropoff:"KINTETSU WORLD EXPRESS (U.S.A.), INC. \u2013 ATLANTA, 235 SOUTHFIELD PARKWAY, SUITE 100, Forest Park, GA 30297",miles:155.5,dh:72.3,rpm:2.89,pay:450,fuel:150.0,comments:"Kintetsu World Express (KWE) straight BOL / Parkforest PDF. Carrier control/PRO LDI 2113350; billing reference 320611929045. Carrier GREEN GATOR ENTERPRISES LLC; driver Jacarr Green. Ship from RBW Logistics (Syensqo), 1419 Columbia Nitrogen Road, Augusta GA 30901; contacts Elizabeth Sangston 706-869-3301 / Kevin Nicholson 839-247-6155. Ship to KWE Atlanta Air Export, 235 Southfield Parkway Suite 100, Forest Park GA 30297; P: 470-343-7200; receiving M-F 08:00-18:00 / Sat 08:00-12:00. Ready 2026-08-14 arrive 08:00; close 15:30; ETA 14:30. Freight: Syensqo Belgium SN 4112320634 HAWB 320611929023 KCR 0003789954 \u2014 2 pallets 2,703 lb; Syensqo Malaysia SN 4112320635 HAWB 320611929034 KCR 0003789955 \u2014 1 pallet 428 lb; Syensqo Brazil SN 4112320264 HAWB 320611929045 KCR 0003789956 \u2014 3 pallets 3,325 lb; total 6 pallets / 6,456 lb; dims 46x45x45. Special: DO NOT STACK; truck must be clean prior to pickup; driver must have load straps/bars for all shipments. Inland freight 3rd party bill-to KWE Atlanta Forest Park. Loaded miles 155.5 estimated census+census+OSRM Augusta \u2192 Forest Park. Deadhead estimated 72.3 mi prior West Columbia SC drop (BlueGrace BG1204889026) \u2192 Augusta PU; replace with actual. Total estimated miles 227.8. Fuel initially pending. IFTA provisional total truck mi: SC 39.8 / GA 188.0. Timing note: BlueGrace West Columbia appt 08:00 same day as this Augusta ready 08:00 \u2014 chain only works if prior load finished early or this PU slips; confirm sequence. Form ATL-AEX-FRM-005 ver.1. Pay updated from Logistic Dynamics LLC rate confirmation Load #2113350 (Parkerrrrr PDF), generated 2026-08-14 1:49 PM EST; signed Jacarr Green 8/14/2026. Broker Jeffrey Senn (502) 874-5069; bill-to Logistic Dynamics LLC, 1140 Wehrle Dr, Buffalo NY 14221; payables@shipldi.com; Quick Pay quickpay@shipldi.com; docs via ldicarriers.com. Flat rate $450.00. Equipment Van Lift Gate / 26'. Delivery window on RC 2026-08-15 0800-1000 (can deliver same day before 1730). Min 2 load locks; verify pallet count before leaving shipper; POD+invoice within 24-48h; OS&D within 24h or $100 fine; sealed loads stay sealed. Driver must call (502) 874-5069 for dispatch. Loaded RPM $2.89; all-in gross RPM $1.98. Fuel initially pending. Fuel updated 2026-08-15: user reported $150.00 actual fuel via Telegram for LDI/KWE Load #2113350. Net after fuel $300.00; net per all 227.8 miles $1.32."},{id:"97",date:"2026-08-14",pickup:"LGE US DC N9Z, 342 INNOVATION DRIVE, Dalton, GA 30721",dropoff:"09UV WEST COLUMBIA MDO, 842 BISTLINE DR., STE 100, West Columbia, SC 29172",miles:302.46,dh:77.3,rpm:2.98,pay:900,fuel:310,comments:"BlueGrace Logistics (BGLF) carrier load tender/rate con Ref/BOL BG1204889026; Shipment/PRO/PO 18601201; Highway RC ID 11607534. Contact Thomas Hennessy thennessy@bluegracegroup.com. Tender 2026-08-13 12:39 PM. Carrier GREEN GATOR ENTERPRISES LLC (DOT 4110201). Pickup LGE US DC N9Z, 342 INNOVATION DRIVE, Dalton, GA 30721, appt 2026-08-13 19:00-19:00. Delivery 09UV WEST COLUMBIA MDO, 842 BISTLINE DR., STE 100, West Columbia, SC 29172, appt 2026-08-14 08:00-08:00; dock (516) 861-1440. Commodity Home Appliances; 22 pcs; 4000 lb. Equipment Straight Truck; load bars; driver assist 0; floor loaded; dolly needed; seal trailer. Special: PPE required; DRIVER RESPONSIBLE FOR GETTING FREIGHT TO & FROM THE FLOOR; MUST STAMP APPROVAL FOR SHIPPER & RECEIVER LOAD COUNT; min 2 load bars/straps; drive min 150 miles after leaving shipper; trailer clean/dry/odor free; driver info before PU; accessorials within 48h of delivery; automated tracking required for accessorial payments. Pay total $900.00 (line haul $778.80 FR + fuel $121.20 @ $0.40/mi); third party freight terms. Document loaded miles 302.46. Deadhead estimated 77.3 mi prior Alpharetta GA drop (KCH #9464545 KRG Oil) \u2192 Dalton PU via arcgis+OSRM; replace with actual. Total truck miles 379.76. Loaded RPM $2.98; all-in gross RPM $2.37. Fuel initially pending. IFTA provisional total truck mi: GA 310.4 / SC 69.4. POD/invoices within 24h of delivery to TLInvoices@bluegracegroup.com. Detention only if reported at event with in/out on BOL. OS&D before leaving consignee. Digitally accepted 2026-08-13 16:50 UTC by Jacarr (info@greengatorenterprises.com). Fuel updated 2026-08-13: user reported $310.00 actual fuel via Telegram for BlueGrace BG1204889026. Net after fuel $590.00; net per all 379.76 miles $1.55."},{id:"96",date:"2026-08-13",pickup:"FELLOWSHIP CHRISTIAN SCHOOL, 10965 WOODSTOCK ROAD, Roswell, GA 30075",dropoff:"KRG OIL SUITE B, 360 Winkler Drive, Alpharetta, GA 30004",miles:15.5,dh:42.6,rpm:12.9,pay:200,fuel:null,comments:"KCH Transportation rate confirmation Load #9464545; Highway RC ID 11586498. Broker contact Zineta Neighbors (980) 270-0264 zneighbors@kchtrans.com; KCH main (770) 962-6829. Carrier GREEN GATOR ENTERPRISES LLC; contact Jacarr Green, 706-726-9949. Pickup FELLOWSHIP CHRISTIAN SCHOOL, 10965 WOODSTOCK ROAD, Roswell, GA 30075, expected 2026-08-13, shipping/receiving 08:00-11:30, appointment not required. Delivery KRG OIL SUITE B, 360 Winkler Drive, Alpharetta, GA 30004, expected 2026-08-13, shipping/receiving 08:00-15:00, appointment not required. Commodity Tank / 1 tank 48x40x48 in / 2500 lbs. Special: 2 Straps; Liftgate; Straight Box Truck 26'. Pay USD $200.00 flat (RC omits miles). Loaded miles 15.5 estimated Census/Nominatim+OSRM Roswell \u2192 Alpharetta (pu=census:10965 WOODSTOCK RD, ROSWELL, GA, 30075; do=arcgis:360 Winkler Dr, Suite B, Alpharetta, Georgia, 30004). Deadhead estimated 42.6 mi prior Conyers GA drop (Accelerated #128717 Precision Corr) \u2192 Roswell PU (prior=census:1875 ROCKDALE INDUSTRIAL BLVD, CONYERS, GA, 30012); replace with actual. Total estimated miles 58.1. Loaded RPM $12.90; all-in gross RPM $3.44. Fuel pending. IFTA provisional all GA 58.1 mi (local GA hop + DH from Conyers). POD@kchtrans.com within 24h of delivery or $100 deduction. Daily check-call by 9am EST or $100/day. Missed PU/DEL up to $250/occurrence + consignee late charges. Detention: notify KCH within 2h after appt; late PU/DEL not eligible; FCFS detention only outside regular hours; stamped/written in/out on BOL. Tracking failure may be $250 deduction. Payments TriumphPay; Quick Pay paperwork payments@kchtrans.com; invoices billing@kchtrans.com. Digitally accepted 2026-08-13 13:05 UTC by Jacarr (info@greengatorenterprises.com)."},
+
+  {
+    "id": 94,
+    "date": "2026-08-12",
+    "pickup": "Poly Deck, 1790 Dewberry Rd, Spartanburg, SC 29307",
+    "dropoff": "HEIDELBERG-JEFFERSON QUARRY, 341 BECKER MINERALS LANE, Jefferson, SC 29718",
+    "miles": 110.0,
+    "dh": 24.2,
+    "rpm": 2.5,
+    "pay": 275.0,
+    "fuel": 266.0,
+    "comments": "Value Logistics INC rate confirmation Load #240309. Broker Chloe Baker, chloe@valueloads.com, (678)-487-5508 x344; fax (678)-666-3088. Value Logistics Inc DBA A1. Carrier GREEN GATOR ENTERPRISES LLC; Disp/Driver Jacarr Green; MC 1569745 DOT 4110201; truck 5331. Equipment Straight Box Truck full; commodity Mining equipments, 1 piece/pallet, 1447 lb, declared value $6850. Pickup Poly Deck, 1790 Dewberry Rd, Spartanburg SC 29307, 2026-08-11 4:00 PM (appt note 9am-6pm). Delivery HEIDELBERG-JEFFERSON QUARRY, 341 BECKER MINERALS LANE, Jefferson SC 29718, 2026-08-12 8:00 AM (appt 8am-4pm; 1 pallet). Refs WO# 286777 PO# 1200164496. Line haul $275.00 flat (RC omits miles). Loaded miles 110 (user-confirmed). Deadhead estimated 24.2 mi prior Greer SC drop (314 Trade St / del_36LCPYC43V) \u2192 Spartanburg pickup via Census+OSRM; user confirmed estimate is good. Total truck miles 134.2. Loaded RPM $2.50; all-in RPM $2.05. IFTA all SC (134.2 mi incl DH). Fuel initially pending. Dispatch notes: good condition else fine; PU window 9am-6pm; DEL 8am-4pm; delay fines. Paperwork Ap@valueloads.com; signed BOL within 7 days or deduction may apply. RC dated 08/11/2026 8:37 EST; signed 8/11/26. Fuel updated 2026-08-12: user reported $266.00 actual fuel via iMessage for Value Logistics Load #240309. Net after fuel $9.00; net per all 134.2 miles $0.07.",
+    "source": "Value Logistics"
+  },
+  {
+    "id": 93,
+    "date": "2026-08-11",
+    "pickup": "1700 W Pointe Dr, Charlotte, NC",
+    "dropoff": "314 Trade St, Greer, SC",
+    "miles": 82.2,
+    "dh": 15,
+    "rpm": 3.65,
+    "pay": 300.0,
+    "fuel": null,
+    "comments": "App delivery detail del_36LCPYC43V. Lane 1700 W Pointe Dr, Charlotte NC \u2192 314 Trade St, Greer SC. Payout $300.00. Document est loaded distance 82.2 mi. Delivery date/time 08/11/2026 1:46 PM. Driver Jacarr Green; Box Truck; violation None; accessory N/A. User-confirmed deadhead 15 mi (Telegram, scoped to this pictured load \u2014 not prior TONU). Total truck miles 97.2. Loaded RPM $3.65; all-in RPM $3.09. IFTA: NC 41.6 / SC 55.6. Fuel pending.",
+    "source": "App Delivery"
+  },
+  {
+    "id": 87,
+    "date": "2026-08-04",
+    "pickup": "JAX9, Jacksonville, FL (street not shown)",
+    "dropoff": "PX23854, Estill, SC 29918",
+    "miles": 222,
+    "dh": 10,
+    "rpm": "2.01",
+    "pay": 445.11,
+    "fuel": 166.0,
+    "source": "Amazon Relay",
+    "comments": "Amazon Relay spot load 113XJ9WL7; collapsed ref DDU-JAX9-1_031… (truncated in screenshot). Pickup JAX9, Jacksonville FL, Tue 2026-08-04 02:20 EDT; delivery PX23854, Estill SC 29918, Tue 2026-08-04 07:44 EDT. 26 ft truck; Special Services; live service. Screenshot: 222 loaded miles, 5h 36m displayed drive, starts-in 9h 48m at capture. Pay $445.11 ($2.01/mi displayed). Assigned J. Green / GA C963FF. Deadhead provisionally estimated at 10 mi in-Jacksonville from preceding CDS #130633570 delivery at Bellingham Marine Ind., 2014 Dennis Ct, Jacksonville FL 32204 to the JAX9 area (street for JAX9 not shown; OSRM ~10.3 mi using 7400 Imeson Rd industrial proxy); replace with actual. Total estimated miles 232; loaded RPM $2.01; all-in gross RPM $1.92; Fuel initially pending. IFTA provisional scaled from OSRM geometry on document 222 loaded miles plus estimated deadhead (FL/GA/SC). Fuel initially pending. Fuel updated 2026-08-04: user reported $166.00 actual fuel via Telegram. Allocated fully to Amazon Relay 113XJ9WL7 (only active load on 2026-08-04; 232 total truck miles). Net after fuel $279.11; net per all miles $1.20."
+  },
+  {
+    "id": 80,
+    "date": "2026-07-24",
+    "pickup": "AGS5 Appling, GA 30802",
+    "dropoff": "PX23658 Chapin, SC 29036",
+    "miles": 96,
+    "dh": 144,
+    "rpm": "3.83",
+    "pay": 367.45,
+    "fuel": 57.98,
+    "source": "Amazon Relay",
+    "comments": "Amazon Relay spot load 115SXMWBT. Pickup AGS5 Appling GA 30802, Fri 2026-07-24 06:30 EDT; drop PX23658 Chapin SC 29036, Fri 2026-07-24 10:42 EDT. 26 ft truck; Special Services; live service. Screenshot showed 96 loaded miles, 4h 24m displayed duration, $367.45 pay, and displayed $3.85/loaded mi. Deadhead corrected to a provisional 144 mi from the prior Tryon NC delivery to the AGS5 Appling pickup, using OSRM city-to-city routing; replace with actual miles if different. Total estimated miles 240. Calculated loaded RPM $3.83; all-in gross RPM $1.53. Fuel pending. Driver J. Green. Truck GA C963FF. Timing conflict: this Chapin delivery at 10:42 makes the same-day GlobalTranz Calhoun load pickup in Augusta 09:00-11:00 likely impossible without broker-approved timing changes. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
+  },
+  {
+    "id": 79,
+    "date": "2026-07-25",
+    "pickup": "INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta, GA 30909",
+    "dropoff": "Calhoun, GA 30703 (facility/street unknown)",
+    "miles": 211,
+    "dh": 83,
+    "rpm": "4.27",
+    "pay": 900,
+    "fuel": 71.02,
+    "source": "GlobalTranz / Fila Freight",
+    "comments": "GlobalTranz / Fila Freight load #32931079, quote #4780287, ref #SLC00353681. Pickup INV - Mason Amacker c/o Vivint, 3134 Wrightsboro Rd, Augusta GA 30909, Fri 2026-07-24 09:00-11:00; contact Mason Amacker, 985-635-9276. Delivery facility and street are shown as unknown; destination Calhoun GA 30703, Sat 2026-07-25 09:30-11:30. Straight-truck full load; 6 pallets / 6 pieces / 5,000 lb. Liftgate and pallet jack required; driver load and unload; bring a roll of shrink wrap. Flat rate $900. Rate confirmation does not state mileage; loaded mileage provisionally estimated at 211 mi by OSRM from exact pickup to Calhoun city/ZIP. Deadhead revised 2026-07-23 to a provisional 83 mi from the newly inserted prior PX23658 Chapin delivery to the Augusta pickup using OSRM city-to-address routing; replace with actual or re-chain if another load intervenes. Total estimated miles 294; loaded RPM $4.27; all-in gross RPM $3.06. Fuel pending. Timing conflict: prior Amazon 115SXMWBT delivery in Chapin is 10:42 on 2026-07-24, while this Augusta pickup window is 09:00-11:00, so service is likely impossible unless GlobalTranz/Vivint approve later pickup or the Amazon load changes. Equipment fields conflict: trailer type says Straight Truck while size says 48 or 53; verify the 26 ft box truck is accepted. POD is due within 1 day of delivery; late POD reduces rate 1% per day. Email invoice, rate confirmation, POD, and receipts to TLinvoices@globaltranz.com. Detention starts after 2 hours at $40/hr, max $200 per stop; notify broker after 60 minutes and provide a time-stamped BOL within 48 hours. Optional 3% / 3-day Quick Pay. Fuel updated 2026-07-24: user reported $129.00 actual fuel at 07:26 EDT. Allocated proportionally across today's active load chain by total truck miles: $57.98 to Amazon Relay 115SXMWBT (240/534 mi) and $71.02 to GlobalTranz 32931079 (294/534 mi)."
+  },
   {
     "id": 78,
     "date": "2026-07-23",
@@ -413,7 +453,7 @@ const SEEDS=[
     "rpm": "2.12",
     "pay": 205.16,
     "fuel": 100.0,
-    "comments": "Amazon Relay spot load 112L2FBZZ. Pickup GSO1, Kernersville NC 27284, Fri 2026-07-17 19:00 EDT; drop CLT9, Charlotte NC 28214, Fri 2026-07-17 22:06 EDT. 26 ft truck; Special Services; live service. Screenshot showed 97 loaded miles, 4h 21m, $205.16 pay, and $2.11/loaded mi. Deadhead estimated at 29 mi from the prior Amara Industries Lexington NC delivery to Kernersville using an OSRM city-to-city route (47.328 km / 29.41 mi); replace if actual differs. Total miles incl. estimated deadhead: 126. Calculated loaded RPM $2.12; all-in gross RPM $1.63. Fuel updated 2026-07-17: user reported $50.00 spent on the Kernersville load. Additional fuel updated 2026-07-18: user added another $50.00 to yesterday\u2019s load, bringing total load fuel to $100.00. Net after fuel $105.16; net per all miles $0.83. Driver J. Green. Truck GA C963FF. Timing note: the 19:00 pickup-to-22:06 delivery appointment span is 3h 6m, while the app displays 4h 21m."
+    "comments": "Amazon Relay spot load 112L2FBZZ. Pickup GSO1, Kernersville NC 27284, Fri 2026-07-17 19:00 EDT; drop CLT9, Charlotte NC 28214, Fri 2026-07-17 22:06 EDT. 26 ft truck; Special Services; live service. Screenshot showed 97 loaded miles, 4h 21m, $205.16 pay, and $2.11/loaded mi. Deadhead estimated at 29 mi from the prior Amara Industries Lexington NC delivery to Kernersville using an OSRM city-to-city route (47.328 km / 29.41 mi); replace if actual differs. Total miles incl. estimated deadhead: 126. Calculated loaded RPM $2.12; all-in gross RPM $1.63. Fuel updated 2026-07-17: user reported $50.00 spent on the Kernersville load. Additional fuel updated 2026-07-18: user added another $50.00 to yesterday’s load, bringing total load fuel to $100.00. Net after fuel $105.16; net per all miles $0.83. Driver J. Green. Truck GA C963FF. Timing note: the 19:00 pickup-to-22:06 delivery appointment span is 3h 6m, while the app displays 4h 21m."
   },
   {
     "id": 69,
@@ -701,7 +741,7 @@ const SEEDS=[
     "rpm": "2.19",
     "pay": 300.0,
     "fuel": 73.12,
-    "comments": "Short shuttle \u2014 137 total mi"
+    "comments": "Short shuttle — 137 total mi"
   },
   {
     "id": 18,
@@ -737,7 +777,7 @@ const SEEDS=[
     "rpm": "3.03",
     "pay": 459.89,
     "fuel": 78.28,
-    "comments": "Amazon Relay 112KKGV1L \u2014 AGS5 to WSC7; 20 mi deadhead; fuel estimated at 10 MPG / $5.15"
+    "comments": "Amazon Relay 112KKGV1L — AGS5 to WSC7; 20 mi deadhead; fuel estimated at 10 MPG / $5.15"
   },
   {
     "id": 19,
@@ -749,7 +789,7 @@ const SEEDS=[
     "rpm": "4.00",
     "pay": 300.0,
     "fuel": 38.63,
-    "comments": "Curri Eastern Industrial \u2014 2 items / 400 lb; loaded miles estimated from Augusta 30901 to Blythewood 29016"
+    "comments": "Curri Eastern Industrial — 2 items / 400 lb; loaded miles estimated from Augusta 30901 to Blythewood 29016"
   },
   {
     "id": 21,
@@ -1123,8 +1163,165 @@ const SEEDS=[
     "fuel": 95.0,
     "comments": "TQL rate confirmation PO# 37470905. Broker contact Stephen Bodet, 800-580-3101 x47342, MBodet@TQL.com; office staffed 24/7. Carrier Green Gator Enterprises LLC MC 1569745 / DOT 4110201. Pickup Orangeburg SC, Tue 2026-07-07 FCFS 08:00-14:00. Delivery Cameron SC, Tue 2026-07-07 FCFS 07:30-15:30. Commodity packaging materials; 1 truckload; estimated weight 5,140 lb; 26 ft straight box truck; FTL; non-hazardous; 0 pallets/0 cases shown. Loaded miles estimated from OSRM city-to-city route: 10 mi (15.4 km). Deadhead updated 2026-07-07: user confirmed 20 mi deadhead; exact pickup address not provided on rate con. Loaded RPM $15.00; all-in gross RPM $5.00. Fuel pending. Tracking required via P44, MacroPoint, or Carrier Dashboard. Deliver straight through. POD must be signed by shipper and receiver and sent to mbodet@tql.com upon delivery; submit rate confirmation, BOL/POD, receipts, and other paperwork within 24 hours to cinvoices@tql.com. Detention/accessorials require advance written approval; notify TQL at least 30 minutes before detention; detention generally starts after at least 3 hours unless agreed in writing. Late pickup/delivery may cause non-payment/special damages. No TONU unless TQL provided load details and approved travel toward pickup. Fuel updated 2026-07-07: user reported $95 fuel. Net after fuel $55.00; net per all miles $1.83."
   }
-];
-const IFTA_BY_ID={"80":{"GA":53,"SC":185,"NC":2},"79":{"GA":227,"SC":67},"78":{"SC":31,"NC":2},"77":{"NC":191,"SC":37},"76":{"NC":159},"75":{"NC":43},"74":{"GA":176,"SC":146,"NC":71},"73":{"GA":190},"70":{"NC":126},"69":{"GA":59,"NC":69,"SC":149},"68":{"SC":38},"67":{"GA":7,"SC":58},"66":{"GA":39,"SC":74},"65":{"GA":131,"NC":146,"SC":154},"64":{},"1783940581495":{"GA":31,"NC":69,"SC":149},"1783835522624":{"NC":90,"SC":16},"61":{"GA":66,"NC":69,"SC":149},"60":{"GA":41},"59":{"GA":64,"SC":118},"58":{"SC":80},"57":{"GA":39,"SC":75},"56":{},"55":{"GA":108,"SC":10},"54":{"GA":59,"SC":185},"51":{"SC":191,"GA":4},"1":{"GA":63,"NC":70,"SC":151},"2":{"GA":63,"NC":70,"SC":151},"3":{"NC":112,"SC":204},"4":{"GA":272,"SC":35},"5":{"GA":161,"SC":75},"16":{"GA":62,"NC":89,"SC":149},"17":{"GA":137},"18":{"GA":60},"52":{"GA":137},"20":{"GA":45,"SC":107},"19":{"GA":1,"SC":74},"21":{"GA":172},"22":{"GA":62},"23":{"DC":10,"MD":29,"NC":182,"SC":218,"VA":182,"GA":6},"26":{"MD":50},"27":{"NC":113,"VA":225},"24":{"GA":39,"SC":68},"25":{"GA":55,"SC":95},"28":{"GA":28,"SC":4},"29":{"SC":196},"30":{"GA":83,"SC":138},"31":{"GA":1,"NC":17,"SC":155},"32":{"GA":47},"33":{"GA":65,"NC":69,"SC":149},"34":{"NC":81,"SC":120},"35":{"GA":71,"SC":113},"37":{"NC":107,"SC":90},"36":{"GA":20,"NC":12,"SC":161},"38":{"GA":107},"39":{"GA":180},"40":{"GA":118},"41":{"GA":177,"SC":148},"43":{"GA":71,"SC":245},"42":{"GA":29,"SC":48},"44":{"GA":42,"SC":157},"45":{"GA":53,"SC":243},"47":{"GA":54},"46":{"GA":40,"SC":72},"48":{"GA":63,"NC":69,"SC":149},"49":{"GA":20,"NC":12,"SC":163},"50":{"NC":135,"SC":126},"53":{"SC":30}};
+,
+  {
+    "id": 90,
+    "date": "2026-08-10",
+    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
+    "dropoff": "Amara Industries, 2018 E. US-64, Lexington, NC 27292",
+    "miles": 249,
+    "dh": 28,
+    "rpm": 3.21,
+    "pay": 800.00,
+    "fuel": 132.00,
+    "source": "Haul'N Loads",
+    "comments": "Haul'N Loads LLC rate confirmation Load #5183 (AscendTMS), RC date 08/09/2026, ref Amara-5183. Broker haulnloads.billing@gmail.com / 734-796-0287; MC1407042. Carrier GREEN GATOR ENTERPRISES LLC, MC01569745, 706-726-9949. Pickup Mon 2026-08-10 08:00 Amara Industries GA, 130 Quality Dr, Thomson, GA 30824. Delivery Mon 2026-08-10 12:00-13:00 Amara Industries, 2018 E. US-64, Lexington, NC 27292. Equipment Van/Box Truck 26'; commodity Dry Goods (General); 1900 lbs; 6-12 pallets; dims 48x45x52; p/# 106350400103. Document loaded miles 249; flat pay $800.00. Deadhead provisionally estimated at 28 mi from home Martinez, GA to Thomson PU (overnight after 2026-08-09 Aiken Amazon drop); replace with actual. Total estimated miles 277. Loaded RPM $3.21; all-in gross RPM $2.89. Fuel initially pending. POD within 30 minutes of delivery. Tracking app required on request. >2 hrs early/late without consent may deduct up to 20% from RC. Driver signed Jacarr Green 8/9/26 (signature block); stops section said driver not set. IFTA provisional: GA 123 / NC 154 (DH all GA + loaded split scaled to doc 249). Fuel updated 2026-08-10: user reported $132.00 actual fuel via Telegram for Haul'N Loads #5183. Net after fuel $668.00; net per all 277 miles $2.41."
+  }
+,
+  {
+    "id": 91,
+    "date": "2026-08-11",
+    "pickup": "CLT9, 3620 Reeves Ridge Drive, Charlotte, NC 28214",
+    "dropoff": "DSC3, 744 Frontage Rd, Greenville, SC 29611",
+    "miles": 0,
+    "dh": 69,
+    "rpm": null,
+    "pay": 175,
+    "fuel": null,
+    "comments": "Amazon Relay TONU/canceled load 112ZLRFENG. User confirmed TONU compensation of $175.00. Screenshot shows Canceled status with pay $175.00 ($1.79/planned mi). Planned pickup CLT9, 3620 Reeves Ridge Drive, Charlotte NC 28214, Tue 2026-08-11 06:25 EDT (CPT departure 07:45 EDT); planned delivery DSC3, 744 Frontage Rd, Greenville SC 29611, Tue 2026-08-11 09:36 EDT. Planned equipment 26 ft truck; Special Services; planned loaded distance 98 mi; app duration 4h 26m. No freight moved (could not get loaded), so loaded miles set to 0. User confirmed 69 mi deadhead driven to the CLT9 pickup. Total actual miles: 69. TONU revenue $175.00; all-in gross RPM $2.54. Fuel pending. Driver J. Green. Truck GA C963FF.",
+    "source": "Amazon Relay"
+  }
+,
+  {
+    "id": 92,
+    "date": "2026-08-11",
+    "pickup": "Ferris Group, 1006 W Academy St, Cherryville, NC 28021",
+    "dropoff": "DBT - DODGE BELTON, 905 SC HWY 247, Belton, SC 29627",
+    "miles": 0,
+    "dh": 30,
+    "rpm": null,
+    "pay": 150,
+    "fuel": null,
+    "comments": "KCH Transportation TONU / carrier removal confirmation load #9463005; Highway Rate Confirmation ID 11500723. Broker contact Samantha Phillips, (423) 786-0663, sphillips@kchtrans.com; KCH main (770) 962-6829. Carrier GREEN GATOR ENTERPRISES LLC; contact Jacarr Green, 706-726-9949. TONU fee description: TONU - Load Not Ready, USD $150.00. Planned pickup Ferris Group, 1006 W Academy St, Cherryville NC 28021, expected 2026-08-11. Planned delivery DBT - DODGE BELTON, 905 SC HWY 247, Belton SC 29627, expected 2026-08-11. No freight moved; loaded miles 0. User confirmed 30 mi deadhead driven toward the Cherryville pickup. Total actual miles: 30. TONU revenue $150.00; all-in gross RPM $5.00. Fuel pending. Digitally accepted 2026-08-11 14:35 UTC by Jacarr (info@greengatorenterprises.com). Payments via TriumphPay; Quick Pay paperwork to payments@kchtrans.com; invoices/support docs to billing@kchtrans.com. POD@kchtrans.com within 24 hrs normally applies to delivered loads.",
+    "source": "KCH Transportation"
+  },
+{
+  "id": 95,
+  "date": "2026-08-13",
+  "pickup": "VICTORY PACKAGING-FORT MILL, 1962 HWY 160 W, SUITE 100, FORT MILL, SC 29708",
+  "dropoff": "PRECISION CORR, 1875 ROCKDALE INDUSTRIAL BLVD, CONYERS, GA 30012",
+  "miles": 265.3,
+  "dh": 60.6,
+  "rpm": "1.88",
+  "pay": 500.0,
+  "fuel": null,
+  "comments": "Accelerated Logistics rate confirmation Load #128717 (Millfort PDF). Dispatcher Zoe P, 817-572-1800, setup@acceleratedlogistics.com. W/O / PO 006000058887, SHIPWELL TBPPXT. Carrier GREEN GATOR ENTERPRISES LLC; driver/dispatcher Jacarr Green 706-726-9949; truck 5331; signed 8/12/26. Equipment Straight Van / 14-26 dock-height box truck (GG 26 ft OK). Pickup VICTORY PACKAGING-FORT MILL, 1962 HWY 160 W, SUITE 100, FORT MILL, SC 29708, 2026-08-12, FCFS shipping hours 0800-1300 exclusive (no appointment). Delivery PRECISION CORR, 1875 ROCKDALE INDUSTRIAL BLVD, CONYERS, GA 30012, 2026-08-13, notes 0800-0900 ASAP; receiving 0700-1200 M-F (no appointment). Commodity PACKAGING MATERIAL; qty 1; 300 lbs. Exclusive truck only — no other freight. Time sensitive; on-time failure/customer fines; late delivery $350/day + chargebacks; missed/rescheduled appt = late. FCFS-No Detention. 2 load locks or cargo straps; driver must count freight. Daily check-call 7am-10am CST @ 817-572-1800 or $25 penalty. Clear legible shipper BOL with invoice or $25; POD scanned within 24h of delivery to setup@acceleratedlogistics.com or $50. No-show $500 if not at shipper within 4h of agreed pickup. Double brokering not allowed. Payment NET 30. RC omits miles; loaded miles 265.3 estimated Census/Nominatim+OSRM Fort Mill SC → Conyers GA. Deadhead estimated 60.6 mi prior Jefferson SC drop (Value #240309 Heidelberg quarry area) → Fort Mill PU; replace with actual. Total estimated miles 325.9. Loaded RPM $1.88; all-in gross RPM $1.53. Fuel pending. IFTA provisional total truck mi: SC 194.4 / GA 131.5 (DH all SC + loaded split scaled to 265.3).",
+  "source": "Accelerated Logistics"
+},
+  {
+    "id": 99,
+    "date": "2026-08-17",
+    "pickup": "Amara Industries GA, 130 Quality Dr, Thomson, GA 30824",
+    "dropoff": "Amara Industries, 2018 E. US-64, Lexington, NC 27292",
+    "miles": 249.0,
+    "dh": 120.1,
+    "rpm": 3.21,
+    "pay": 800.0,
+    "fuel": 281.0,
+    "comments": "Haul'N Loads LLC rate confirmation Load #5231 (Tonlexing.pdf / AscendTMS), RC date 08/15/2026, ref Amara-5231. Broker haulnloads.billing@gmail.com / 734-796-0287; MC1407042. Carrier GREEN GATOR ENTERPRISES LLC, MC01569745, 706-726-9949; Atlanta mailing address on RC. Pickup Mon 2026-08-17 07:30-08:00 Amara Industries GA, 130 Quality Dr, Thomson, GA 30824. Delivery Mon 2026-08-17 12:00-13:00 Amara Industries, 2018 E. US-64, Lexington, NC 27292; phone 336-370-5800. Equipment Van/Box Truck 26'; commodity Dry Goods (General); 1900 lbs; 10 pallets; dims 48x45x52; p/# 106350400103. Document loaded miles 249; flat pay $800.00. Deadhead provisionally estimated at 120.1 mi from prior 2026-08-14 KWE Atlanta drop (KINTETSU WORLD EXPRESS (U.S.A.), INC. \u2013 ATLANTA, 235 SOUTHFIELD PARKWAY, SUITE 100, Forest Park, GA 30297) \u2192 Thomson PU via arcgis+OSRM (120.1 mi / ~2.3h); replace with actual. Total estimated miles 369.1. Loaded RPM $3.21; all-in gross RPM $2.17. Fuel initially pending. POD within 30 minutes of delivery. Tracking app required on request. >2 hrs early/late without consent may deduct up to 20% from RC. No layover without consent. Updates required; if email unanswered call and leave VM. RC notes also include Antolin dock/key/chock language (boilerplate). RC notes line shows '8am & 08/10/2026' but stop schedule is 08/17/26 \u2014 using stop windows. Driver field says not set on RC. IFTA provisional: GA 290.8 / NC 78.3 (DH split + loaded split scaled to doc 249). Fuel updated 2026-08-17: user reported $281.00 actual fuel via Telegram for Haul'N Loads Load #5231. Net after fuel $519.00; net per all 369.1 miles $1.41.",
+    "source": "Haul'N Loads"
+  },
+  {
+    "id": 100,
+    "date": "2026-08-18",
+    "pickup": "FINCH INDUSTRIES INC, 104 Williams St, Thomasville, NC 27360",
+    "dropoff": "Creekside at the Grounds, 933 Gate View Lane, Winston-Salem, NC 27105",
+    "miles": 23.5,
+    "dh": 9.6,
+    "rpm": 12.77,
+    "pay": 300.0,
+    "fuel": null,
+    "comments": "American Logistics Inc rate confirmation Load #131035698; Highway RC ID 11712439 (Salemssss.pdf). Broker contact Terron Dixon (704) 635-5477 tdixon@amloginc.com; American Logistics Inc, 2034 Hamilton Place Blvd #210, Chattanooga, TN 37421. Carrier GREEN GATOR ENTERPRISES LLC. Pickup Mon 2026-08-17 08:00-16:00 FINCH INDUSTRIES INC, 104 Williams St, Thomasville, NC 27360; phone (336) 472-4499. Delivery Tue 2026-08-18 08:00 appointment Creekside at the Grounds, 933 Gate View Lane, Winston-Salem, NC 27105. Equipment on RC: 24 ft Straight Truck / Full (Green Gator operates 26 ft \u2014 verify accepted as min/category). Commodity Furniture; 3 pallets; 8,000 lb; liftgate-delivery and residential-delivery listed at $0.00. RC shows a HAZMAT header with no class/UN/SDS \u2014 furniture commodity only; verify BOL/shipping papers before loading. RC omits miles; loaded miles 23.5 calculated via census+OSRM Thomasville\u2192Winston-Salem (23.5 mi / ~0.7h). Flat pay $300.00. Deadhead provisionally estimated at 9.6 mi from prior 2026-08-17 Haul'N #5231 Lexington NC drop \u2192 Thomasville PU via census+OSRM (9.6 mi / ~0.2h); replace with actual. Total estimated miles 33.1. Loaded RPM $12.77; all-in gross RPM $9.06. Fuel pending. Tracking mandatory (Chain/Text Location/Highway); $50 fee if not tracking on PU/DEL notes; non-compliance tracking fee up to $250. Missed appointment penalty $100; instruction non-compliance may fine $150/infraction. Detention after 3 hrs free with on-time arrival + signed bills: $25/hr max $150/24h. Accessorials must be pre-approved. Count/inspect freight; OS&D before departure. Billing: TriumphPay secure.triumphpay.com; invoice+POD to carrierpay@amloginc.com; Net-37; 2-day QuickPay 2.5%; invoices >90 days waived. Dashboard date = delivery 2026-08-18. IFTA all NC (33.1 mi incl DH).",
+    "source": "American Logistics"
+  }
+,
+    {
+    "id": 101,
+    "date": "2026-08-19",
+    "pickup": "KINGSDOWN- MEBANE, 7320 OAKWOOD ST. EXT., MEBANE, NC 27302",
+    "dropoff": "MATTRESS WAREHOUSE SC, 425 DISTRIBUTION DR. SUITE #400, WEST COLUMBIA, SC 29170",
+    "miles": 221.0,
+    "dh": 61.8,
+    "rpm": 2.71,
+    "pay": 600.0,
+    "fuel": 251.0,
+    "comments": "Ryder Freight Management Group carrier load tender Reference/BOL/Load ID #99104649; SID Q176551; Shipment ID SN1526319; tender 2026-08-18 10:21. Carrier GREEN GATOR ENTERPRISES LLC; equipment 26 Box Truck (SB). Pickup KINGSDOWN- MEBANE, 7320 OAKWOOD ST. EXT., Mebane NC 27302, 2026-08-18 12:00-13:00; Jason Niles 919-563-3531. Delivery MATTRESS WAREHOUSE SC, 425 DISTRIBUTION DR. SUITE #400, West Columbia SC 29170, 2026-08-19 10:00 appointment; Shipping Dept 703-939-7488. Freight MISC; 20 pieces; 1,442 lb; class 50. Flat line haul/pay $600.00. Document loaded miles 221. Deadhead provisionally estimated at 61.8 mi from prior 2026-08-18 Winston-Salem NC drop (Creekside at the Grounds, 933 Gate View Lane) to Mebane pickup via arcgis/census+OSRM (~1.3 hr); replace with actual. Total estimated miles 282.8. Loaded RPM $2.71; all-in gross RPM $2.12. Tracking required: driver is ineligible for detention and may face fines for failure to track. Report added charges to Account Executive within 24 hours and submit supporting documents within 48 hours of delivery. Send invoice and POD to RyderFMGpaperwork@ryder.com within 15 days of delivery to avoid payment risk; billing questions CL_CarrierAp@Ryder.com. Riley Farrell 469-930-2872. Dashboard date = delivery 2026-08-19. IFTA provisional: NC 191.8 / SC 91.0 (loaded split scaled exactly to document 221 mi plus NC deadhead). Fuel updated 2026-08-18: user reported $251.00 actual fuel via Telegram; linked to Ryder load #99104649 Mebane NC → West Columbia SC. Net after fuel $349.00; net per all 282.8 miles $1.23.",
+    "source": "Ryder Freight Management Group"
+,
+  {
+    "id": 102,
+    "date": "2026-08-24",
+    "pickup": "AGS1 Amazon, 2150 Discovery Dr, Appling, GA 30802",
+    "dropoff": "DLT3, Concord, NC 28027 (street address not shown)",
+    "miles": 194.0,
+    "dh": 84.3,
+    "rpm": 3.15,
+    "pay": 611.0,
+    "fuel": 122.0,
+    "comments": "Amazon Relay spot trip 113YY2WXZ, In Transit. Pickup AGS1, 2150 Discovery Dr, Appling GA 30802, Mon 2026-08-24 07:15 EDT; delivery DLT3, Concord NC 28027, Mon 2026-08-24 12:16 EDT (delivery street address not visible). Screenshot shows 194 loaded miles, 6h 16m displayed duration, 26 ft truck, Special Services, driver J. Green, pay $611.00, and displayed $3.15/loaded mi. Deadhead provisionally estimated at 84.3 mi from prior logged delivery at 425 Distribution Dr Suite 400, West Columbia SC to AGS1 via ArcGIS score-100 endpoints + OSRM; replace with actual. Total estimated truck miles 278.3; loaded RPM $3.15; all-in gross RPM $2.20. Fuel initially pending. Fuel updated 2026-08-24: user reported $122.00 actual fuel via Telegram; linked to Amazon Relay trip 113YY2WXZ AGS1 Appling GA → DLT3 Concord NC. Net after fuel $489.00; net per all 278.3 miles $1.76. IFTA provisional: SC 213.5 / GA 36.0 / NC 28.8. Timing note: appointment span is 5h 01m while the app displays 6h 16m; preserve both.",
+    "source": "Amazon Relay",
+  {
+    "id": 103,
+    "date": "2026-08-24",
+    "pickup": "CLT3 Amazon, 6500 Davidson Hwy, Concord, NC 28027",
+    "dropoff": "AGS5 Amazon, 785 Innovation Pkwy, Appling, GA 30802",
+    "miles": 198.0,
+    "dh": 3.1,
+    "rpm": 2.47,
+    "pay": 488.32,
+    "fuel": 185.0,
+    "comments": "Amazon Relay spot return load 1162D3H1Q. Pickup CLT3, 6500 Davidson Hwy, Concord NC 28027, Mon 2026-08-24 15:30 EDT; delivery AGS5, 785 Innovation Pkwy, Appling GA 30802, Mon 2026-08-24 20:30 EDT. Screenshot shows 198 loaded miles, 6h 15m displayed duration, 26 ft truck, Special Services, Live service, driver J. Green, truck GA C963FF, pay $488.32, and displayed $2.46/loaded mi. Deadhead provisionally estimated at 3.1 mi from prior DLT3 drop, 413 Goodman Rd Concord, to CLT3 via ArcGIS score-100 endpoints + OSRM (~8 min); replace with actual. Total estimated truck miles 201.1; loaded RPM $2.47; all-in gross RPM $2.43. Fuel initially pending. Fuel updated 2026-08-24: user reported extra $185.00 actual fuel via Telegram; linked to Amazon Relay return load #1162D3H1Q CLT3 Concord NC → AGS5 Appling GA. Net after fuel $303.32; net per all 201.1 miles $1.51. IFTA provisional: NC 35.2 / SC 144.4 / GA 21.5. Timing note: 15:30 pickup to 20:30 delivery spans 5h while the app displays 6h 15m; preserve both.",
+    "source": "Amazon Relay"
+  },
+  {
+    "id": 104,
+    "date": "2026-08-25",
+    "pickup": "Doctors Hospital, 3651 Wheeler Rd, Augusta, GA 30909",
+    "dropoff": "Tutt Contracting, 5015 Parham Road, Grovetown, GA 30813",
+    "miles": 11.0,
+    "dh": 14.8,
+    "rpm": 35.0,
+    "pay": 385.0,
+    "fuel": null,
+    "comments": "PLS Logistics rate confirmation Load #32309113 (Hospital dump.pdf). Rep Isaac Ayala 904-539-3807; tracking lsjaxtracking@plslogistics.com; POD iayala@plslogistics.com. Carrier GREEN GATOR ENTERPRISES LLC; DOT 4110201; contact Jacarr Green 706-726-9949. Pickup Doctors Hospital, 3651 Wheeler Rd, Augusta GA 30909, 2026-08-25 11:00-12:00; Edgardo Arasme 903-355-6807. Delivery Tutt Contracting, 5015 Parham Road, Grovetown GA 30813, 2026-08-25 13:00-15:30. Equipment Straight Truck 26 (GG 26 ft OK). Commodity Debris; 3000 lb. Pay estimated award $385.00 (line haul $250 + detention $35 + lumper $100). Document loaded miles 11. Deadhead estimated 14.8 mi prior AGS5 Appling drop (Amazon Relay 1162D3H1Q, 785 Innovation Pkwy) \u2192 Augusta PU via arcgis:785 Innovation Pkwy, Appling, Georgia, 30802 + census:3651 WHEELER RD, AUGUSTA, GA, 30909 + OSRM 14.76 mi / ~0.35h; replace with actual. Total estimated miles 25.8. Loaded RPM $35.00; all-in gross RPM $14.92. Fuel pending. IFTA all GA 25.8 mi (DH+loaded). MacroPoint/Samsara tracking mandatory within 1 hour of pickup or 25% rate reduction. Clear photos of signed POD within 24 hours after delivery to iayala@plslogistics.com or $250 deducted. TONU $150 only if broker fault and driver onsite. Detention 3h then $35/hr with signed in/out (already $35 in award). Invoice+POD freightbills@plslogistics.com. Dashboard date = 2026-08-25.",
+    "source": "PLS Logistics"
+  },
+  {
+    "id": 105,
+    "date": "2026-08-26",
+    "pickup": "Amara Industries / Thomson Plastics, 130 Quality Drive, Thomson, GA 30824",
+    "dropoff": "EZGO WEST CAMPUS - 1080, 1710 MARVIN GRIFFIN RD-DOCK DOORS 43-50, Augusta, GA 30906",
+    "miles": 37.6,
+    "dh": 21.9,
+    "rpm": 7.31,
+    "pay": 275.0,
+    "fuel": null,
+    "comments": "KCH Transportation rate confirmation Load #9471867; Highway RC ID 12029122 (Tthomson.pdf). Broker contact Drew McMillon (423) 680-7383 dmcmillon@kchtrans.com; KCH main (770) 962-6829. Carrier GREEN GATOR ENTERPRISES LLC; contact Jacarr Green, 706-726-9949. Digitally accepted 2026-08-25 19:41 UTC by Jacarr (info@greengatorenterprises.com). Pickup Amara Industries / Thomson Plastics, 130 Quality Drive, Thomson, GA 30824, expected 2026-08-26, shipping/receiving 11:00-12:00, appointment not required. Delivery EZGO WEST CAMPUS - 1080, 1710 MARVIN GRIFFIN RD-DOCK DOORS 43-50, Augusta, GA 30906, expected 2026-08-26, shipping/receiving 12:00-15:00, appointment not required. Equipment Straight Box Truck 26'; special 2 Straps; FORKLIFT ACCESSIBLE BOX TRUCK REQUIRED. Commodity golf cart parts; 12 pallets 40x48x34 in; 6000 lbs. Pay USD $275.00 flat (RC omits miles). Loaded miles 37.6 estimated census+census+OSRM Thomson \u2192 Augusta (pu=census:130 QUALITY DR, THOMSON, GA, 30824; do=census:1710 MARVIN GRIFFIN RD, AUGUSTA, GA, 30906; 37.63 mi / ~0.83h). Deadhead estimated 21.9 mi prior Grovetown drop (PLS #32309113 Tutt Contracting, 5015 Parham Rd) \u2192 Thomson PU (prior=census:5015 PARHAM RD, GROVETOWN, GA, 30813); replace with actual. Total estimated miles 59.5. Loaded RPM $7.31; all-in gross RPM $4.62. Fuel pending. IFTA all GA 59.5 mi. Trucker Tools tracking required or $250 rate reduction. Dedicated truck. POD@kchtrans.com within 24h of delivery or $100 deduction. Daily check-call by 9am EST or $100/day. Missed PU/DEL up to $250/occurrence + consignee late charges. Detention: notify KCH within 2h after appt; late PU/DEL not eligible; FCFS detention only outside regular hours; stamped/written in/out on BOL. Payments TriumphPay; Quick Pay paperwork payments@kchtrans.com; invoices billing@kchtrans.com. Dashboard date = 2026-08-26.",
+    "source": "KCH Transportation"
+  }
+  }];
+const IFTA_BY_ID={"105":{"GA":59.5},"104":{"GA":25.8},"103":{"NC":35.2,"SC":144.4,"GA":21.5},"102":{"GA":36.0,"SC":213.5,"NC":28.8},"101":{"NC":191.8,"SC":91.0},"98":{"GA":188,"SC":39.8},"97":{"GA":310.4,"SC":69.4},"96":{GA:58.1},"80":{"GA":53,"SC":185,"NC":2},"79":{"GA":227,"SC":67},"78":{"SC":31,"NC":2},"77":{"NC":191,"SC":37},"76":{"NC":159},"75":{"NC":43},"74":{"GA":176,"SC":146,"NC":71},"73":{"GA":190},"70":{"NC":126},"69":{"GA":59,"NC":69,"SC":149},"68":{"SC":38},"67":{"GA":7,"SC":58},"66":{"GA":39,"SC":74},"65":{"GA":131,"NC":146,"SC":154},"64":{},"1783940581495":{"GA":31,"NC":69,"SC":149},"1783835522624":{"NC":90,"SC":16},"61":{"GA":66,"NC":69,"SC":149},"60":{"GA":41},"59":{"GA":64,"SC":118},"58":{"SC":80},"57":{"GA":39,"SC":75},"56":{},"55":{"GA":108,"SC":10},"54":{"GA":59,"SC":185},"51":{"SC":191,"GA":4},"1":{"GA":63,"NC":70,"SC":151},"2":{"GA":63,"NC":70,"SC":151},"3":{"NC":112,"SC":204},"4":{"GA":272,"SC":35},"5":{"GA":161,"SC":75},"16":{"GA":62,"NC":89,"SC":149},"17":{"GA":137},"18":{"GA":60},"52":{"GA":137},"20":{"GA":45,"SC":107},"19":{"GA":1,"SC":74},"21":{"GA":172},"22":{"GA":62},"23":{"DC":10,"MD":29,"NC":182,"SC":218,"VA":182,"GA":6},"26":{"MD":50},"27":{"NC":113,"VA":225},"24":{"GA":39,"SC":68},"25":{"GA":55,"SC":95},"28":{"GA":28,"SC":4},"29":{"SC":196},"30":{"GA":83,"SC":138},"31":{"GA":1,"NC":17,"SC":155},"32":{"GA":47},"33":{"GA":65,"NC":69,"SC":149},"34":{"NC":81,"SC":120},"35":{"GA":71,"SC":113},"37":{"NC":107,"SC":90},"36":{"GA":20,"NC":12,"SC":161},"38":{"GA":107},"39":{"GA":180},"40":{"GA":118},"41":{"GA":177,"SC":148},"43":{"GA":71,"SC":245},"42":{"GA":29,"SC":48},"44":{"GA":42,"SC":157},"45":{"GA":53,"SC":243},"47":{"GA":54},"46":{"GA":40,"SC":72},"48":{"GA":63,"NC":69,"SC":149},"49":{"GA":20,"NC":12,"SC":163},"50":{"NC":135,"SC":126},"53":{"SC":30},"87":{"FL":52,"GA":112,"SC":68},"90":{"GA":123,"NC":154},
+  "91": {"NC": 69}
+,
+  "92": {"NC": 30}
+,
+  "93": {"NC": 41.6, "SC": 55.6}
+,
+  "94": {"SC": 134.2},
+  "95": {"SC": 194.4, "GA": 131.5},
+  "99": {"GA": 290.8, "NC": 78.3},
+  "100": {"NC": 33.1}
+};
 SEEDS.forEach(e=>{e.ifta=IFTA_BY_ID[String(e.id)]??null;e.iftaStatus='calculated';});
 const SEED=SEEDS[0];
 const SU_URL='https://bzbaifskyvjhvooteowx.supabase.co';
@@ -1158,196 +1355,55 @@ const cbColor=d=>{if(!d)return null;const t=todayStr();if(d<t)return '#f87171';i
 const sg=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}};
 const ss=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}};
 
-// Session + GoTrue helpers (multi-tenant RLS requires a user JWT, not the anon key)
-const GG_SESSION_KEY='gg-session';
-const GG_ORG_ID='11111111-1111-4111-8111-111111111111'; // Green Gator tenant #1 (claim via SQL once)
-const loadSession=()=>{try{const v=localStorage.getItem(GG_SESSION_KEY);return v?JSON.parse(v):null;}catch{return null;}};
-const saveSession=s=>{try{if(s)localStorage.setItem(GG_SESSION_KEY,JSON.stringify(s));else localStorage.removeItem(GG_SESSION_KEY);}catch{}};
-const parseHashTokens=()=>{
-  const h=(window.location.hash||'').replace(/^#/,'');
-  if(!h||h.indexOf('access_token=')<0)return null;
-  const p=new URLSearchParams(h);
-  const access_token=p.get('access_token'), refresh_token=p.get('refresh_token');
-  if(!access_token)return null;
-  const expires_in=parseInt(p.get('expires_in')||'3600',10);
-  return{access_token,refresh_token,expires_at:Date.now()+expires_in*1000,token_type:p.get('token_type')||'bearer',user:null};
-};
-async function authRequest(path,body,method='POST',token=null){
-  const headers={'apikey':SU_KEY,'Content-Type':'application/json'};
-  if(token)headers['Authorization']='Bearer '+token;
-  const r=await fetch(SU_URL+'/auth/v1'+path,{method,headers,body:body==null?undefined:JSON.stringify(body)});
-  const text=await r.text();
-  let data=null;try{data=text?JSON.parse(text):null;}catch{data={message:text};}
-  if(!r.ok){
-    const msg=data?.error_description||data?.msg||data?.message||data?.error||('HTTP '+r.status);
-    throw new Error(msg);
-  }
-  return data;
-}
-async function refreshSession(sess){
-  if(!sess?.refresh_token)return null;
-  const data=await authRequest('/token?grant_type=refresh_token',{refresh_token:sess.refresh_token});
-  const next={
-    access_token:data.access_token,
-    refresh_token:data.refresh_token||sess.refresh_token,
-    expires_at:Date.now()+((data.expires_in||3600)*1000),
-    token_type:data.token_type||'bearer',
-    user:data.user||sess.user||null,
-  };
-  saveSession(next);return next;
-}
-async function ensureFreshSession(sess){
-  if(!sess?.access_token)return null;
-  // refresh 60s early
-  if(sess.expires_at && Date.now()<sess.expires_at-60000)return sess;
-  try{return await refreshSession(sess);}catch(e){console.warn('session refresh failed',e);saveSession(null);return null;}
-}
-async function fetchAuthUser(accessToken){
-  return authRequest('/user',null,'GET',accessToken);
-}
-async function signInWithPassword(email,password){
-  const data=await authRequest('/token?grant_type=password',{email,password});
-  const sess={
-    access_token:data.access_token,
-    refresh_token:data.refresh_token,
-    expires_at:Date.now()+((data.expires_in||3600)*1000),
-    token_type:data.token_type||'bearer',
-    user:data.user||null,
-  };
-  if(!sess.user){try{sess.user=await fetchAuthUser(sess.access_token);}catch{}}
-  saveSession(sess);return sess;
-}
-async function signInWithOtp(email){
-  await authRequest('/otp',{email,create_user:true,data:{},redirect_to:window.location.href.split('#')[0]});
-  // Prefer PKCE-less magiclink; redirect handled by Supabase Site URL config
-  return true;
-}
-async function signOutSession(sess){
-  try{if(sess?.access_token)await authRequest('/logout',{},'POST',sess.access_token);}catch{}
-  saveSession(null);
-}
-
-function makeDB(url,anonKey,getAccessToken){
-  const token=()=>{
-    try{const t=typeof getAccessToken==='function'?getAccessToken():null;return t||anonKey;}catch{return anonKey;}
-  };
-  const H=(x={})=>({'apikey':anonKey,'Authorization':'Bearer '+token(),'Content-Type':'application/json',...x});
+function makeDB(url,key){
+  const H=(x={})=>({'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json',...x});
   const base=url+'/rest/v1';
-  const withConflict=(p,onConflict)=>{
-    if(!onConflict)return p;
-    return p+(p.includes('?')?'&':'?')+'on_conflict='+encodeURIComponent(onConflict);
-  };
   return{
     get:async p=>{const r=await fetch(base+'/'+p,{headers:H()});if(!r.ok)throw new Error(r.status);return r.json();},
-    // u=true upsert. onConflict e.g. 'org_id' or 'org_id,key' required when PK is not the natural key.
-    post:async(p,b,u=false,onConflict=null)=>{
-      const ex=u?{'Prefer':'resolution=merge-duplicates,return=representation'}:{'Prefer':'return=representation'};
-      const r=await fetch(base+'/'+withConflict(p,u?onConflict:null),{method:'POST',headers:H(ex),body:JSON.stringify(b)});
-      if(!r.ok){const t=await r.text();throw new Error(r.status+(t?': '+t.slice(0,180):''));}
-      const t=await r.text();return t?JSON.parse(t):null;
-    },
-    patch:async(p,b)=>{const r=await fetch(base+'/'+p,{method:'PATCH',headers:H({'Prefer':'return=minimal'}),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);},
-    del:async p=>{const r=await fetch(base+'/'+p,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(r.status);},
-    rpc:async(fn,args={})=>{
-      const r=await fetch(url+'/rest/v1/rpc/'+fn,{method:'POST',headers:H({'Prefer':'return=representation'}),body:JSON.stringify(args)});
-      if(!r.ok){const t=await r.text();throw new Error(r.status+(t?': '+t.slice(0,180):''));}
-      const t=await r.text();return t?JSON.parse(t):null;
-    }
+    post:async(p,b,u=false)=>{const ex=u?{'Prefer':'resolution=merge-duplicates,return=representation'}:{'Prefer':'return=representation'};const r=await fetch(base+'/'+p,{method:'POST',headers:H(ex),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);const t=await r.text();return t?JSON.parse(t):null;},
+    patch:async(p,b)=>{const r=await fetch(base+'/'+p,{method:'PATCH',headers:H(),body:JSON.stringify(b)});if(!r.ok)throw new Error(r.status);},
+    del:async p=>{const r=await fetch(base+'/'+p,{method:'DELETE',headers:H()});if(!r.ok)throw new Error(r.status);}
   };
 }
 
-function AuthScreen({onAuthed}){
-  const [mode,setMode]=useState('password'); // password | magic
-  const [email,setEmail]=useState('');
-  const [password,setPassword]=useState('');
-  const [busy,setBusy]=useState(false);
-  const [err,setErr]=useState('');
-  const [sent,setSent]=useState(false);
-  const submit=async()=>{
-    setErr('');setBusy(true);
+function SetupScreen({onConnect,onSkip}){
+  const [url,setUrl]=useState('');const [key,setKey]=useState('');const [testing,setTesting]=useState(false);const [err,setErr]=useState('');
+  const connect=async()=>{
+    if(!url.trim()||!key.trim()){setErr('Both fields required.');return;}
+    const u=url.trim().replace(/\/$/,'');setTesting(true);setErr('');
     try{
-      const em=email.trim().toLowerCase();
-      if(!em||!em.includes('@'))throw new Error('Enter a valid email');
-      if(mode==='password'){
-        if(!password)throw new Error('Enter your password');
-        const sess=await signInWithPassword(em,password);
-        onAuthed(sess);
-      }else{
-        // Magic link — requires Supabase Auth URL config + email provider enabled
-        await signInWithOtp(em);
-        setSent(true);
-      }
-    }catch(e){setErr(e.message||String(e));}
-    setBusy(false);
+      const r=await fetch(u+'/rest/v1/gg_weekly?id=eq.1',{headers:{'apikey':key.trim(),'Authorization':'Bearer '+key.trim()}});
+      if(!r.ok)throw new Error('HTTP '+r.status+' — check URL/key and run supabase_setup.sql first');
+      ss('gg-su',u);ss('gg-sk',key.trim());
+      onConnect(u,key.trim());
+    }catch(e){setErr(e.message);}
+    setTesting(false);
   };
   return(
     <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
-      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:420,width:'100%'}}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18}}>
+      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:460,width:'100%'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20}}>
           <span style={{fontSize:24}}>🐊</span>
           <div>
-            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Sign in to <span style={{color:G}}>Green Gator</span></div>
-            <div style={{color:DIM,fontSize:11,marginTop:2}}>Multi-tenant cloud — your carrier data only</div>
+            <div style={{fontSize:16,fontWeight:700,color:'#dceede'}}>Connect <span style={{color:G}}>Green Gator</span> to Cloud</div>
+            <div style={{color:DIM,fontSize:11,marginTop:2}}>Supabase powers Telegram bot sync</div>
           </div>
         </div>
-        <div style={{display:'flex',gap:8,marginBottom:14}}>
-          <button type="button" onClick={()=>{setMode('password');setSent(false);setErr('');}} style={{flex:1,background:mode==='password'?G:'transparent',color:mode==='password'?'#030803':G,border:`1px solid ${BD}`,borderRadius:7,padding:'8px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Password</button>
-          <button type="button" onClick={()=>{setMode('magic');setErr('');}} style={{flex:1,background:mode==='magic'?G:'transparent',color:mode==='magic'?'#030803':G,border:`1px solid ${BD}`,borderRadius:7,padding:'8px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Magic link</button>
+        <div style={{marginBottom:12}}>
+          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Supabase Project URL</span>
+          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={url} onChange={e=>setUrl(e.target.value)} placeholder="https://xxxxxxxxxxxx.supabase.co"/>
         </div>
-        {sent?(
-          <div style={{color:G,fontSize:12,lineHeight:1.6,padding:'12px 14px',background:'rgba(57,255,107,.06)',border:`1px solid rgba(57,255,107,.2)`,borderRadius:8}}>
-            Check <b>{email}</b> for your sign-in link. Leave this tab open on mobile if your mail app opens a different browser — copy the link back here if needed.
-          </div>
-        ):(
-          <>
-            <div style={{marginBottom:12}}>
-              <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Email</span>
-              <input autoComplete="username" inputMode="email" style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'12px 13px',fontSize:16,width:'100%',outline:'none',fontFamily:'monospace'}} value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} placeholder="you@carrier.com"/>
-            </div>
-            {mode==='password'&&(
-              <div style={{marginBottom:16}}>
-                <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Password</span>
-                <input autoComplete="current-password" type="password" style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'12px 13px',fontSize:16,width:'100%',outline:'none',fontFamily:'monospace'}} value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&submit()} placeholder="••••••••"/>
-              </div>
-            )}
-            {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6,border:'1px solid rgba(248,113,113,.2)'}}>⚠ {err}</div>}
-            <button type="button" onClick={submit} disabled={busy} style={{width:'100%',background:G,color:'#030803',border:'none',borderRadius:7,padding:'12px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:13,opacity:busy?.6:1}}>{busy?'Working…':(mode==='password'?'Sign in →':'Send magic link →')}</button>
-          </>
-        )}
+        <div style={{marginBottom:16}}>
+          <span style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:5,display:'block'}}>Anon / Public Key</span>
+          <input style={{background:'rgba(4,9,5,.9)',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',padding:'10px 13px',fontSize:13,width:'100%',outline:'none',fontFamily:'monospace'}} value={key} onChange={e=>setKey(e.target.value)} placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."/>
+        </div>
+        {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12,padding:'8px 12px',background:'rgba(248,113,113,.08)',borderRadius:6,border:'1px solid rgba(248,113,113,.2)'}}>⚠ {err}</div>}
+        <div style={{display:'flex',gap:8}}>
+          <button onClick={connect} disabled={testing} style={{flex:1,background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:testing?.6:1}}>{testing?'Testing...':'Connect Dashboard →'}</button>
+          <button onClick={onSkip} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Skip</button>
+        </div>
         <div style={{marginTop:14,padding:'10px 12px',background:'rgba(57,255,107,.04)',border:'1px solid rgba(57,255,107,.1)',borderRadius:7,fontSize:10,color:DIM,lineHeight:1.7}}>
-          <span style={{color:G,fontWeight:700}}>Owner setup:</span> Supabase → Authentication → Users → Add user (auto-confirm). Then SQL Editor: insert into org_members for tenant 11111111-… with your user UUID as owner.
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NoOrgScreen({session,onSignOut,onRetry}){
-  const [busy,setBusy]=useState(false);
-  const [err,setErr]=useState('');
-  const email=session?.user?.email||'signed-in user';
-  const claimHint=`insert into public.org_members (org_id, user_id, role)\nvalues ('${GG_ORG_ID}', '${session?.user?.id||'YOUR-USER-UUID'}', 'owner');`;
-  return(
-    <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20}}>
-      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:520,width:'100%'}}>
-        <div style={{fontSize:16,fontWeight:700,color:'#dceede',marginBottom:8}}>🐊 No carrier linked</div>
-        <div style={{color:DIM,fontSize:12,lineHeight:1.6,marginBottom:14}}>
-          Signed in as <span style={{color:G}}>{email}</span>, but this account is not on an org yet. RLS is working — cloud data stays locked until you claim Green Gator (tenant #1) or create a new carrier org.
-        </div>
-        {session?.user?.id&&(
-          <div style={{marginBottom:12}}>
-            <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Your user id</div>
-            <code style={{display:'block',padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#dceede',fontSize:11,wordBreak:'break-all'}}>{session.user.id}</code>
-          </div>
-        )}
-        <div style={{marginBottom:14}}>
-          <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:6}}>Claim tenant #1 (SQL Editor)</div>
-          <pre style={{margin:0,padding:'10px 12px',background:'#040905',border:`1px solid ${BD}`,borderRadius:7,color:'#9fd6ad',fontSize:10,whiteSpace:'pre-wrap',wordBreak:'break-word'}}>{claimHint}</pre>
-        </div>
-        {err&&<div style={{color:'#f87171',fontSize:11,marginBottom:12}}>⚠ {err}</div>}
-        <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-          <button type="button" className="btn" onClick={async()=>{setBusy(true);setErr('');try{await onRetry();}catch(e){setErr(e.message||String(e));}setBusy(false);}} style={{background:G,color:'#030803',border:'none',borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12,opacity:busy?.6:1}}>{busy?'Checking…':'I ran the SQL — retry'}</button>
-          <button type="button" onClick={onSignOut} style={{background:'transparent',color:G,border:`1px solid ${BD}`,borderRadius:7,padding:'10px 14px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:12}}>Sign out</button>
+          <span style={{color:G,fontWeight:700}}>Setup:</span> supabase.com → New Project → SQL Editor → run supabase_setup.sql → Settings → API → copy URL + anon key.
         </div>
       </div>
     </div>
@@ -1455,10 +1511,6 @@ function App(){
   },[]);
 
   const [appState,setAppState]=useState('init');
-  const [session,setSession]=useState(null);
-  const [orgId,setOrgId]=useState(null);
-  const sessionRef=useRef(null);
-  useEffect(()=>{sessionRef.current=session;},[session]);
   const [db,setDb]=useState(null);
   const [sec,setSec]=useState('overview');
   const [W,setW]=useState({ar:'',dg:'',dl:'',fs:'',mi:'',fp:String(FUEL_PRICE_PER_GALLON),mpg:String(TRUCK_MPG),tg:'5000'});
@@ -1475,12 +1527,10 @@ function App(){
   const [selectedWeek,setSelectedWeek]=useState(()=>{const d=new Date(),day=d.getDay(),diff=(day+6)%7,s=new Date(d);s.setDate(d.getDate()-diff);const e=new Date(s);e.setDate(s.getDate()+6);const fmt=x=>x.toISOString().slice(0,10);return{start:fmt(s),end:fmt(e)};});
   const [selectedMonth,setSelectedMonth]=useState('');
   const [overviewMonth,setOverviewMonth]=useState('');
-  const [fixedMo,setFixedMo]=useState('2331');const [tFixedMo,setTFixedMo]=useState('2331');
-  const [estMilesHint,setEstMilesHint]=useState('8000');
-  const [onboarded,setOnboarded]=useState(()=>!!sg('gg-onboarded'));
-  const [bal,setBal]=useState('25761');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
-  const [odometer,setOdometer]=useState('217002');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
-  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25761');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('217002');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [calcM,setCalcM]=useState('');const [calcDH,setCalcDH]=useState('');const [calcR,setCalcR]=useState('');const [calcSource,setCalcSource]=useState('DAT');
+  const [bal,setBal]=useState('25161');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
+  const [odometer,setOdometer]=useState('220453');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('25161');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('220453');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
   const nowD=new Date();
   const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
   const [toast,setToast]=useState('');
@@ -1560,7 +1610,7 @@ function App(){
   const loadSupa=async(d)=>{
     try{
       const [wR,lR,lgR,cfR,mlR,whR]=await Promise.all([
-        d.get('gg_weekly?select=*&limit=1'),
+        d.get('gg_weekly?id=eq.1&select=*'),
         d.get('gg_leads?select=*&order=id'),
         d.get('gg_log?select=*&order=created_at.desc'),
         d.get('gg_config?select=key,value'),
@@ -1578,70 +1628,19 @@ function App(){
       if(cfg.current_odometer){setOdometer(cfg.current_odometer);setTOdometer(cfg.current_odometer);}
       if(cfg.maintenance_cpm){setMaintCpm(cfg.maintenance_cpm);setTMaintCpm(cfg.maintenance_cpm);}
       if(cfg.week_reset_date){setWeekResetDate(cfg.week_reset_date);ss('gg-wrd',cfg.week_reset_date);}
-      if(cfg.fixed_monthly){setFixedMo(String(cfg.fixed_monthly));setTFixedMo(String(cfg.fixed_monthly));}
-      if(cfg.est_monthly_miles){setEstMilesHint(String(cfg.est_monthly_miles));}
-      if(cfg.saas_onboarded==='1'||cfg.saas_onboarded==='true'){setOnboarded(true);ss('gg-onboarded',true);}
       if(mlR?.length)setMaintLog(mlR);
       if(whR?.length)setWeekHistory(whR.map(w=>({...w,weekEnd:w.weekEnd||w.week_end,weekStart:w.weekStart||w.week_start})));
-      // Existing operators with history skip SaaS onboarding wizard
-      if((lgR?.length||0)>=3){setOnboarded(true);ss('gg-onboarded',true);}
     }catch(e){console.log('Supa err',e);loadLocal();}
   };
 
-  const readyRef=useRef(false);
-  useEffect(()=>{readyRef.current=appState==='ready';},[appState]);
-  const appStateRefReady=()=>readyRef.current;
-  const buildDb=(sess)=>makeDB(SU_URL,SU_KEY,()=>(sess||sessionRef.current)?.access_token||null);
-  const resolveOrg=async(d)=>{
-    const rows=await d.get('org_members?select=org_id,role&limit=1');
-    return rows?.[0]?.org_id||null;
-  };
-  const startCloud=async(sess)=>{
-    const fresh=await ensureFreshSession(sess);
-    if(!fresh){setSession(null);setOrgId(null);setDb(null);setAppState('auth');return null;}
-    if(!fresh.user){try{fresh.user=await fetchAuthUser(fresh.access_token);saveSession(fresh);}catch{}}
-    setSession(fresh);
-    const d=buildDb(fresh);setDb(d);
-    ss('gg-su',SU_URL);
-    let oid=null;
-    try{oid=await resolveOrg(d);}catch(e){console.warn('org resolve',e);oid=null;}
-    setOrgId(oid);
-    if(!oid){setAppState('noorg');return fresh;}
-    await loadSupa(d);
-    setAppState('ready');
-    return fresh;
-  };
   useEffect(()=>{
-    let alive=true;
-    let poll=null;
-    (async()=>{
-      loadLocal();
-      // Capture magic-link tokens from URL hash before React router noise
-      let sess=parseHashTokens();
-      if(sess){
-        try{sess.user=await fetchAuthUser(sess.access_token);}catch{}
-        saveSession(sess);
-        // strip tokens from address bar
-        try{history.replaceState(null,'',window.location.pathname+window.location.search);}catch{}
-      }else{
-        sess=loadSession();
-      }
-      if(!alive)return;
-      if(!sess?.access_token){setAppState('auth');return;}
-      await startCloud(sess);
-      poll=setInterval(async()=>{
-        const cur=sessionRef.current||loadSession();
-        if(!cur)return;
-        const fresh=await ensureFreshSession(cur);
-        if(!fresh){setSession(null);setDb(null);setOrgId(null);setAppState('auth');return;}
-        if(fresh.access_token!==cur.access_token){setSession(fresh);setDb(buildDb(fresh));}
-        if(appStateRefReady()){
-          const d=buildDb(fresh);
-          loadSupa(d).catch(()=>{});
-        }
-      },30000);
-    })().catch(e=>{console.error(e);if(alive)setAppState('auth');});
-    return ()=>{alive=false;if(poll)clearInterval(poll);};
+    loadLocal();
+    const su=SU_URL,sk=SU_KEY;
+    ss('gg-su',su);ss('gg-sk',sk);
+    const d=makeDB(su,sk);setDb(d);
+    loadSupa(d).then(()=>setAppState('ready')).catch(()=>setAppState('ready'));
+    const t=setInterval(()=>{loadSupa(d).catch(()=>{});},30000);
+    return ()=>clearInterval(t);
   },[]);
 
   const flash=m=>{setToast(m);setTimeout(()=>setToast(''),2500);};
@@ -1659,7 +1658,7 @@ function App(){
 
   const saveW=async(k,v)=>{
     const u={...W,[k]:v};setW(u);
-    if(db)try{await db.post('gg_weekly',{ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true,'org_id');}catch(e){console.warn('saveW',e);}
+    if(db)try{await db.post('gg_weekly',{id:1,ar:parseFloat(u.ar)||0,dg:parseFloat(u.dg)||0,dl:parseFloat(u.dl)||0,fs:parseFloat(u.fs)||0,mi:parseFloat(u.mi)||0,fp:parseFloat(u.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(u.mpg)||TRUCK_MPG,tg:parseFloat(u.tg)||5000},true);}catch{}
     else ss('gg-w',u);
   };
   const saveLead=async()=>{
@@ -1700,18 +1699,17 @@ function App(){
   const delLog=async id=>{const u=log.filter(e=>e.id!==id);setLog(u);if(route?.id===id)setRoute(u[0]||null);if(editingLogId===id)cancelLogEdit();if(db)try{await db.del('gg_log?id=eq.'+id);}catch{}else ss('gg-lg',u);};
   const saveCfg=async()=>{
     const cleanOdo=String(Math.max(0,parseFloat(tOdometer)||0));const cleanCpm=String(Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM));
-    const cleanFixed=String(Math.max(0,parseFloat(tFixedMo)||2331));
-    setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);setOdometer(cleanOdo);setTOdometer(cleanOdo);setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);setFixedMo(cleanFixed);setTFixedMo(cleanFixed);
-    ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice,o:cleanOdo,mc:cleanCpm,fm:cleanFixed});
+    setBal(tBal);setMaint2(tMaint);setBuyPrice(tBuyPrice);setOdometer(cleanOdo);setTOdometer(cleanOdo);setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);
+    ss('gg-c',{b:tBal,m:tMaint,p:tBuyPrice,o:cleanOdo,mc:cleanCpm});
     if(db)try{await Promise.all([
-      db.post('gg_config',{key:'truck_balance',value:tBal},true,'org_id,key'),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true,'org_id,key'),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true,'org_id,key'),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true,'org_id,key'),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key'),db.post('gg_config',{key:'fixed_monthly',value:cleanFixed},true,'org_id,key')
-    ]);}catch(e){console.warn('saveCfg',e);flash('Saved on device; cloud config sync failed');}
+      db.post('gg_config',{key:'truck_balance',value:tBal},true),db.post('gg_config',{key:'maintenance_reserve',value:tMaint},true),db.post('gg_config',{key:'truck_buy_price',value:tBuyPrice},true),db.post('gg_config',{key:'current_odometer',value:cleanOdo},true),db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true)
+    ]);}catch{flash('Saved on device; cloud config sync failed');}
     setEditCfg(false);flash('Config saved');
   };
   const saveOdometer=async()=>{
     const clean=String(Math.max(0,parseFloat(tOdometer)||0));setOdometer(clean);setTOdometer(clean);
     ss('gg-c',{b:bal,m:maint2,p:buyPrice,o:clean,mc:maintCpm});
-    if(db)try{await db.post('gg_config',{key:'current_odometer',value:clean},true,'org_id,key');}catch(e){console.warn('saveOdo',e);flash('Odometer saved on device; cloud sync failed');return;}
+    if(db)try{await db.post('gg_config',{key:'current_odometer',value:clean},true);}catch{flash('Odometer saved on device; cloud sync failed');return;}
     flash('Odometer updated');
   };
   const resetMaintForm=()=>{setAddMaint(false);setEditingMaintId(null);setMaintF({date:todayStr(),type:'Oil Change',mileage:'',cost:'',notes:''});};
@@ -1739,17 +1737,15 @@ function App(){
     setWeekResetDate(today);
     ss('gg-wrd',today);ss('gg-w',cleared);ss('gg-wh',h2);
     if(db)try{
-      await db.post('gg_weekly',{ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(W.mpg)||TRUCK_MPG,tg:parseFloat(W.tg)||5000},true,'org_id');
-      await db.post('gg_config',{key:'week_reset_date',value:today},true,'org_id,key');
-      try{await db.post('gg_weekly_history',{week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true,'org_id,week_end');}catch(e){console.warn('week hist',e);}
-    }catch(e){console.warn('week reset',e);}
+      await db.post('gg_weekly',{id:1,ar:0,dg:0,dl:0,fs:0,mi:0,fp:parseFloat(W.fp)||FUEL_PRICE_PER_GALLON,mpg:parseFloat(W.mpg)||TRUCK_MPG,tg:parseFloat(W.tg)||5000},true);
+      await db.post('gg_config',{key:'week_reset_date',value:today},true);
+      try{await db.post('gg_weekly_history',{id:snap.id,week_end:today,mi:mi,gross:gross,net:net,loads:_wl.length},true);}catch{}
+    }catch{}
     setShowReset(false);flash('Week archived & tracker reset');
   };
   const disconnectSupa=async()=>{
-    await signOutSession(sessionRef.current||loadSession());
-    setSession(null);setOrgId(null);setDb(null);
     try{localStorage.removeItem('gg-su');localStorage.removeItem('gg-sk');}catch{}
-    setAppState('auth');flash('Signed out');
+    setDb(null);flash('Disconnected from Supabase');
   };
   const refreshSupa=async()=>{if(db)await loadSupa(db).then(()=>flash('Synced ✓'));};
 
@@ -1774,10 +1770,10 @@ function App(){
   const draftFuelEstimate=fuelEstimateForMiles(draftTotalMiles,mpg,fp);
   const net=gross-useF,pct=Math.min(100,(gross/tgt)*100);
   const pc=pct>=100?G:pct>=60?'#fbbf24':'#f87171';
-  const fixedMonthly=Math.max(0,parseFloat(fixedMo)||2331);
-  const fixedWk=fixedMonthly/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
+  const fixedWk=2331/4;const bePct=Math.min(100,(Math.max(0,net)/fixedWk)*100);
   const avgRpm=(()=>{const tm=log.reduce((s,e)=>s+(e.miles||0)+(e.dh||0),0);const tn=log.reduce((s,e)=>s+((e.pay||0)-(e.fuel||0)),0);return tm>0?tn/tm:0;})();
-  // Operating floor — pace from logbook; fall back to onboard estimate for new carriers
+  // Load decision calculator — actual mileage pace since the first dashboard log.
+  // Current-week miles are excluded so the baseline rolls forward once each Monday.
   const calcDatedLogs=log.filter(e=>/^\d{4}-\d{2}-\d{2}$/.test(String(e.date||''))).slice().sort((a,b)=>a.date.localeCompare(b.date));
   const calcBaselineStart=calcDatedLogs[0]?.date||currentWeekStart;
   const calcCompletedLogs=calcDatedLogs.filter(e=>e.date>=calcBaselineStart&&e.date<currentWeekStart);
@@ -1785,13 +1781,28 @@ function App(){
   const calcElapsedDays=Math.max(7,(new Date(currentWeekStart+'T00:00:00')-new Date(calcBaselineStart+'T00:00:00'))/86400000);
   const calcElapsedWeeks=calcElapsedDays/7;
   const calcAvgWeeklyMiles=calcBaselineMiles/calcElapsedWeeks;
-  const loggedMoMiles=calcAvgWeeklyMiles*52/12;
-  const hintMoMiles=Math.max(1000,parseFloat(estMilesHint)||8000);
-  const estMoMiles=loggedMoMiles>0?loggedMoMiles:hintMoMiles;
-  const ohPerMi=estMoMiles>0?fixedMonthly/estMoMiles:0;
+  const estMoMiles=calcAvgWeeklyMiles*52/12;
+  const calcThrough=addDays(currentWeekStart,-1);
+  const ohPerMi=estMoMiles>0?2331/estMoMiles:0;
   const fuelPerMi=mpg>0?fp/mpg:0;
   const maintenancePerMi=Math.max(0,parseFloat(maintCpm)||DEFAULT_MAINT_CPM);
   const beRPM=fuelPerMi+ohPerMi+maintenancePerMi;
+  const cL=parseFloat(calcM)||0,cD=parseFloat(calcDH)||0,cR=parseFloat(calcR)||0;
+  const cTot=cL+cD;
+  const cFuel=cTot>0?cTot/mpg*fp:0;
+  const cNetF=cR-cFuel;
+  const cGrossRPM=cTot>0?cR/cTot:0;
+  const cNetRPM=cTot>0?cNetF/cTot:0;
+  const cOH=ohPerMi*cTot;
+  const cMaintWear=maintenancePerMi*cTot;
+  const cFactoring=calcSource==='DAT'&&cR>0?(cR*DAT_FACTOR_RATE)+DAT_INVOICE_FEE:0;
+  const cOperatingProfit=cR-cFuel-cOH-cMaintWear-cFactoring;
+  const cOperatingRPM=cTot>0?cOperatingProfit/cTot:0;
+  const cBreakEvenGross=cTot>0?(calcSource==='DAT'?((beRPM*cTot)+DAT_INVOICE_FEE)/(1-DAT_FACTOR_RATE)/cTot:beRPM):beRPM;
+  const cMinimumTarget=cBreakEvenGross*1.30;
+  const cStrongTarget=cBreakEvenGross*1.60;
+  const cReady=cTot>0&&cR>0;
+  const cVerdict=!cReady?{t:'Enter load details',c:DIM,b:'transparent'}:cGrossRPM>=cStrongTarget?{t:'TAKE · strong margin',c:'#4ade80',b:'rgba(74,222,128,.1)'}:cGrossRPM>=cMinimumTarget?{t:'TAKE IF QUICK · acceptable margin',c:'#86efac',b:'rgba(134,239,172,.08)'}:cGrossRPM>=cBreakEvenGross?{t:'NEGOTIATE · covers costs, misses target',c:'#fbbf24',b:'rgba(251,191,36,.1)'}:{t:'PASS · below operating floor',c:'#f87171',b:'rgba(248,113,113,.1)'};
   const currentMoKey=`${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}`;
   const logMonths=[...new Set(log.map(e=>e.date?.slice(0,7)).filter(Boolean))].sort().reverse();
   const activeOverviewMonth=overviewMonth||(()=>{
@@ -1821,7 +1832,7 @@ function App(){
   const moInvoiceFees=moFactoredLogs.length*DAT_INVOICE_FEE;
   const moFactoringTotal=moFactoringPct+moInvoiceFees;
   const moFactoredReceipts=moFactoredGross-moFactoringTotal;
-  const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-fixedMonthly;
+  const moNet=moGross-moFuel-moFactoringTotal;const moProfit=moNet-2331;
   const moMiles=moLogs.reduce((s,e)=>s+(parseFloat(e.miles)||0)+(parseFloat(e.dh)||0),0);
   const moFuelPending=moLogs.filter(e=>!/\b(cancel(?:led)?|tonu)\b/i.test(e.comments||'')&&((parseFloat(e.miles)||0)+(parseFloat(e.dh)||0))>0&&!(parseFloat(e.fuel)>0)).length;
   const moIdx=logMonths.indexOf(activeOverviewMonth);
@@ -1873,56 +1884,8 @@ function App(){
   ].filter(Boolean).map(r=>({...r,remaining:r.due-currentOdometer}));
   const iftaText=e=>Object.entries(e?.ifta||{}).map(([st,mi])=>st+' '+mi).join(' · ');
 
-  const finishOnboard=async()=>{
-    const cleanFixed=String(Math.max(0,parseFloat(tFixedMo)||2331));
-    const cleanMpg=String(Math.max(1,parseFloat(W.mpg)||TRUCK_MPG));
-    const cleanFp=String(Math.max(0.1,parseFloat(W.fp)||FUEL_PRICE_PER_GALLON));
-    const cleanCpm=String(Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM));
-    const cleanMiles=String(Math.max(1000,parseFloat(estMilesHint)||8000));
-    setFixedMo(cleanFixed);setTFixedMo(cleanFixed);
-    setMaintCpm(cleanCpm);setTMaintCpm(cleanCpm);
-    setEstMilesHint(cleanMiles);
-    setW(w=>({...w,mpg:cleanMpg,fp:cleanFp}));
-    ss('gg-onboarded',true);setOnboarded(true);
-    if(db)try{await Promise.all([
-      db.post('gg_config',{key:'fixed_monthly',value:cleanFixed},true,'org_id,key'),
-      db.post('gg_config',{key:'maintenance_cpm',value:cleanCpm},true,'org_id,key'),
-      db.post('gg_config',{key:'est_monthly_miles',value:cleanMiles},true,'org_id,key'),
-      db.post('gg_config',{key:'saas_onboarded',value:'1'},true,'org_id,key'),
-      db.post('gg_weekly',{ar:parseFloat(W.ar)||0,dg:parseFloat(W.dg)||0,dl:parseFloat(W.dl)||0,fs:parseFloat(W.fs)||0,mi:parseFloat(W.mi)||0,fp:parseFloat(cleanFp),mpg:parseFloat(cleanMpg),tg:parseFloat(W.tg)||5000},true,'org_id'),
-    ]);}catch(e){console.warn('onboard save',e);}
-    setSec('overview');
-    flash('Gator Dispatch is live — run your numbers');
-  };
-
   if(appState==='init')return <div style={{background:'#050c06',minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:14,color:G}}><span className="ld" style={{width:14,height:14}}/><span style={{fontSize:14,letterSpacing:'.15em'}}>LOADING...</span></div>;
-  if(appState==='auth')return <AuthScreen onAuthed={async(sess)=>{setAppState('init');await startCloud(sess);}}/>;
-  if(appState==='noorg')return <NoOrgScreen session={session} onSignOut={disconnectSupa} onRetry={async()=>{setAppState('init');await startCloud(sessionRef.current||loadSession());}}/>;
-  if(appState==='ready'&&!onboarded)return (
-    <div style={{background:'#050c06',minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',padding:20,backgroundImage:'linear-gradient(rgba(26,53,32,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(26,53,32,.1) 1px,transparent 1px)',backgroundSize:'36px 36px'}}>
-      <div style={{background:'linear-gradient(150deg,#0c1c0e,#081108)',border:`1px solid ${BD}`,borderRadius:14,padding:28,maxWidth:480,width:'100%'}}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}><span style={{fontSize:26}}>🐊</span><div style={{fontSize:18,fontWeight:700,color:G,letterSpacing:'.04em'}}>GATOR DISPATCH</div></div>
-        <div style={{color:'#c8e0cc',fontSize:14,fontWeight:700,marginBottom:6}}>Set your real cost per mile</div>
-        <div style={{color:DIM,fontSize:12,lineHeight:1.6,marginBottom:16}}>One-time setup. We use these numbers for every TAKE / COUNTER / PASS verdict. Wrong CPM = wrong money decisions.</div>
-        <div style={{display:'grid',gap:10,marginBottom:14}}>
-          <div><span className="lbl">Fixed costs / month ($)</span><input className="inp" value={tFixedMo} onChange={e=>setTFixedMo(e.target.value)} inputMode="decimal" placeholder="Insurance + truck + parking + DAT + software"/></div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <div><span className="lbl">MPG</span><input className="inp" value={W.mpg} onChange={e=>setW(w=>({...w,mpg:e.target.value}))} inputMode="decimal"/></div>
-            <div><span className="lbl">Fuel $/gal</span><input className="inp" value={W.fp} onChange={e=>setW(w=>({...w,fp:e.target.value}))} inputMode="decimal"/></div>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-            <div><span className="lbl">Maint reserve $/mi</span><input className="inp" value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/></div>
-            <div><span className="lbl">Est. miles / month</span><input className="inp" value={estMilesHint} onChange={e=>setEstMilesHint(e.target.value)} inputMode="decimal"/></div>
-          </div>
-        </div>
-        <div style={{padding:'10px 12px',borderRadius:8,background:'rgba(57,255,107,.05)',border:`1px solid rgba(57,255,107,.15)`,marginBottom:14,fontSize:11,color:DIM,lineHeight:1.6}}>
-          Preview floor: <b style={{color:G}}>${(( (parseFloat(W.fp)>0?parseFloat(W.fp):FUEL_PRICE_PER_GALLON) / (parseFloat(W.mpg)>0?parseFloat(W.mpg):TRUCK_MPG) ) + (Math.max(0,parseFloat(tMaintCpm)||DEFAULT_MAINT_CPM)) + ((Math.max(0,parseFloat(tFixedMo)||2331))/Math.max(1000,parseFloat(estMilesHint)||8000))).toFixed(2)}/mi</b> before factoring · box truck O/O economics, not 53ft van fantasy.
-        </div>
-        <button type="button" onClick={finishOnboard} style={{width:'100%',background:G,color:'#030803',border:'none',borderRadius:8,padding:'12px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:13,marginBottom:8}}>Start dispatching →</button>
-        <button type="button" onClick={()=>{ss('gg-onboarded',true);setOnboarded(true);setSec('overview');}} style={{width:'100%',background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:8,padding:'10px',fontWeight:700,cursor:'pointer',fontFamily:'monospace',fontSize:11}}>Skip for now</button>
-      </div>
-    </div>
-  );
+  if(appState==='setup')return <SetupScreen onConnect={(u,k)=>{const d=makeDB(u,k);setDb(d);loadSupa(d).then(()=>setAppState('ready'));}} onSkip={()=>{loadLocal();setAppState('ready');}}/>;
 
   const SH=({t,right})=><div className="sec-hd"><div className="sec-title">{t}</div>{right&&<div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>{right}</div>}</div>;
   const Stat=({l,v,c,sub})=><div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',marginBottom:4}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:15,lineHeight:1}}>{v}</div>{sub&&<div style={{color:DIM,fontSize:10,marginTop:3}}>{sub}</div>}</div>;
@@ -1934,16 +1897,15 @@ function App(){
       <div className="nav">
         <div className="nav-logo">
           <span style={{fontSize:18}}>🐊</span>
-          <div><div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div><div style={{fontSize:8,color:MUT,letterSpacing:'.12em',textTransform:'uppercase'}}>Gator Dispatch</div></div>
+          <div style={{fontSize:13,fontWeight:700,color:G}}>Green Gator</div>
         </div>
-        {[['overview','Overview'],['pipeline','Pipeline'],['logbook','Logbook'],['maintenance','Maint']].map(([id,label])=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{label}</div>)}
+        {['overview','pipeline','logbook','maintenance'].map(id=><div key={id} className={`nav-tab${sec===id?' active':''}`} onClick={()=>navTo(id)}>{id.charAt(0).toUpperCase()+id.slice(1)}</div>)}
         <div className="nav-right">
           {(overdue.length>0||dueToday.length>0)&&<span style={{color:overdue.length>0?'#f87171':'#fbbf24',fontSize:10,padding:'3px 9px',border:`1px solid ${overdue.length>0?'rgba(248,113,113,.25)':'rgba(251,191,36,.25)'}`,borderRadius:5,background:overdue.length>0?'rgba(248,113,113,.06)':'rgba(251,191,36,.06)',cursor:'pointer'}} onClick={()=>navTo('pipeline')}>{overdue.length>0?`⚠ ${overdue.length} overdue`:`${dueToday.length} due today`}</span>}
           {toast&&<span style={{color:G,fontSize:10,padding:'3px 9px',border:'1px solid rgba(57,255,107,.25)',borderRadius:5,background:'rgba(57,255,107,.06)',display:'flex',alignItems:'center',gap:5}}><span className="ld"/>{toast}</span>}
-          {db&&session?<>
+          {db?<>
             <button onClick={refreshSupa} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>↻ Sync</button>
             <div style={{display:'flex',alignItems:'center',gap:5,padding:'4px 9px',border:'1px solid rgba(57,255,107,.2)',borderRadius:6,background:'rgba(57,255,107,.05)'}}><span className="ld"/><span style={{color:G,fontSize:9,fontWeight:700,letterSpacing:'.1em'}}>CLOUD</span></div>
-            <button onClick={disconnectSupa} title={session?.user?.email||'Sign out'} style={{background:'transparent',color:MUT,border:`1px solid ${BD}`,borderRadius:6,padding:'4px 9px',cursor:'pointer',fontSize:9,fontFamily:'inherit',fontWeight:700}}>Sign out</button>
           </>:<span style={{color:'#fbbf24',fontSize:9,padding:'4px 9px',border:'1px solid rgba(251,191,36,.2)',borderRadius:6}}>connecting...</span>}
         </div>
       </div>
@@ -2020,27 +1982,47 @@ function App(){
               </div>
             </div>
             <div className="g-auto" style={{marginBottom:12}}>
-              {[{l:'2.5% Factoring',v:moMoney(moFactoringTotal),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:moMoney(moProfit),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$'+fixedMonthly.toLocaleString(),c:'#fbbf24',sub:'Ins+truck+addr+DAT+QB'},{l:'Miles',v:moMiles.toLocaleString(),sub:'Loaded + deadhead'},{l:'Avg Net RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM,sub:'Net ÷ total miles'},{l:'Loads',v:String(moLogs.length),sub:moName}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
+              {[{l:'2.5% Factoring',v:moMoney(moFactoringTotal),c:'#f87171',sub:'Invoice fees included'},{l:'After Fixed Costs',v:moMoney(moProfit),c:moProfit>=0?G:'#f87171',sub:moProfit>=0?'Fuel, factoring and fixed costs deducted':'Below costs'},{l:'Overhead',v:'$2,331',c:'#fbbf24',sub:'Ins+truck+addr+DAT+QB'},{l:'Miles',v:moMiles.toLocaleString(),sub:'Loaded + deadhead'},{l:'Avg Net RPM',v:moMiles>0?'$'+(moNet/moMiles).toFixed(2):'—',c:moMiles>0?rC(moNet/moMiles):DIM,sub:'Net ÷ total miles'},{l:'Loads',v:String(moLogs.length),sub:moName}].map(({l,v,c,sub})=><Stat key={l} l={l} v={v} c={c} sub={sub}/>)}
             </div>
             <div className="pg"><div className="pgf" style={{width:Math.min(100,Math.max(0,(moProfit/5000)*100))+'%',background:`linear-gradient(90deg,${moProfit>=0?G:'#f87171'}88,${moProfit>=0?G:'#f87171'})`}}/></div>
           </>}
         </div>
 
+        <div className="card" style={{marginBottom:12}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6,flexWrap:'wrap',gap:8}}>
+            <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,display:'flex',alignItems:'center',gap:8}}>🧮 Load Decision Calculator</div>
+            <span style={{color:DIM,fontSize:10}}>Base operating floor ${beRPM.toFixed(2)}/mi · actual pace {estMoMiles.toLocaleString(undefined,{maximumFractionDigits:0})}mi/mo · {mpg}MPG @ ${fp}/gal</span>
+          </div>
+          <div style={{color:DIM,fontSize:10,marginBottom:12}}>Punch in an offered load to see net $/mi after fuel and overhead before you book it. Mileage baseline: {calcBaselineMiles.toLocaleString()} miles logged since {calcBaselineStart}, measured through {calcThrough}; recalculates every Monday.</div>
+          <div className="maint-form-grid" style={{marginBottom:14}}>
+            <div><span className="lbl">Loaded Miles</span><input className="inp" value={calcM} onChange={e=>setCalcM(e.target.value)} inputMode="decimal" placeholder="e.g. 250"/></div>
+            <div><span className="lbl">Deadhead Miles</span><input className="inp" value={calcDH} onChange={e=>setCalcDH(e.target.value)} inputMode="decimal" placeholder="e.g. 30"/></div>
+            <div><span className="lbl">Offered Rate ($)</span><input className="inp" value={calcR} onChange={e=>setCalcR(e.target.value)} inputMode="decimal" placeholder="e.g. 800"/></div>
+            <div><span className="lbl">Load Type</span><select className="inp" value={calcSource} onChange={e=>setCalcSource(e.target.value)}><option value="DAT">DAT / Brokered · Factored</option><option value="OTHER">Amazon / Direct · No Factoring</option></select></div>
+            <div style={{display:'flex',alignItems:'flex-end'}}><button className="btn-g" style={{fontSize:11,padding:'8px 12px',width:'100%'}} onClick={()=>{setCalcM('');setCalcDH('');setCalcR('');setCalcSource('DAT');}}>Clear</button></div>
+          </div>
+          {cReady?<>
+            <div style={{padding:'10px 14px',borderRadius:8,background:cVerdict.b,border:`1px solid ${cVerdict.c}44`,marginBottom:12,display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}>
+              <span style={{color:cVerdict.c,fontWeight:700,fontSize:14,letterSpacing:'.03em'}}>{cVerdict.t}</span>
+              <span style={{color:DIM,fontSize:10,marginLeft:'auto'}}>your recent avg net ${avgRpm.toFixed(2)}/mi</span>
+            </div>
+            <div style={{color:DIM,fontSize:10,marginBottom:10}}>Gross RPM targets: floor <b style={{color:'#f87171'}}>${cBreakEvenGross.toFixed(2)}</b> · minimum <b style={{color:'#fbbf24'}}>${cMinimumTarget.toFixed(2)}</b> · strong <b style={{color:G}}>${cStrongTarget.toFixed(2)}</b>. DAT cost includes 2.5% factoring plus $2 per invoice.</div>
+            <div className="g-auto">
+              <Stat l="Total Miles" v={cTot.toLocaleString()}/>
+              <Stat l="Gross $/mi" v={'$'+cGrossRPM.toFixed(2)} c={rC(cGrossRPM)}/>
+              <Stat l="Fuel Est" v={'$'+cFuel.toFixed(0)} c="#f87171" sub={mpg+'MPG @ $'+fp}/>
+              <Stat l="Net After Fuel" v={'$'+cNetF.toFixed(0)} c={cNetF>=0?G:'#f87171'} sub={'$'+cNetRPM.toFixed(2)+'/mi'}/>
+              <Stat l="Factoring + Invoice" v={'$'+cFactoring.toFixed(2)} c={cFactoring>0?'#f87171':DIM} sub={calcSource==='DAT'?'2.5% + $2 invoice':'Not applied'}/>
+              <Stat l="Maintenance Wear" v={'$'+cMaintWear.toFixed(0)} c="#fbbf24" sub={'$'+maintenancePerMi.toFixed(2)+'/mi reserve'}/>
+              <Stat l="Overhead Share" v={'$'+cOH.toFixed(0)} c="#fbbf24" sub={'$'+ohPerMi.toFixed(2)+'/mi'}/>
+              <Stat l="Estimated Operating Profit" v={'$'+cOperatingProfit.toFixed(0)} c={cOperatingProfit>=0?'#4ade80':'#f87171'} sub={'$'+cOperatingRPM.toFixed(2)+'/mi after fuel, maintenance, factoring and fixed overhead'}/>
+            </div>
+          </>:<div style={{color:DIM,fontSize:11,padding:'6px 0'}}>Base operating floor is ${beRPM.toFixed(2)}/mi — fuel (${fuelPerMi.toFixed(2)}) + maintenance reserve (${maintenancePerMi.toFixed(2)}) + fixed overhead (${ohPerMi.toFixed(2)}) per mile. DAT loads also add 2.5% factoring and a $2 invoice charge.</div>}
+        </div>
+
         <div className="g12" style={{marginBottom:12}}>
           <div className="card">
             <div style={{fontWeight:700,color:'#c8e0cc',fontSize:13,marginBottom:14}}>Truck & Config</div>
-            <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',padding:'12px',borderRadius:8,background:'rgba(57,255,107,.05)',border:'1px solid rgba(57,255,107,.15)',marginBottom:12}}>
-              <div>
-                <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>Operating floor</div>
-                <div style={{fontSize:28,fontWeight:700,color:G}}>${beRPM.toFixed(2)}<span style={{fontSize:13,color:DIM}}>/mi</span></div>
-                <div style={{color:DIM,fontSize:10,marginTop:4}}>fuel ${fuelPerMi.toFixed(2)} · maint ${maintenancePerMi.toFixed(2)} · overhead ${ohPerMi.toFixed(2)} · {estMoMiles.toLocaleString(undefined,{maximumFractionDigits:0})} mi/mo pace · ${fixedMonthly.toLocaleString()}/mo fixed</div>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{color:MUT,fontSize:9,fontWeight:700,letterSpacing:'.12em',textTransform:'uppercase',marginBottom:4}}>Your recent avg net</div>
-                <div style={{fontSize:22,fontWeight:700,color:avgRpm>0?rC(avgRpm):DIM}}>{avgRpm>0?('$'+avgRpm.toFixed(2)+'/mi'):'—'}</div>
-                <div style={{color:DIM,fontSize:10,marginTop:4}}>{loggedMoMiles>0?'From logbook pace':'Using estimate until you log loads'}</div>
-              </div>
-            </div>
             <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:12}}>{['2020 MV607','26ft box + liftgate','2 pallet jacks','15 straps'].map(t=><span key={t} style={{background:'rgba(57,255,107,.06)',color:G,padding:'4px 10px',borderRadius:20,fontSize:10,border:'1px solid rgba(57,255,107,.18)'}}>{t}</span>)}</div>
             <div className="dv"/>
             {editCfg?<>
@@ -2048,17 +2030,16 @@ function App(){
               <span className="lbl">Original Purchase Price ($)</span><input className="inp" style={{marginBottom:8}} value={tBuyPrice} onChange={e=>setTBuyPrice(e.target.value)} inputMode="decimal"/>
               <span className="lbl">Current Odometer (mi)</span><input className="inp" style={{marginBottom:8}} value={tOdometer} onChange={e=>setTOdometer(e.target.value)} inputMode="numeric"/>
               <span className="lbl">Maint. Reserve Balance ($)</span><input className="inp" style={{marginBottom:8}} value={tMaint} onChange={e=>setTMaint(e.target.value)} inputMode="decimal"/>
-              <span className="lbl">Maintenance Reserve Per Mile ($)</span><input className="inp" style={{marginBottom:8}} value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/>
-              <span className="lbl">Fixed Monthly Overhead ($)</span><input className="inp" style={{marginBottom:10}} value={tFixedMo} onChange={e=>setTFixedMo(e.target.value)} inputMode="decimal"/>
+              <span className="lbl">Maintenance Reserve Per Mile ($)</span><input className="inp" style={{marginBottom:10}} value={tMaintCpm} onChange={e=>setTMaintCpm(e.target.value)} inputMode="decimal"/>
               <div style={{display:'flex',gap:7}}><button className="btn" style={{fontSize:11,padding:'7px 14px'}} onClick={saveCfg}>Save</button><button className="btn-g" style={{fontSize:11,padding:'7px 14px'}} onClick={()=>setEditCfg(false)}>Cancel</button></div>
             </>:<>
               <div className="g-auto" style={{marginBottom:12}}>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Maint. Reserve</div><div style={{color:G,fontWeight:700,fontSize:16}}>${parseFloat(maint2).toLocaleString()}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Protected.</div></div>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Current Odometer</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>{currentOdometer.toLocaleString()} mi</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Manual dash reading.</div></div>
                 <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Maintenance / Mile</div><div style={{color:'#fbbf24',fontWeight:700,fontSize:16}}>${maintenancePerMi.toFixed(2)}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Reserved on every total mile.</div></div>
-                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Fixed Monthly</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>${fixedMonthly.toLocaleString()}</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Ins+truck+addr+DAT+QB</div></div>
+                <div className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.08em',marginBottom:3}}>Fixed Monthly</div><div style={{color:'#dceede',fontWeight:700,fontSize:16}}>$2,331</div><div style={{color:DIM,fontSize:10,marginTop:2}}>Ins+truck+addr+DAT+QB</div></div>
               </div>
-              <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>{setTBal(bal);setTMaint(maint2);setTBuyPrice(buyPrice);setTOdometer(odometer);setTMaintCpm(maintCpm);setTFixedMo(fixedMo);setEditCfg(true);}}>Edit Config</button>
+              <button className="btn-g" style={{fontSize:10,padding:'5px 11px'}} onClick={()=>{setTBal(bal);setTMaint(maint2);setTBuyPrice(buyPrice);setTOdometer(odometer);setTMaintCpm(maintCpm);setEditCfg(true);}}>Edit Config</button>
             </>}
           </div>
           <div className="card">
