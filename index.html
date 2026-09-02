@@ -16,6 +16,7 @@
 </head>
 <body>
 <div id="root"></div>
+<script src="factoring.js"></script>
 <script type="text/babel">
 const {useState,useEffect,useRef}=React;
 const G='#39ff6b',BD='#1c3822',DIM='#3d5c45',MUT='#4a6d52';
@@ -1935,13 +1936,7 @@ function App(){
   const moGross=moLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
   const moFuel=moLogs.reduce((s,e)=>s+(parseFloat(e.fuel)||0),0);
   const moFuelAfterOnly=moGross-moFuel;
-  const isFactoredLoad=e=>{
-    const src=String(e.source||'').toLowerCase(),c=String(e.comments||'');
-    if(/\bamazon(?:\s+relay)?\b/.test(src)||/(?:^|[^a-z])direct(?:[^a-z]|$)/.test(src))return false;
-    if(/dat|broker|factored/.test(src))return true;
-    if(/\bamazon relay (?:spot )?(?:trip|load)\b/i.test(c))return false;
-    return /broker|rate confirmation|carrier (?:load )?tender|ascendtms|haul.n|tql|landstar|kch transportation|evans transportation|axle logistics|bergen|giltner|tforce|sage freight|highway/i.test(src+' '+c);
-  };
+  const isFactoredLoad=e=>window.isFactoredLoad(e);
   const moFactoredLogs=moLogs.filter(isFactoredLoad);
   const moFactoredGross=moFactoredLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
   const moFactoringPct=moFactoredGross*DAT_FACTOR_RATE;
