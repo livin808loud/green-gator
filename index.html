@@ -1937,9 +1937,10 @@ function App(){
   const moFuelAfterOnly=moGross-moFuel;
   const isFactoredLoad=e=>{
     const src=String(e.source||'').toLowerCase(),c=String(e.comments||'');
-    if(/amazon|direct/.test(src)||/amazon relay/i.test(c))return false;
+    if(/\bamazon(?:\s+relay)?\b/.test(src)||/(?:^|[^a-z])direct(?:[^a-z]|$)/.test(src))return false;
     if(/dat|broker|factored/.test(src))return true;
-    return /broker|rate confirmation|carrier tender|ascendtms|haul.n|tql|landstar|kch transportation|evans transportation|axle logistics|bergen|giltner|tforce|sage freight|highway/i.test(c);
+    if(/\bamazon relay (?:spot )?(?:trip|load)\b/i.test(c))return false;
+    return /broker|rate confirmation|carrier (?:load )?tender|ascendtms|haul.n|tql|landstar|kch transportation|evans transportation|axle logistics|bergen|giltner|tforce|sage freight|highway/i.test(src+' '+c);
   };
   const moFactoredLogs=moLogs.filter(isFactoredLoad);
   const moFactoredGross=moFactoredLogs.reduce((s,e)=>s+(parseFloat(e.pay)||0),0);
