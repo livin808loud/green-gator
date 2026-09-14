@@ -114,7 +114,7 @@ for (const m of chunk.matchAll(/\{\s*(?:"id"|id):/g)) {
 }
 
 const sept = seeds.filter((e) => String(e.date).startsWith('2026-09'));
-assert.strictEqual(sept.length, 6, 'expected 6 September loads, got ' + sept.length);
+assert.strictEqual(sept.length, 7, 'expected 7 September loads, got ' + sept.length);
 const bySrc = Object.fromEntries(sept.map((e) => [e.source, e]));
 yes(bySrc['BlueGrace Logistics'], 'Sept BlueGrace');
 no(bySrc['Amazon Relay'], 'Sept Amazon');
@@ -130,6 +130,6 @@ for (const e of seeds) {
 
 const factoredSept = sept.filter(isFactoredLoad);
 const gross = factoredSept.reduce((s, e) => s + e.pay, 0);
-assert.strictEqual(gross, 3750, 'September factored gross should be 1750+600+800+600, got ' + gross);
+assert.strictEqual(gross, 4550, 'September factored gross should be 1750+600+800+600+800, got ' + gross);
 
 console.log('test_factoring.js ok — %d seed loads, %d September factored', seeds.length, factoredSept.length);
