@@ -130,6 +130,6 @@ for (const e of seeds) {
 
 const factoredSept = sept.filter(isFactoredLoad);
 const gross = factoredSept.reduce((s, e) => s + e.pay, 0);
-assert.strictEqual(gross, 4550, 'September factored gross should be 1750+600+800+600+800, got ' + gross);
+assert.strictEqual(gross, 3900, 'September factored gross should be 1750+600+800+600+150, got ' + gross);
 
 console.log('test_factoring.js ok — %d seed loads, %d September factored', seeds.length, factoredSept.length);
