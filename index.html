@@ -1481,6 +1481,7 @@ const SU_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
 const STATUSES=['Not called','Emailed','Called - No answer','Called - Interested','Called - Not interested','Follow up','Active customer'];
+const MAINT_SEEDS=[{"id":"recovered-pm-20260720","date":"2026-07-20","type":"Oil Change","mileage":214886,"cost":463,"notes":"Rush Truck Centers PM service: $429. Owner-installed engine air filter: $34. Total: $463. Service mileage corrected by owner to 214,886. Re-logged from confirmed service history."}];
 const MAINT_TYPES=['Oil Change','Tire Rotation','DEF Fill','Brake Service','Air Filter','Fuel Filter','Tire Replacement','Inspection','Transmission Service','Other'];
 const PM_INTERVAL_MI=10000;
 const AIR_FILTER_INTERVAL_MI=30000;
@@ -1767,7 +1768,7 @@ function App(){
     const localLog=Array.isArray(lg)?mergeLogs(SEEDS,lg):SEEDS;
     setLog(localLog);if(localLog[0])setRoute(localLog[0]);
     if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}if(c.o){setOdometer(c.o);setTOdometer(c.o);}if(c.mc){setMaintCpm(c.mc);setTMaintCpm(c.mc);}}
-    if(ml)setMaintLog(ml);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
+    setMaintLog(Array.isArray(ml)?ml:MAINT_SEEDS);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
   };
   const loadSupa=async(d)=>{
     try{
