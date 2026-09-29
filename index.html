@@ -2319,15 +2319,15 @@ function App(){
           <div style={{overflowX:'auto'}}>
             <table className="tbl">
               <thead><tr>{['DATE','PICKUP','DROPOFF','LOADED','DH','$/MI','GROSS','EST. FUEL','ACTUAL FUEL','NET','NET RPM','IFTA','ACTIONS'].map(h=><th key={h}>{h}</th>)}</tr></thead>
-              <tbody>{shownLog.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const nr=tot>0?((e.pay||0)-(e.fuel||0))/tot:0;const np=(e.pay||0)-(e.fuel||0);const fe=fuelEstimateForMiles(tot,mpg,fp);
+              <tbody>{shownLog.map(e=>{const tot=(e.miles||0)+(e.dh||0);const ai=tot>0?(e.pay||0)/tot:0;const fe=fuelEstimateForMiles(tot,mpg,fp);const hasFuel=parseFloat(e.fuel)>0||(e.fuel!==null&&e.fuel!==''&&!isNaN(parseFloat(e.fuel))&&parseFloat(e.fuel)===0);const fCost=hasFuel?parseFloat(e.fuel):fe.cost;const np=(e.pay||0)-fCost;const nr=tot>0?np/tot:0;
                 return <tr key={e.id} className={route?.id===e.id?'sel':''} onClick={()=>setRoute(e)} style={{cursor:'pointer'}}>
                   <td style={{color:DIM,whiteSpace:'nowrap',fontSize:10}}>{e.date}</td>
                   <td style={{whiteSpace:'nowrap'}}>{e.pickup}</td><td style={{whiteSpace:'nowrap'}}>{e.dropoff}</td>
                   <td>{e.miles}mi</td><td style={{color:DIM}}>{e.dh}mi</td>
                   <td style={{color:rC(ai),fontWeight:700}}>${ai.toFixed(2)}</td>
                   <td style={{color:G,fontWeight:700}}>${e.pay}</td><td style={{color:'#fbbf24',whiteSpace:'nowrap',fontWeight:700}}>{fe.gallons.toFixed(1)}gal<br/><span style={{fontSize:9,color:DIM}}>${fe.cost.toFixed(2)}</span></td><td style={{color:'#f87171',whiteSpace:'nowrap'}}>{parseFloat(e.fuel)>0?'$'+parseFloat(e.fuel).toFixed(2):<span style={{color:DIM}}>Pending</span>}</td>
-                  <td style={{color:np>=0?G:'#f87171',fontWeight:700}}>${np.toFixed(2)}</td>
-                  <td><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span></td>
+                  <td style={{color:np>=0?G:'#f87171',fontWeight:700,whiteSpace:'nowrap'}}>${np.toFixed(2)}{!hasFuel&&<span style={{fontSize:8,color:'#fbbf24',display:'block',fontWeight:400}}>est</span>}</td>
+                  <td style={{whiteSpace:'nowrap'}}><span style={{color:rC(nr),fontWeight:700}}>${nr.toFixed(2)}</span><span style={{color:DIM,fontSize:9}}>/mi</span>{!hasFuel&&<span style={{fontSize:8,color:'#fbbf24',fontWeight:400,marginLeft:3}}>est</span>}</td>
                   <td>{e.iftaStatus==='calculated'?<span className="ifta-tag" title={iftaText(e)}>✓ {iftaText(e)||'0 mi'}</span>:<span className="ifta-tag pending">UNTAGGED</span>}</td>
                   <td style={{whiteSpace:'nowrap'}}><button className="btn-g" style={{fontSize:10,padding:'3px 8px',marginRight:5}} onClick={ev=>{ev.stopPropagation();startEditLog(e);}}>Edit</button><button className="btn-danger" onClick={ev=>{ev.stopPropagation();delLog(e.id);}}>Del</button></td>
                 </tr>;
@@ -2359,13 +2359,16 @@ function App(){
             {route?(()=>{
               const routeTotalMiles=(parseFloat(route.miles)||0)+(parseFloat(route.dh)||0);
               const routeFuelEstimate=fuelEstimateForMiles(routeTotalMiles,mpg,fp);
+              const routeHasFuel=parseFloat(route.fuel)>0||(route.fuel!==null&&route.fuel!==''&&!isNaN(parseFloat(route.fuel))&&parseFloat(route.fuel)===0);
+              const routeNet=routeHasFuel?((route.pay||0)-parseFloat(route.fuel)):((route.pay||0)-routeFuelEstimate.cost);
+              const routeNetRpm=routeTotalMiles>0?routeNet/routeTotalMiles:0;
               return <>
                 <div style={{borderRadius:8,overflow:'hidden',marginBottom:8,background:'#030806',border:'1px solid #1c3822'}}>
                   {mapCoords?<div ref={mapElRef} className="route-map"/>:<div style={{padding:28,textAlign:'center',color:DIM,fontSize:11,lineHeight:1.6}}>{mapNote||'Loading map...'}<br/><a href={googleRouteUrl(route)} target="_blank" rel="noreferrer" style={{display:'inline-block',marginTop:10,color:G,border:'1px solid #1c3822',borderRadius:7,padding:'7px 12px',textDecoration:'none',fontWeight:700}}>Open in Google Maps →</a></div>}
                 </div>
                 <div style={{color:DIM,fontSize:9,marginBottom:10}}>© OpenStreetMap contributors · {mapNote}</div>
                 <div className="g-auto">
-                  {[{l:'Total Miles',v:routeTotalMiles+'mi',s:(route.miles||0)+' loaded · '+(route.dh||0)+' DH'},{l:'Estimated Fuel',v:routeFuelEstimate.gallons.toFixed(1)+' gal',s:'$'+routeFuelEstimate.cost.toFixed(2)+' · $'+routeFuelEstimate.price.toFixed(2)+'/gal · '+routeFuelEstimate.mpg.toFixed(1)+' MPG',c:'#fbbf24'},{l:'Gross Pay',v:'$'+(route.pay||0),s:parseFloat(route.fuel)>0?'Actual fuel: $'+parseFloat(route.fuel).toFixed(2):'Actual fuel: pending',c:G},{l:'Net RPM',v:'$'+(((route.pay||0)-(route.fuel||0))/Math.max(1,routeTotalMiles)).toFixed(2),s:'net per all miles',c:rC(((route.pay||0)-(route.fuel||0))/Math.max(1,routeTotalMiles))}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
+                  {[{l:'Total Miles',v:routeTotalMiles+'mi',s:(route.miles||0)+' loaded · '+(route.dh||0)+' DH'},{l:'Estimated Fuel',v:routeFuelEstimate.gallons.toFixed(1)+' gal',s:'$'+routeFuelEstimate.cost.toFixed(2)+' · $'+routeFuelEstimate.price.toFixed(2)+'/gal · '+routeFuelEstimate.mpg.toFixed(1)+' MPG',c:'#fbbf24'},{l:'Gross Pay',v:'$'+(route.pay||0),s:parseFloat(route.fuel)>0?'Actual fuel: $'+parseFloat(route.fuel).toFixed(2):'Actual fuel: pending',c:G},{l:'Net RPM',v:'$'+routeNetRpm.toFixed(2)+(routeHasFuel?'':' (est)'),s:routeHasFuel?'net per all miles':'est. net per all miles',c:rC(routeNetRpm)}].map(({l,v,s,c})=><div key={l} className="stat"><div style={{color:MUT,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:'.07em',marginBottom:2}}>{l}</div><div style={{color:c||'#dceede',fontWeight:700,fontSize:13}}>{v}</div><div style={{color:DIM,fontSize:9,marginTop:2}}>{s}</div></div>)}
                 </div>
                 <div style={{marginTop:10,padding:'10px 12px',border:'1px solid #1c3822',borderRadius:8,background:'rgba(57,255,107,.025)'}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8,marginBottom:8}}><span className="lbl" style={{margin:0}}>IFTA State Breakdown</span><span className={route.iftaStatus==='calculated'?'ifta-tag':'ifta-tag pending'}>{route.iftaStatus==='calculated'?'✓ CALCULATED':'UNTAGGED'}</span></div>
