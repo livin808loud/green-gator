@@ -114,7 +114,7 @@ for (const m of chunk.matchAll(/\{\s*(?:"id"|id):/g)) {
 }
 
 const sept = seeds.filter((e) => String(e.date).startsWith('2026-09'));
-assert.strictEqual(sept.length, 17, 'expected 17 September loads, got ' + sept.length);
+assert.strictEqual(sept.length, 18, 'expected 18 September loads, got ' + sept.length);
 const bySrc = Object.fromEntries(sept.map((e) => [e.source, e]));
 yes(bySrc['BlueGrace Logistics'], 'Sept BlueGrace');
 no(bySrc['Amazon Relay'], 'Sept Amazon');
