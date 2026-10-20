@@ -1684,8 +1684,8 @@ function App(){
   const [overviewMonth,setOverviewMonth]=useState('');
   const [calcM,setCalcM]=useState('');const [calcDH,setCalcDH]=useState('');const [calcR,setCalcR]=useState('');const [calcSource,setCalcSource]=useState('DAT');
   const [bal,setBal]=useState('24581');const [maint2,setMaint2]=useState('4000');const [buyPrice,setBuyPrice]=useState('27500');
-  const [odometer,setOdometer]=useState('220453');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
-  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('24581');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('220453');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [odometer,setOdometer]=useState('229418');const [maintCpm,setMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
+  const [editCfg,setEditCfg]=useState(false);const [tBal,setTBal]=useState('24581');const [tMaint,setTMaint]=useState('4000');const [tBuyPrice,setTBuyPrice]=useState('27500');const [tOdometer,setTOdometer]=useState('229418');const [tMaintCpm,setTMaintCpm]=useState(String(DEFAULT_MAINT_CPM));
   const nowD=new Date();
   const [cal,setCal]=useState({y:nowD.getFullYear(),m:nowD.getMonth()});
   const [toast,setToast]=useState('');
@@ -1769,7 +1769,7 @@ function App(){
     if(w)setW({...w,fp:String([4.89,5.25,5.94,6.51].includes(parseFloat(w.fp))?FUEL_PRICE_PER_GALLON:(w.fp||FUEL_PRICE_PER_GALLON))});if(l)setLeads(mergeLocalLeadDrafts(l));
     const localLog=Array.isArray(lg)?mergeLogs(SEEDS,lg):SEEDS;
     setLog(localLog);if(localLog[0])setRoute(localLog[0]);
-    if(c){if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}if(c.o){setOdometer(c.o);setTOdometer(c.o);}if(c.mc){setMaintCpm(c.mc);setTMaintCpm(c.mc);}}
+    if(c){if(c.o==='220453'){c.o='229418';ss('gg-c',c);}if(c.b){setBal(c.b);setTBal(c.b);}if(c.m){setMaint2(c.m);setTMaint(c.m);}if(c.p){setBuyPrice(c.p);setTBuyPrice(c.p);}if(c.o){setOdometer(c.o);setTOdometer(c.o);}if(c.mc){setMaintCpm(c.mc);setTMaintCpm(c.mc);}}
     setMaintLog(Array.isArray(ml)?ml:MAINT_SEEDS);if(wh)setWeekHistory(wh);const wrd=sg('gg-wrd');if(wrd)setWeekResetDate(wrd);
   };
   const loadSupa=async(d)=>{
@@ -1790,7 +1790,7 @@ function App(){
       if(cfg.truck_balance){setBal(cfg.truck_balance);setTBal(cfg.truck_balance);}
       if(cfg.maintenance_reserve){setMaint2(cfg.maintenance_reserve);setTMaint(cfg.maintenance_reserve);}
       if(cfg.truck_buy_price){setBuyPrice(cfg.truck_buy_price);setTBuyPrice(cfg.truck_buy_price);}
-      if(cfg.current_odometer){setOdometer(cfg.current_odometer);setTOdometer(cfg.current_odometer);}
+      if(cfg.current_odometer){const odo=cfg.current_odometer==='220453'?'229418':cfg.current_odometer;setOdometer(odo);setTOdometer(odo);}
       if(cfg.maintenance_cpm){setMaintCpm(cfg.maintenance_cpm);setTMaintCpm(cfg.maintenance_cpm);}
       if(cfg.week_reset_date){setWeekResetDate(cfg.week_reset_date);ss('gg-wrd',cfg.week_reset_date);}
       if(mlR?.length)setMaintLog(mlR);
